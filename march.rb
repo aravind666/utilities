@@ -1,4 +1,3 @@
-
 # rconfig is used to read configuration from files
 require 'rconfig'
 
@@ -10,7 +9,7 @@ require 'fileutils'
 
 
 # Requiring all classes in the classes directory
-Dir[File.dirname(__FILE__) + '/classes/*.rb'].each {|file| require file }
+Dir[File.dirname(__FILE__) + '/classes/*.rb'].each { |file| require file }
 
 # Initialize Configuration
 

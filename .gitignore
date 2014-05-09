@@ -19,6 +19,8 @@ build/
 /_yardoc/
 /doc/
 /rdoc/
+/content
+.idea
 
 ## Environment normalisation:
 /.bundle/
