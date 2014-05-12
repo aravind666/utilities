@@ -1,4 +1,4 @@
-# Content class definition
+# Application bootstrap class definition
 #
 # Author::    Aravind Udayashankara  (mailto:aravind.udayashankara@gmail.com)
 # Copyright:: Copyright (c) 2012 Crossroads
@@ -15,9 +15,10 @@ class Application
   #
   def initialize(command)
 
+    # Start the log over whenever the log exceeds 100 megabytes in size.
+    @logger = Logger.new('migration.log', 0, 100 * 1024 * 1024);
     @config = RConfig.global;
     self.main(command);
-
   end
 
   #
@@ -48,6 +49,7 @@ class Application
       else
         puts "you have passed #{command_line_argument} -- I have no idea what to do with that.";
         puts 'I know only to process the commands :  ,  migrate-content & migrate-media'
+        @logger.error "Invalid command usage !"
         exit(false);
     end
   end
@@ -59,7 +61,7 @@ class Application
     begin
       FileUtils.remove_dir(@config.content_destination_path, force=false);
     rescue Errno::ENOENT => e
-      puts ('Folder does not exists, Its first run' + e.message);
+      @logger.error "Folder does not exists, Its first run #{e}"
     end
 
   end
@@ -97,11 +99,9 @@ class Application
       @dbh = DBI.connect("#{connection_string}", @config.db_user_name, @config.db_password);
 
     rescue DBI::DatabaseError => e
-      puts 'An error occurred while initializing DB handler'
-      puts "Error code: #{e.err}"
-      puts "Error message: #{e.errstr}"
-
-
+      puts 'An error occurred while initializing DB handler check migration log for more details '
+      @logger.error "Error code: #{e.err}"
+      @logger.error "Error message: #{e.errstr}"
     end
   end
 
@@ -114,10 +114,10 @@ class Application
 FROM web_page AS wp LEFT JOIN page_category AS pc ON wp.page_category_id = pc.page_category_id');
       return content_data;
     rescue DBI::DatabaseError => e
-      puts 'An error occurred while getting data from DB'
-      puts "Error code: #{e.err}"
-      puts "Error message: #{e.errstr}"
-      puts "Error SQLSTATE: #{e.state}"
+      puts 'An error occurred while getting data from DB, Check migration log for more details'
+      @logger.error "Error code: #{e.err}"
+      @logger.error "Error message: #{e.errstr}"
+      @logger.error "Error SQLSTATE: #{e.state}"
     end
   end
 
@@ -129,6 +129,7 @@ FROM web_page AS wp LEFT JOIN page_category AS pc ON wp.page_category_id = pc.pa
       while row = content.fetch do
         self.build_content_based_on_status(row);
       end
+      @logger.info "Completed Migration "
       abort('done');
     end
   end
@@ -179,7 +180,7 @@ FROM web_page AS wp LEFT JOIN page_category AS pc ON wp.page_category_id = pc.pa
         front_matter = get_jekyll_front_matter_for_content(content);
         self.migrate_by_adding_jekyll_front_matter(complete_source_path, content[2], category_name, front_matter);
       when false
-        puts (" - > Source File Does Not Exists #{complete_source_path} ");
+        @logger.warn " - > Source File Does Not Exists #{complete_source_path} "
     end
   end
 
@@ -202,6 +203,7 @@ FROM web_page AS wp LEFT JOIN page_category AS pc ON wp.page_category_id = pc.pa
   def get_jekyll_front_matter_for_content(content)
 
     file_path = content[1];
+    title = content[0].gsub(':','-')
     if file_path['shortlink']
       file_name = content[2];
       file_name['.htm']= '';

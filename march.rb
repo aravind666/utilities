@@ -7,6 +7,8 @@ require 'dbi'
 # require File Utils
 require 'fileutils'
 
+# required for logging
+require 'logger'
 
 # Requiring all classes in the classes directory
 Dir[File.dirname(__FILE__) + '/classes/*.rb'].each { |file| require file }
