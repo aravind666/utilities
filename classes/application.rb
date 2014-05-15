@@ -110,8 +110,8 @@ class Application
   #
   def get_content_from_database
     begin
-      content_data = @dbh.execute('SELECT page_title,file_path,file_name,pc.category_name,pc.milacron_layout
-FROM web_page AS wp LEFT JOIN page_category AS pc ON wp.page_category_id = pc.page_category_id');
+      content_data = @dbh.execute('SELECT page_title, file_path, file_name, pc.category_name, pc.milacron_layout
+FROM web_page AS wp INNER JOIN page_category AS pc ON ( wp.page_category_id = pc.page_category_id AND wp.milacron_migrate != "NO" ) ');
       return content_data;
     rescue DBI::DatabaseError => e
       puts 'An error occurred while getting data from DB, Check migration log for more details'
