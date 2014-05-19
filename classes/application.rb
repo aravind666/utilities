@@ -59,7 +59,7 @@ class Application
   #
   def clean_old_files
     begin
-      FileUtils.remove_dir(@config.content_destination_path, force=false);
+      FileUtils.rm_rf(Dir.glob(@config.content_destination_path))
     rescue Errno::ENOENT => e
       @logger.error "Folder does not exists, Its first run #{e}"
     end
@@ -172,13 +172,15 @@ FROM web_page AS wp INNER JOIN page_category AS pc ON ( wp.page_category_id = pc
 
     db_file_path = self.purify_file_path(content[1]);
     complete_source_path = @config.content_source_path + db_file_path + content[2];
+
     category_name = content[3];
     status = File.file?(complete_source_path);
     case status
       when true
         self.setup_file_path(category_name);
         front_matter = get_jekyll_front_matter_for_content(content);
-        self.migrate_by_adding_jekyll_front_matter(complete_source_path, content[2], category_name, front_matter);
+        file_name = get_file_name_based_on_content_type(content);
+        self.migrate_by_adding_jekyll_front_matter(complete_source_path, file_name, category_name, front_matter);
       when false
         @logger.warn " - > Source File Does Not Exists #{complete_source_path} "
     end
@@ -203,15 +205,31 @@ FROM web_page AS wp INNER JOIN page_category AS pc ON ( wp.page_category_id = pc
   def get_jekyll_front_matter_for_content(content)
 
     file_path = content[1];
-    title = content[0].gsub(':','-')
+    title = content[0].gsub(':','-');
+    category = content[3].to_s;
     if file_path['shortlink']
       file_name = content[2];
       file_name['.htm']= '';
-      return "---\nlayout: #{content[4]}\ntitle: #{content[0]}\ncategory: #{content[3]}\npermalink: #{file_name}\n---\n"
+      file_name = file_name.to_s;
+      return "---\nlayout: #{content[4]}\ntitle: #{title}\ncategory: #{category}\npermalink: /#{file_name}/\n---\n"
     else
-      return "---\nlayout: #{content[4]}\ntitle: #{content[0]}\ncategory: #{content[3]}\n---\n";
+      return "---\nlayout: #{content[4]}\ntitle: #{title}\ncategory: #{category}\n---\n";
     end
   end
 
+  #
+  # This method removes file extension for files which are in shortlinks folder
+  #
+  def get_file_name_based_on_content_type(content)
+
+    file_path = content[1];
+    if file_path['shortlink']
+      file_name = content[2];
+      file_name.gsub('.htm','');
+      return file_name;
+    else
+      return content[2];
+    end
+  end
 
 end
