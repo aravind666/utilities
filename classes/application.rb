@@ -15,6 +15,7 @@ class Application
   #
   def initialize(command)
 
+    #
     FileUtils.rm('migration.log');
     # Start the log over whenever the log exceeds 100 megabytes in size.
     @logger = Logger.new('migration.log', 0, 100 * 1024 * 1024);
@@ -42,7 +43,6 @@ class Application
   def validate_arguments(command_line_argument)
     case command_line_argument
       when 'migrate-content'
-
         return;
       when 'migrate-media'
         puts (' - > This feature is not yet developed ');
@@ -60,6 +60,7 @@ class Application
   #
   def clean_old_files
     begin
+      self.validate_content_destination_path(@config.content_destination_path);
       FileUtils.rm_rf(Dir.glob(@config.content_destination_path))
     rescue Errno::ENOENT => e
       @logger.error "Folder does not exists, Its first run #{e}"
@@ -230,6 +231,41 @@ FROM web_page AS wp INNER JOIN page_category AS pc ON ( wp.page_category_id = pc
       return file_name;
     else
       return content[2];
+    end
+  end
+
+  #
+  # This method is used to check whether directory exists
+  #
+  def directory_exists?(directory)
+    File.directory?(directory)
+  end
+
+  #
+  # This methods validates destination ,
+  # It checks if user has accidently set the destination path as source .
+  # meaning if production documents path is set as destination,
+  # script will clear all production files . To prevent this accident .
+  # This method validates destination by checking if it has any directory which normally apears in
+  # production documents folder .
+  #
+  # Including these tough checks because one day we will be running this script in
+  # production environment .
+  #
+  def validate_content_destination_path(directory)
+    pages_directory_path = directory+'pages'
+    ajax_directory_path = directory+'ajax'
+    admin_directory_path = directory+'admin'
+
+    # Checking like this is wierd but still can prevent blunders :)
+    if(directory_exists?(pages_directory_path))
+      abort("Hey looks like you have set source directory as destination please review the configuration, \n Warning you to make sure that you dont clear your production files ");
+    elsif(directory_exists?(ajax_directory_path))
+      abort("Hey looks like you have set source directory as destination please review the configuration, \n Warning you to make sure that you dont clear your production files ");
+    elsif(directory_exists?(admin_directory_path))
+      abort("Hey looks like you have set source directory as destination please review the configuration, \n Warning you to make sure that you dont clear your production files ");
+    else
+      @logger.info " - > Source and destination paths seems to be fine to proceed  ";
     end
   end
 
