@@ -15,6 +15,7 @@ class Application
   #
   def initialize(command)
 
+    FileUtils.rm('migration.log');
     # Start the log over whenever the log exceeds 100 megabytes in size.
     @logger = Logger.new('migration.log', 0, 100 * 1024 * 1024);
     @config = RConfig.global;
