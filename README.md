@@ -11,9 +11,10 @@ Install ruby 2.0.0 or latest version in your system .
 
 To use this application just run these commands to install gems
 
+```
 gem install bundler
 bundle install
-
+```
 
 
 Configuration 
