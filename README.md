@@ -9,11 +9,12 @@ Installation
 
 Install ruby 2.0.0 or latest version in your system . 
 
-To use this application just run these commands to install gems 
+To use this application just run these commands to install gems
 
-gem install dbi 
-gem install rconfig 
-gem install fileutils
+gem install bundler
+bundle install
+
+
 
 Configuration 
 =============
