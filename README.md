@@ -43,6 +43,12 @@ To migrate content just run
 ruby march.rb migrate-content 
 ```
 
+To migrate message just run 
+
+```
+ruby march.rb migrate-messages
+```
+
 Logging 
 =======
 
