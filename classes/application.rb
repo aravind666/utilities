@@ -28,12 +28,11 @@ class Application
     case command_line_argument
       when 'migrate-content'
         return;
-      when 'migrate-media'
-        puts (' - > This feature is not yet developed ');
-        exit(false);
+      when 'migrate-messages'
+        return;
       else
         puts "you have passed #{command_line_argument} -- I have no idea what to do with that.";
-        puts 'I know only to process the commands :  ,  migrate-content & migrate-media'
+        puts 'I know only to process the commands :  ,  migrate-content &migrate-messages'
         Immutables.log.error "Invalid command usage !"
         exit(false);
     end
@@ -47,9 +46,8 @@ class Application
     case command_line_argument
       when 'migrate-content'
        Content.new;
-      when 'migrate-media'
-        puts (' - > This feature is not yet developed ');
-        exit(false);
+      when 'migrate-messages'
+       Message.new;
     end
   end
 

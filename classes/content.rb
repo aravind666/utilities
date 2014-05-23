@@ -63,7 +63,7 @@ FROM web_page AS wp INNER JOIN page_category AS pc ON ( wp.page_category_id = pc
         self.build_content_based_on_status(row);
       end
       Immutables.log.info "Completed Migration "
-      abort('\n Migration process successfully completed, Please check migration.log \n');
+      abort("\n Migration process successfully completed, Please check migration.log \n");
     end
   end
 
@@ -113,7 +113,7 @@ FROM web_page AS wp INNER JOIN page_category AS pc ON ( wp.page_category_id = pc
         self.setup_file_path(category_name);
         front_matter = get_jekyll_front_matter_for_content(content);
         file_name = get_file_name_based_on_content_type(content);
-        self.migrate_content(complete_source_path, file_name, category_name, front_matter);
+        self.migrate_by_adding_jekyll_front_matter(complete_source_path, file_name, category_name, front_matter);
       when false
         Immutables.log.warn " - > Source File Does Not Exists #{complete_source_path} "
     end
@@ -122,7 +122,7 @@ FROM web_page AS wp INNER JOIN page_category AS pc ON ( wp.page_category_id = pc
   #
   # This method actually migrates the content by creating the front matter
   #
-  def migrate_content(complete_source_path, file_name, category_name, front_matter)
+  def migrate_by_adding_jekyll_front_matter(complete_source_path, file_name, category_name, front_matter)
     source_file_handler = File.open(complete_source_path)
     data_to_migrate = source_file_handler.read();
     migrated_file_path = "#{Immutables.config.content_destination_path}/#{category_name}/#{file_name}";
