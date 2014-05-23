@@ -134,7 +134,7 @@ where mediacontentid in (select messagemediacontent.mediaid from messagemediacon
             audio_description = self.purify_by_removing_special_characters(media['Description']);
             audio = media['LowQFilePath'] + media['HighQFilePath'];
             audio_title = self.purify_by_removing_special_characters(media['Title']);
-            front_matter += "\naudio-description: \"#{audio_description}\"\naudio:#{audio}\naudio-title:\"#{audio_title}\""
+            front_matter += "\naudio-description: \"#{audio_description}\"\naudio: \"#{audio}\"\naudio-title: \"#{audio_title}\""
             front_matter += "\naudio-duration: \"#{media['duration'].gsub(':', '&#58;')}\"";
           when 4
             # Video -- only IPOD video
@@ -155,7 +155,7 @@ where mediacontentid in (select messagemediacontent.mediaid from messagemediacon
             program_description = self.purify_by_removing_special_characters(media['Description']);
             program = media['LowQFilePath'] + media['HighQFilePath'];
             program_title = self.purify_by_removing_special_characters(media['Title']);
-            front_matter += "\nprogram-description: \"#{program_description}\"\nprogram: \"#{program}\"\nprogram-title:\"#{program_title}\""
+            front_matter += "\nprogram-description: \"#{program_description}\"\nprogram: \"#{program}\"\nprogram-title: \"#{program_title}\""
         end
       end
       front_matter += "\n---";
@@ -171,7 +171,7 @@ where mediacontentid in (select messagemediacontent.mediaid from messagemediacon
   def migrate_by_adding_jekyll_front_matter(jekyll_front_matter, message_data)
     begin
       target_file_path = "#{Immutables.config.message_destination_path}/";
-      target_file_path += "#{message_data["Title"].downcase.gsub(' ', '_').gsub('/', '-').gsub('?','')}.markdown"
+      target_file_path += "#{message_data["Title"].downcase.gsub(' ', '_').gsub('/', '-').gsub('?','')}.md"
       migrated_message_file_handler = File.open(target_file_path, 'w');
       migrated_message_file_handler.write(jekyll_front_matter);
     end
