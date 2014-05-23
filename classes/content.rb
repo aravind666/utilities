@@ -43,8 +43,8 @@ class Content
   #
   def get_content_from_database
     begin
-      content_data = Immutables.dbh.execute('SELECT page_title, file_path, file_name, pc.category_name, pc.milacron_layout
-FROM web_page AS wp INNER JOIN page_category AS pc ON ( wp.page_category_id = pc.page_category_id AND wp.milacron_migrate != "NO" ) ');
+ 
+      content_data = Immutables.dbh.execute("SELECT page_title, file_path, file_name, pc.category_name, pc.milacron_layout, mmp.migrate FROM web_page AS wp INNER JOIN page_category AS pc ON (wp.page_category_id = pc.page_category_id) INNER JOIN milacron_migrate_pages as mmp ON (wp.web_page_id = mmp.web_page_id and mmp.migrate = 'YES')");
       return content_data;
     rescue DBI::DatabaseError => e
       Immutables.log.error "Error code: #{e.err}"
