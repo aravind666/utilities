@@ -95,8 +95,7 @@ where mediacontentid in (select messagemediacontent.mediaid from messagemediacon
       message_data.each do |message|
         media_content = self.get_media_content_for_message(message[0]);
         if media_content.column_names.size === 0 then
-
-          puts "Message  #{message[0]} does not have any media content";
+          Immutables.log.info "Message  #{message[0]} does not have any media content";
         else
           front_matter = self.get_jekyll_frontmatter_for_messages(message, series, media_content);
           self.migrate_by_adding_jekyll_front_matter(front_matter, message);
@@ -111,7 +110,8 @@ where mediacontentid in (select messagemediacontent.mediaid from messagemediacon
   #
   def get_jekyll_frontmatter_for_messages(message_data, series, media_content)
     begin
-      front_matter = "---\nlayout: message\ncategory: message\nseries: \"#{series[1]}\"\ntitle: \"#{message_data[2]}\"";
+      mainTitle = message_data[2].gsub /"/, '';
+      front_matter = "---\nlayout: message\ncategory: message\nseries: \"#{series[1]}\"\ntitle: \"#{mainTitle}\"";
       front_matter += "\ndate: #{message_data["Date"].strftime("%Y-%m-%d")}"
       return self.add_media_content_front_matter(media_content,front_matter);
     end
@@ -172,6 +172,8 @@ where mediacontentid in (select messagemediacontent.mediaid from messagemediacon
     begin
       target_file_path = "#{Immutables.config.message_destination_path}/";
       target_file_path += "#{message_data["Title"].downcase.gsub(' ', '_').gsub('/', '-').gsub('?','')}.md"
+      # lets remove only quotes in the file name since its non standard
+      target_file_path.gsub /"/, '';
       migrated_message_file_handler = File.open(target_file_path, 'w');
       migrated_message_file_handler.write(jekyll_front_matter);
     end
