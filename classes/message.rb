@@ -63,7 +63,7 @@ class Message
   def get_media_content_for_message(message_id)
     begin
       message_media_content_data = Immutables.dbh.execute("SELECT * from mediacontent
-where mediacontentid in (select messagemediacontent.mediaid from messagemediacontent where messageid = 864) AND ( HighQFilePath IS NOT NULL OR iPodVideo IS NOT NULL)");
+where mediacontentid in (select messagemediacontent.mediaid from messagemediacontent where messageid = #{message_id}) AND ( HighQFilePath IS NOT NULL OR iPodVideo IS NOT NULL)");
       return message_media_content_data;
     rescue DBI::DatabaseError => e
       Immutables.log.error "Error code: #{e.err}"

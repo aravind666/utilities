@@ -44,7 +44,7 @@ class Content
   def get_content_from_database
     begin
 
-      content_data = Immutables.dbh.execute("SELECT page_title, file_path, file_name, pc.category_name, pc.milacron_layout, mmp.migrate FROM web_page AS wp INNER JOIN page_category AS pc ON (wp.page_category_id = pc.page_category_id) INNER JOIN milacron_migrate_pages as mmp ON (wp.web_page_id = mmp.web_page_id and mmp.migrate = 'YES')");
+      content_data = Immutables.dbh.execute("SELECT page_title, file_path, file_name, pc.category_name, pc.milacron_layout, mmp.migrate, mmp.web_page_id FROM web_page AS wp INNER JOIN page_category AS pc ON (wp.page_category_id = pc.page_category_id) INNER JOIN milacron_migrate_pages as mmp ON (wp.web_page_id = mmp.web_page_id and mmp.migrate = 'YES')");
       return content_data;
     rescue DBI::DatabaseError => e
       Immutables.log.error "Error code: #{e.err}"
@@ -115,7 +115,7 @@ class Content
         file_name = get_file_name_based_on_content_type(content);
         self.migrate_by_adding_jekyll_front_matter(complete_source_path, file_name, category_name, front_matter);
       when false
-        Immutables.log.warn " - > Source File Does Not Exists #{complete_source_path} "
+        Immutables.log.warn " - Source WebPage ID #{content['web_page_id']} does not exists at #{complete_source_path} "
     end
   end
 
@@ -128,7 +128,8 @@ class Content
     migrated_file_path = "#{Immutables.config.content_destination_path}/#{category_name}/#{file_name}";
     migrated_content_file_handler = File.open(migrated_file_path, 'w');
     migrated_content_file_handler.write(front_matter);
-    data_to_migrate.delete!("\C-M");
+    # TODO : - Research not sure why this wont work in Mac system
+    # data_to_migrate.delete!("\C-M");
     migrated_content_file_handler.write(data_to_migrate);
   end
 
