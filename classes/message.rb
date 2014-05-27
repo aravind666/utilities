@@ -111,7 +111,6 @@ where mediacontentid in (select messagemediacontent.mediaid from messagemediacon
   def get_jekyll_frontmatter_for_messages(message_data, series, media_content)
     begin
       mainTitle = message_data[2].gsub /"/, '';
-      mainTitle = message_data[2].gsub /<i>/,'';
       front_matter = "---\nlayout: message\ncategory: message\nseries: \"#{series[1]}\"\ntitle: \"#{mainTitle}\"";
       front_matter += "\ndate: #{message_data["Date"].strftime("%Y-%m-%d")}"
       return self.add_media_content_front_matter(media_content,front_matter);
@@ -174,9 +173,10 @@ where mediacontentid in (select messagemediacontent.mediaid from messagemediacon
   def migrate_by_adding_jekyll_front_matter(jekyll_front_matter, message_data)
     begin
       target_file_path = "#{Immutables.config.message_destination_path}/";
-      target_file_path += "#{message_data["Title"].downcase.gsub(' ', '_').gsub('/', '-').gsub('?','')}.md"
+      target_file_path += "#{message_data["Title"].downcase.gsub(' ', '_').gsub('/', '-').gsub('?','').gsub('*','').gsub('#','').gsub('@','').gsub('&','_and_')}.md"
       # lets remove only quotes in the file name since its non standard
       target_file_path.gsub /"/, '';
+
       migrated_message_file_handler = File.open(target_file_path, 'w');
       migrated_message_file_handler.write(jekyll_front_matter);
     end
