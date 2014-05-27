@@ -141,8 +141,10 @@ where mediacontentid in (select messagemediacontent.mediaid from messagemediacon
             if (media['iPodVideo'].length > 0)
               video_description = self.purify_by_removing_special_characters(media['Description']);
               video_title = self.purify_by_removing_special_characters(media['Title']);
+              video_poster = media['ThumbImagePath'];
               front_matter += "\nvideo-description: \"#{video_description}\"\nvideo-title: \"#{video_title}\""
               front_matter += "\nvideo: \"#{media['iPodVideo']}\"";
+              front_matter += "\nvideo-poster: \"#{Immutables.config.image_thumb_base_url}#{video_poster}\"";
             end
           when 7
             # Study Notes
