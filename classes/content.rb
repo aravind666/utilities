@@ -102,14 +102,15 @@ class Content
   #
   def build_content_based_on_status(content)
     db_file_path = self.purify_file_path(content[1]);
-    complete_source_path = Immutables.config.content_source_path + db_file_path + content[2];
+    destination_file_name = content[2];
+    complete_source_path = Immutables.config.content_source_path + db_file_path + destination_file_name;
     category_name = content[3];
     status = File.file?(complete_source_path);
     case status
       when true
         self.setup_file_path(category_name);
         front_matter = get_jekyll_front_matter_for_content(content);
-        self.migrate_by_adding_jekyll_front_matter(complete_source_path, content[2], category_name, front_matter);
+        self.migrate_by_adding_jekyll_front_matter(complete_source_path, destination_file_name, category_name, front_matter);
       when false
         Immutables.log.warn " - Source WebPage ID #{content['web_page_id']} does not exists at #{complete_source_path} "
     end
@@ -118,7 +119,7 @@ class Content
   #
   # This method actually migrates the content by creating the front matter
   #
-  def migrate_by_adding_jekyll_front_matter(complete_source_path, file_name, category_name, front_matter)
+  def migrate_by_adding_jekyll_front_matter(complete_source_path, file_name, category_name,front_matter)
     source_file_handler = File.open(complete_source_path)
     data_to_migrate = source_file_handler.read();
     migrated_file_path = "#{Immutables.config.content_destination_path}/#{category_name}/#{file_name}";
@@ -138,10 +139,7 @@ class Content
     title = content[0].gsub(':','-');
     category = content[3].to_s;
     if file_path['shortlink']
-      file_name = content[2];
-      file_name['.htm']= '';
-      file_name = file_name.to_s;
-      return "---\nlayout: #{content[4]}\ntitle: #{title}\ncategory: #{category}\npermalink: /#{file_name}/\n---\n"
+      return "---\nlayout: #{content[4]}\ntitle: #{title}\ncategory: #{category}\npermalink: /#{content[2].gsub('.htm','');}/\n---\n"
     else
       return "---\nlayout: #{content[4]}\ntitle: #{title}\ncategory: #{category}\n---\n";
     end
