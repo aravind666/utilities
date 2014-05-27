@@ -110,10 +110,13 @@ where mediacontentid in (select messagemediacontent.mediaid from messagemediacon
   #
   def get_jekyll_frontmatter_for_messages(message_data, series, media_content)
     begin
+      front_matter = '';
       mainTitle = message_data[2].gsub /"/, '';
       front_matter = "---\nlayout: message\ncategory: message\nseries: \"#{series[1]}\"\ntitle: \"#{mainTitle}\"";
       front_matter += "\ndate: #{message_data["Date"].strftime("%Y-%m-%d")}"
-      return self.add_media_content_front_matter(media_content,front_matter);
+      front_matter = self.add_media_content_front_matter(media_content,front_matter);
+      front_matter += "\n---";
+      return front_matter
     end
   end
 
@@ -154,14 +157,16 @@ where mediacontentid in (select messagemediacontent.mediaid from messagemediacon
             front_matter += "\nnotes-description: \"#{notes_description} \"\nnotes: \"#{notes} \"\nnotes-title: \"#{notes_title}\""
           when 8
             # Weekend Program
-            program_description = self.purify_by_removing_special_characters(media['Description']);
+            if(media['Description'].length > 0)
+              program_description = self.purify_by_removing_special_characters(media['Description']);
+            else
+              program_description = '';
+            end
             program = media['LowQFilePath'] + media['HighQFilePath'];
-            program_title = self.purify_by_removing_special_characters(media['Title']);
+            program_title = media['Title'];
             front_matter += "\nprogram-description: \"#{program_description}\"\nprogram: \"#{program}\"\nprogram-title: \"#{program_title}\""
         end
       end
-      front_matter += "\n---";
-
       return front_matter;
     end
   end
@@ -175,8 +180,10 @@ where mediacontentid in (select messagemediacontent.mediaid from messagemediacon
       target_file_path = "#{Immutables.config.message_destination_path}/";
       target_file_path += "#{message_data["Title"].downcase.gsub(' ', '_').gsub('/', '-').gsub('?','').gsub('*','').gsub('#','').gsub('@','').gsub('&','_and_')}.md"
       # lets remove only quotes in the file name since its non standard
-      target_file_path.gsub /"/, '';
-
+      target_file_path = target_file_path.gsub /"/, '';
+      target_file_path = target_file_path.gsub '|', '';
+      target_file_path = target_file_path.gsub ':', '';
+     
       migrated_message_file_handler = File.open(target_file_path, 'w');
       migrated_message_file_handler.write(jekyll_front_matter);
     end
