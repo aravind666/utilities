@@ -112,7 +112,7 @@ class Content
       when true
         self.setup_file_path(category_name);
         front_matter = get_jekyll_front_matter_for_content(content);
-        file_name = get_file_name_based_on_content_type(content);
+        file_name = content[2];
         self.migrate_by_adding_jekyll_front_matter(complete_source_path, file_name, category_name, front_matter);
       when false
         Immutables.log.warn " - Source WebPage ID #{content['web_page_id']} does not exists at #{complete_source_path} "
