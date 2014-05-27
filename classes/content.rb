@@ -89,7 +89,7 @@ class Content
       FileUtils.mkdir_p(destination_dir)
     end
 
-    dirname = Immutables.config.content_destination_path + '/' + category_name;
+    dirname = Immutables.config.content_destination_path + '/' + category_name.gsub(/\s/,'-');
     unless File.directory?(dirname)
       FileUtils.mkdir_p(dirname)
     end
@@ -104,7 +104,7 @@ class Content
     db_file_path = self.purify_file_path(content[1]);
     destination_file_name = content[2];
     complete_source_path = Immutables.config.content_source_path + db_file_path + destination_file_name;
-    category_name = content[3];
+    category_name = content[3].gsub(/\s/,'-');
     status = File.file?(complete_source_path);
     case status
       when true
