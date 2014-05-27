@@ -135,7 +135,7 @@ where mediacontentid in (select messagemediacontent.mediaid from messagemediacon
             audio = media['LowQFilePath'] + media['HighQFilePath'];
             audio_title = self.purify_by_removing_special_characters(media['Title']);
             front_matter += "\naudio-description: \"#{audio_description}\"\naudio: \"#{audio}\"\naudio-title: \"#{audio_title}\""
-            front_matter += "\naudio-duration: \"#{media['duration'].gsub(':', '&#58;')}\"";
+            front_matter += "\naudio-duration: \"#{media['duration']}\"";
           when 4
             # Video -- only IPOD video
             if (media['iPodVideo'].length > 0)
