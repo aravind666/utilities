@@ -111,6 +111,7 @@ where mediacontentid in (select messagemediacontent.mediaid from messagemediacon
   def get_jekyll_frontmatter_for_messages(message_data, series, media_content)
     begin
       mainTitle = message_data[2].gsub /"/, '';
+      mainTitle = message_data[2].gsub /<i>/,'';
       front_matter = "---\nlayout: message\ncategory: message\nseries: \"#{series[1]}\"\ntitle: \"#{mainTitle}\"";
       front_matter += "\ndate: #{message_data["Date"].strftime("%Y-%m-%d")}"
       return self.add_media_content_front_matter(media_content,front_matter);
