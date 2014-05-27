@@ -43,7 +43,6 @@ class Content
   #
   def get_content_from_database
     begin
-
       content_data = Immutables.dbh.execute("SELECT page_title, file_path, file_name, pc.category_name, pc.milacron_layout, mmp.migrate, mmp.web_page_id FROM web_page AS wp INNER JOIN page_category AS pc ON (wp.page_category_id = pc.page_category_id) INNER JOIN milacron_migrate_pages as mmp ON (wp.web_page_id = mmp.web_page_id and mmp.migrate = 'YES')");
       return content_data;
     rescue DBI::DatabaseError => e
@@ -102,18 +101,15 @@ class Content
   # status of the content which is about to get migrated
   #
   def build_content_based_on_status(content)
-
     db_file_path = self.purify_file_path(content[1]);
     complete_source_path = Immutables.config.content_source_path + db_file_path + content[2];
-
     category_name = content[3];
     status = File.file?(complete_source_path);
     case status
       when true
         self.setup_file_path(category_name);
         front_matter = get_jekyll_front_matter_for_content(content);
-        file_name = content[2];
-        self.migrate_by_adding_jekyll_front_matter(complete_source_path, file_name, category_name, front_matter);
+        self.migrate_by_adding_jekyll_front_matter(complete_source_path, content[2], category_name, front_matter);
       when false
         Immutables.log.warn " - Source WebPage ID #{content['web_page_id']} does not exists at #{complete_source_path} "
     end
