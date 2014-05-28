@@ -33,7 +33,7 @@ class Application
       else
         puts "you have passed #{command_line_argument} -- I have no idea what to do with that.";
         puts 'I know only to process the commands :  ,  migrate-content &migrate-messages'
-        Immutables.log.error "Invalid command usage !"
+        Immutable.log.error "Invalid command usage !"
         exit(false);
     end
   end
