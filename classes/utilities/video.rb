@@ -81,7 +81,7 @@ class Video
         begin
             media_content.each do |media|
             case media['ContentTypeID']
-            when 4
+            when 4, 1
                 # Video -- only IPOD video
                 if (media['iPodVideo'].length > 0)
                     mainTitle = message_data[2].gsub /"/, '';
