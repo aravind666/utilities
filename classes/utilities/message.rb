@@ -141,7 +141,7 @@ class Message
       target_file_path = target_file_path.gsub '|', '';
       target_file_path = target_file_path.gsub ':', '';
       target_file_path = target_file_path.gsub '__', '_';
- 
+      target_file_path = target_file_path.gsub '_-_', '_';
       migrated_message_file_handler = File.open(target_file_path, 'w');
       migrated_message_file_handler.write(jekyll_front_matter);
     end
