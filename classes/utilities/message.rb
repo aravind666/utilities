@@ -135,6 +135,8 @@ class Message
       target_file_path += "#{message_data["Title"].downcase.gsub(' ', '_').gsub('/', '-').gsub('?','').gsub('*','').gsub('#','').gsub('@','').gsub('&','_and_')}"
       # lets remove only quotes in the file name since its non standard
       target_file_path += "_#{message_data["Date"].strftime("%Y_%m_%d")}.md";
+      # TODO : - put this in a seperate function and make it reusable 
+
       target_file_path = target_file_path.gsub '...', '';
       target_file_path = target_file_path.gsub /'/, '';
       target_file_path = target_file_path.gsub /"/, '';
