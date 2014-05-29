@@ -59,6 +59,22 @@ where mediacontentid in (select messagemediacontent.mediaid from messagemediacon
         abort('An error occurred while getting message media content data from DB, Check migration log for more details');
       end
     end
+    
+    #
+    # This method gets audio content for a particular message
+    #
+    def get_audio_content_for_message(message_id)
+      begin
+        message_audio_content_data = Immutable.dbh.execute("SELECT * from mediacontent
+where mediacontentid in (select messagemediacontent.mediaid from messagemediacontent where messageid = #{message_id}) AND ( HighQFilePath IS NOT NULL) AND ContentTypeID IN (2,5) AND HighQFilePath!=''");
+        return message_audio_content_data;
+      rescue DBI::DatabaseError => e
+        Immutable.log.error "Error code: #{e.err}"
+        Immutable.log.error "Error message: #{e.errstr}"
+        Immutable.log.error "Error SQLSTATE: #{e.state}"
+        abort('An error occurred while getting audio content data from DB, Check migration log for more details');
+      end
+    end
 
   end
 end
