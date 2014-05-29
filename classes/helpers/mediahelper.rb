@@ -63,7 +63,7 @@ where mediacontentid in (select messagemediacontent.mediaid from messagemediacon
     #
     # This method gets only the video mediacontent for a particular message
     #
-    def get_videos_in_media_content_for_message(message_id)
+    def get_video_media_content_for_message(message_id)
       begin
         message_video_media_content_data = Immutable.dbh.execute("SELECT * from mediacontent
         where mediacontentid in 

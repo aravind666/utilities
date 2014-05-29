@@ -47,62 +47,52 @@ class Video
     def process_message_data(message_data, series)
         begin
             message_data.each do |message|
-            media_content = Mediahelper.get_videos_in_media_content_for_message(message[0]);
+            media_content = Mediahelper.get_video_media_content_for_message(message[0]);
             if media_content.column_names.size === 0 then
                 Immutable.log.info "Message  #{message[0]} does not have any video content";
             else
-                front_matter = self.get_jekyll_frontmatter_for_messages(message, series, media_content);
+                self.create_video_posts_for_each_video_content(message, series, media_content);
             end
             end
         end
     end
 
-    #
-    # Prepare Jekyll Frontmatter for migrated video messages
-    #
-    #
-    def get_jekyll_frontmatter_for_messages(message_data, series, media_content)
-        begin
-            front_matter = '';
-            front_matter = 
-                self.add_media_content_front_matter(message_data, series, media_content,front_matter);
-            return front_matter
-        end
-    end
 
     #
     # Add media video content front matter
     # this can be used by liquid variables in media layout .
     #
-    def add_media_content_front_matter(message_data, series, media_content, front_matter)
+    def create_video_posts_for_each_video_content(message, series, media_content)
         begin
             media_content.each do |media|
-            case media['ContentTypeID']
-            when 4, 1
-                # Video -- only IPOD video
                 if (media['iPodVideo'].length > 0)
-                    mainTitle = media['Title'].gsub /"/, '';
-                    front_matter = "---\nlayout: media\ncategory: media\nseries: \"#{series[1]}\"\ntitle: \"#{mainTitle}\"";
-                    front_matter += "\ndate: #{media["ActiveDate"].strftime("%Y-%m-%d")}"
-
-                    video_description = Contenthelper.purify_by_removing_special_characters(media['Description']);
-                    video_poster = media['ThumbImagePath'];
-                    front_matter += "\ndescription: \"#{video_description}\""
-                    front_matter += "\nvideo: \"#{media['iPodVideo']}\"";
-                    front_matter += "\nvideo-poster: \"#{Immutable.config.image_thumb_base_url}#{video_poster}\"";
-
-                    front_matter += "\n---";
+                    front_matter = self.get_jekyll_front_matter_video_post(media,series);
+                    self.migrate_by_adding_jekyll_front_matter(front_matter,media);
                 end
-            else
-                    front_matter = '';
             end
-            if (front_matter.length > 0)
-                    self.migrate_by_adding_jekyll_front_matter(front_matter, media);
-            end
-            end
-        return front_matter;
+
         end
     end
+
+    #
+    # This method returns the frontmatter YAML for the media
+    # which is about to get migrated
+    #
+    def get_jekyll_front_matter_video_post(media,series)
+      
+      mainTitle = media['Title'].gsub /"/, '';
+      video_description = Contenthelper.purify_by_removing_special_characters(media['Description']);
+      video_poster = media['ThumbImagePath'];
+
+      front_matter = "---\nlayout: media\ncategory: media\nseries: \"#{series[1]}\"\ntitle: \"#{mainTitle}\"";
+      front_matter += "\ndate: #{media["ActiveDate"].strftime("%Y-%m-%d")}";
+      front_matter += "\ndescription: \"#{video_description}\""
+      front_matter += "\nvideo: \"#{media['iPodVideo']}\"";
+      front_matter += "\nvideo-poster: \"#{Immutable.config.image_thumb_base_url}#{video_poster}\"";
+      front_matter += "\n---";
+      return front_matter;
+    end
+
 
     #
     # Creates a jekyll page by applying neccessary frontmatter
@@ -110,16 +100,8 @@ class Video
     def migrate_by_adding_jekyll_front_matter(jekyll_front_matter, media)
         begin
             target_file_path = "#{Immutable.config.video_destination_path}/";
-            target_file_path += "#{media["Title"].downcase.gsub(' ', '_').gsub('/', '-').gsub('?','').gsub('*','').gsub('#','').gsub('@','').gsub('&','_and_')}"
-            
-            target_file_path += "_#{media["ActiveDate"].strftime("%Y_%m_%d_%H_%M")}.md";
-            target_file_path = target_file_path.gsub '...', '';
-            target_file_path = target_file_path.gsub /'/, '';
-            # lets remove only quotes in the file name since its non standard
-            target_file_path = target_file_path.gsub /"/, '';
-            target_file_path = target_file_path.gsub '|', '';
-            target_file_path = target_file_path.gsub ':', '';
-
+            title = Contenthelper.purify_title_by_removing_special_characters(media["Title"].downcase);
+            target_file_path += "#{title}_#{media["ActiveDate"].strftime("%Y_%m_%d")}.md"
             migrated_message_file_handler = File.open(target_file_path, 'w');
             migrated_message_file_handler.write(jekyll_front_matter);
         end

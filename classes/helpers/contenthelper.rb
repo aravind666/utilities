@@ -119,7 +119,30 @@ class Contenthelper
       return string_to_purify
     end
 
+    #
+    # This method removes special characters
+    # from the title, its used for naming files using titles
+    #
+    def purify_title_by_removing_special_characters(title)
 
+      replacements = []
+      replacements << [' ', '_']
+      replacements << ['/', '-']
+      replacements << ['?','']
+      replacements << ['*','']
+      replacements << ['#','']
+      replacements << ['@','']
+      replacements << ['&','_and_']
+      replacements << ['...', '']
+      replacements << [/'/, '']
+      replacements << [/"/, '']
+      replacements << ['|', '']
+      replacements << [':', '']
+
+      replacements.each { |set| title = title.gsub(set[0], set[1]) }
+      return title
+
+    end
   end
 
 end

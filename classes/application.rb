@@ -34,7 +34,7 @@ class Application
         return;
       else
         puts "you have passed #{command_line_argument} -- I have no idea what to do with that.";
-        puts 'I know only to process the commands :  ,  migrate-content &migrate-messages'
+        puts "I know only to process the commands :  ,  \nmigrate-content \nmigrate-messages \nmigrate-videos";
         Immutable.log.error "Invalid command usage !"
         exit(false);
     end
