@@ -85,7 +85,7 @@ class Video
                 # Video -- only IPOD video
                 if (media['iPodVideo'].length > 0)
                     mainTitle = message_data[2].gsub /"/, '';
-                    front_matter = "---\nlayout: message\ncategory: message\nseries: \"#{series[1]}\"\ntitle: \"#{mainTitle}\"";
+                    front_matter = "---\nlayout: media\ncategory: media\nseries: \"#{series[1]}\"\ntitle: \"#{mainTitle}\"";
                     front_matter += "\ndate: #{message_data["Date"].strftime("%Y-%m-%d")}"
 
                     video_description = Contenthelper.purify_by_removing_special_characters(media['Description']);
