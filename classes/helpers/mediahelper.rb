@@ -65,8 +65,7 @@ where mediacontentid in (select messagemediacontent.mediaid from messagemediacon
     #
     def get_audio_content_for_message(message_id)
       begin
-        message_audio_content_data = Immutable.dbh.execute("SELECT * from mediacontent
-where mediacontentid in (select messagemediacontent.mediaid from messagemediacontent where messageid = #{message_id}) AND ( HighQFilePath IS NOT NULL) AND ContentTypeID IN (2,5) AND HighQFilePath!=''");
+        message_audio_content_data = Immutable.dbh.execute("SELECT Title,Description,DATE(ActiveDate) as audio_date,LowQFilePath,HighQFilePath,ContentTypeID,duration from mediacontent where mediacontentid in (select messagemediacontent.mediaid from messagemediacontent where messageid = #{message_id}) AND ( HighQFilePath IS NOT NULL) AND ContentTypeID IN (2,5) AND HighQFilePath!=''");
         return message_audio_content_data;
       rescue DBI::DatabaseError => e
         Immutable.log.error "Error code: #{e.err}"

@@ -70,10 +70,10 @@ class Audio
 				audio_title = Contenthelper.purify_by_removing_special_characters(audio['Title'])
 				audio_description = Contenthelper.purify_by_removing_special_characters(audio['Description'])
 				
-				if audio["RecordDate"] then
-					audio_date = audio["RecordDate"].strftime("%Y-%m-%d")
+				if audio["audio_date"] then
+					audio_date = audio["audio_date"].strftime("%Y-%m-%d")
 				else
-					audio_date = audio["RecordDate"]
+					audio_date = audio["audio_date"]
 				end
 				
 				audio_path = audio['LowQFilePath'] + audio['HighQFilePath'];
@@ -93,10 +93,10 @@ class Audio
   def migrate_audio_by_adding_jekyll_front_matter(jekyll_front_matter, audio_data)
     begin
       target_file_path = "#{Immutable.config.audio_destination_path}/";
-      target_file_path += "#{audio_data["Title"].downcase.gsub(' ', '_').gsub('/', '-').gsub('?','').gsub('*','').gsub('#','').gsub('@','').gsub('&','_and_')}.md"
+      target_file_path += "#{audio_data["Title"].downcase.gsub(' ', '_').gsub('/', '-').gsub('?','').gsub('*','').gsub('#','').gsub('@','').gsub('&','_and_')}"
       # lets remove only quotes in the file name since its non standard
       # lets remove only quotes in the file name since its non standard
-      target_file_path += "_#{audio_data["RecordDate"].strftime("%Y_%m_%d")}.md";
+      target_file_path += "_#{audio_data["audio_date"].strftime("%Y_%m_%d")}.md";
       # TODO : - put this in a seperate function and make it reusable 
 
       target_file_path = target_file_path.gsub '...', '';
