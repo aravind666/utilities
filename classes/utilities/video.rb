@@ -52,9 +52,6 @@ class Video
                 Immutable.log.info "Message  #{message[0]} does not have any video content";
             else
                 front_matter = self.get_jekyll_frontmatter_for_messages(message, series, media_content);
-                if (front_matter.length > 0)
-                    self.migrate_by_adding_jekyll_front_matter(front_matter, message);
-                end
             end
             end
         end
@@ -84,14 +81,13 @@ class Video
             when 4, 1
                 # Video -- only IPOD video
                 if (media['iPodVideo'].length > 0)
-                    mainTitle = message_data[2].gsub /"/, '';
+                    mainTitle = media['Title'].gsub /"/, '';
                     front_matter = "---\nlayout: media\ncategory: media\nseries: \"#{series[1]}\"\ntitle: \"#{mainTitle}\"";
-                    front_matter += "\ndate: #{message_data["Date"].strftime("%Y-%m-%d")}"
+                    front_matter += "\ndate: #{media["ActiveDate"].strftime("%Y-%m-%d")}"
 
                     video_description = Contenthelper.purify_by_removing_special_characters(media['Description']);
-                    video_title = Contenthelper.purify_by_removing_special_characters(media['Title']);
                     video_poster = media['ThumbImagePath'];
-                    front_matter += "\ndescription: \"#{video_description}\"\nvideo-title: \"#{video_title}\""
+                    front_matter += "\ndescription: \"#{video_description}\""
                     front_matter += "\nvideo: \"#{media['iPodVideo']}\"";
                     front_matter += "\nvideo-poster: \"#{Immutable.config.image_thumb_base_url}#{video_poster}\"";
 
@@ -99,6 +95,9 @@ class Video
                 end
             else
                     front_matter = '';
+            end
+            if (front_matter.length > 0)
+                    self.migrate_by_adding_jekyll_front_matter(front_matter, media);
             end
             end
         return front_matter;
@@ -108,12 +107,12 @@ class Video
     #
     # Creates a jekyll page by applying neccessary frontmatter
     #
-    def migrate_by_adding_jekyll_front_matter(jekyll_front_matter, message_data)
+    def migrate_by_adding_jekyll_front_matter(jekyll_front_matter, media)
         begin
             target_file_path = "#{Immutable.config.video_destination_path}/";
-            target_file_path += "#{message_data["Title"].downcase.gsub(' ', '_').gsub('/', '-').gsub('?','').gsub('*','').gsub('#','').gsub('@','').gsub('&','_and_')}"
+            target_file_path += "#{media["Title"].downcase.gsub(' ', '_').gsub('/', '-').gsub('?','').gsub('*','').gsub('#','').gsub('@','').gsub('&','_and_')}"
             
-            target_file_path += "_#{message_data["Date"].strftime("%Y_%m_%d")}.md";
+            target_file_path += "_#{media["ActiveDate"].strftime("%Y_%m_%d_%H_%M")}.md";
             target_file_path = target_file_path.gsub '...', '';
             target_file_path = target_file_path.gsub /'/, '';
             # lets remove only quotes in the file name since its non standard
