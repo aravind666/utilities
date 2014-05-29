@@ -30,8 +30,10 @@ class Application
         return;
       when 'migrate-messages'
         return;
-			when 'migrate-audio'
+      when 'migrate-audio'
         return;        
+      when 'migrate-videos'
+        return;
       else
         puts "you have passed #{command_line_argument} -- I have no idea what to do with that.";
         puts 'I know only to process the commands :  ,  migrate-content &migrate-messages'
@@ -52,6 +54,8 @@ class Application
        Message.new;
       when 'migrate-audio'
        Audio.new;
+      when 'migrate-videos'
+       Video.new;
     end
   end
 

@@ -76,5 +76,24 @@ where mediacontentid in (select messagemediacontent.mediaid from messagemediacon
       end
     end
 
+    #
+    # This method gets only the video mediacontent for a particular message
+    #
+    def get_videos_in_media_content_for_message(message_id)
+      begin
+        message_video_media_content_data = Immutable.dbh.execute("SELECT * from mediacontent
+        where mediacontentid in 
+        (select messagemediacontent.mediaid from messagemediacontent 
+            where messageid = #{message_id}) AND 
+            ( iPodVideo IS NOT NULL)");
+        return message_video_media_content_data;
+        rescue DBI::DatabaseError => e
+        Immutable.log.error "Error code: #{e.err}"
+        Immutable.log.error "Error message: #{e.errstr}"
+        Immutable.log.error "Error SQLSTATE: #{e.state}"
+        abort('An error occurred while getting message video content data from DB, Check migration log for more details');
+      end
+    end
+
   end
 end
