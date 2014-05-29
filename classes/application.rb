@@ -30,6 +30,8 @@ class Application
         return;
       when 'migrate-messages'
         return;
+      when 'migrate-audio'
+        return;        
       when 'migrate-videos'
         return;
       else
@@ -50,6 +52,8 @@ class Application
        Content.new;
       when 'migrate-messages'
        Message.new;
+      when 'migrate-audio'
+       Audio.new;
       when 'migrate-videos'
        Video.new;
     end
