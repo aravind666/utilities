@@ -7,6 +7,7 @@
 # Copyright:: Copyright (c) 2014 Crossroads
 # License::   MIT
 #
+# Instiating this class leads to migration of videos
 #
 class Video
 

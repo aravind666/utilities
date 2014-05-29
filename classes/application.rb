@@ -18,25 +18,27 @@ class Application
     self.process_commands(command_line_argument);
   end
 
-
   #
   # This method validates passed arguments from standard IO
   #
   # Checks and aborts if command passed is invalid
   #
   def validate_arguments(command_line_argument)
+    # TODO : - Aravind :  Make this as config and validate commands from YAML
+    # This has to be done post integration with Rspec in future .
+    #
     case command_line_argument
       when 'migrate-content'
         return;
       when 'migrate-messages'
         return;
-      when 'migrate-audio'
+      when 'migrate-audios'
         return;        
       when 'migrate-videos'
         return;
       else
         puts "you have passed #{command_line_argument} -- I have no idea what to do with that.";
-        puts "I know only to process the commands :  ,  \nmigrate-content \nmigrate-messages \nmigrate-videos";
+        puts "I know only to process the commands :  ,  \nmigrate-content \nmigrate-messages \nmigrate-videos \nmigrate-audios";
         Immutable.log.error "Invalid command usage !"
         exit(false);
     end
@@ -45,21 +47,17 @@ class Application
   #
   # This will process the command passed by the enduser
   #
-  #
   def process_commands(command_line_argument)
     case command_line_argument
       when 'migrate-content'
        Content.new;
       when 'migrate-messages'
        Message.new;
-      when 'migrate-audio'
+      when 'migrate-audios'
        Audio.new;
       when 'migrate-videos'
        Video.new;
     end
   end
-
-
-
 
 end

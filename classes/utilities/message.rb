@@ -8,6 +8,9 @@
 # License::   MIT
 #
 #
+# Instiating this class leads to migration of messages
+#
+
 class Message
 
   #
