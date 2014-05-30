@@ -50,7 +50,7 @@ class Audio
     begin
       message_data.each do |message|
         audio_content = Mediahelper.get_audio_content_for_message(message[0])
-        if media_content.fetch_all.size == 0 then
+        if audio_content.fetch_all.size == 0 then
           Immutable.log.info "Message  #{message[0]} does not have any audio content"
         else
           front_matter = self.get_jekyll_frontmatter_for_audio(audio_content,series)
@@ -76,7 +76,7 @@ class Audio
         front_matter += "\nseries: \"#{series[1]}\""
 				front_matter += "\ndate: #{audio["ActiveDate"].strftime("%Y-%m-%d")}"
 				front_matter += " \ndescription: \"#{audio_description}\""
-				front_matter += "\naudio: \"#{audio_path}\"\n audio-duration: \"#{audio['duration']}\""
+				front_matter += "\naudio: \"#{audio_path}\"\naudio-duration: \"#{audio['duration']}\""
 				front_matter += "\n---"
 				self.migrate_audio_by_adding_jekyll_front_matter(front_matter, audio)
 			end
