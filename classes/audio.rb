@@ -68,7 +68,7 @@ class Audio
 			# Audio
 			audio_content.each do |audio|
 				front_matter = ''
-				audio_title = Contenthelper.purify_by_removing_special_characters(audio['Title'])
+				audio_title = Contenthelper.purify_title_by_removing_special_characters(audio['Title'])
 				audio_description = Contenthelper.purify_by_removing_special_characters(audio['Description'])
 
 				audio_path = audio['LowQFilePath'] + audio['HighQFilePath'];
@@ -89,27 +89,13 @@ class Audio
   def migrate_audio_by_adding_jekyll_front_matter(jekyll_front_matter, audio_data)
     begin
       target_file_path = "#{Immutable.config.audio_destination_path}/";
-      title = Contenthelper.purify_title_by_removing_special_characters(audio_data["Title"].downcase);
-      target_file_path += "#{title}_#{audio_data["ActiveDate"].strftime("%Y_%m_%d")}.md";
+      title = Contenthelper.purify_title_by_removing_special_characters(audio_data["Title"].downcase.strip);
+      target_file_path += "#{audio_data["ActiveDate"].strftime("%Y-%m-%d")}-#{title}.md";
       migrated_audio_file_handler = File.open(target_file_path, 'w');
       migrated_audio_file_handler.write(jekyll_front_matter);
     end
   end
   
 end
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 

@@ -126,13 +126,13 @@ class Contenthelper
     def purify_title_by_removing_special_characters(title)
 
       replacements = []
-      replacements << [' ', '_']
+      replacements << [' ', '-']
       replacements << ['/', '-']
       replacements << ['?','']
       replacements << ['*','']
       replacements << ['#','']
       replacements << ['@','']
-      replacements << ['&','_and_']
+      replacements << ['&','-and-']
       replacements << ['...', '']
       replacements << [/'/, '']
       replacements << [/"/, '']
