@@ -135,25 +135,14 @@ class Message
   def migrate_by_adding_jekyll_front_matter(jekyll_front_matter, message_data)
     begin
       target_file_path = "#{Immutable.config.message_destination_path}/";
-      target_file_path += "#{message_data["Title"].downcase.gsub(' ', '_').gsub('/', '-').gsub('?','').gsub('*','').gsub('#','').gsub('@','').gsub('&','_and_')}"
-      # lets remove only quotes in the file name since its non standard
-      target_file_path += "_#{message_data["Date"].strftime("%Y_%m_%d")}.md";
-      # TODO : - put this in a seperate function and make it reusable
-
-      target_file_path = target_file_path.gsub '...', '';
-      target_file_path = target_file_path.gsub /'/, '';
-      target_file_path = target_file_path.gsub /"/, '';
-      target_file_path = target_file_path.gsub '|', '';
-      target_file_path = target_file_path.gsub ':', '';
-      target_file_path = target_file_path.gsub '__', '_';
-      target_file_path = target_file_path.gsub '_-_', '_';
-      target_file_path = target_file_path.gsub ',_', '_';
-      target_file_path = target_file_path.gsub '_<i>', '_';
-
+      title = Contenthelper.purify_title_by_removing_special_characters(message_data["Title"].downcase.strip);
+      target_file_path += "#{message_data["Date"].strftime("%Y-%m-%d")}-#{title}.md";
       migrated_message_file_handler = File.open(target_file_path, 'w');
       migrated_message_file_handler.write(jekyll_front_matter);
     end
   end
-
-
+  
 end
+
+
+
