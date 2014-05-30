@@ -101,8 +101,8 @@ class Video
     def migrate_by_adding_jekyll_front_matter(jekyll_front_matter, media)
         begin
             target_file_path = "#{Immutable.config.video_destination_path}/";
-            title = Contenthelper.purify_title_by_removing_special_characters(media["Title"].downcase);
-            target_file_path += "#{title}_#{media["ActiveDate"].strftime("%Y_%m_%d")}.md"
+            title = Contenthelper.purify_title_by_removing_special_characters(media["Title"].downcase.strip);
+            target_file_path += "#{media["ActiveDate"].strftime("%Y-%m-%d")}-#{title}.md"
             migrated_message_file_handler = File.open(target_file_path, 'w');
             migrated_message_file_handler.write(jekyll_front_matter);
         end
