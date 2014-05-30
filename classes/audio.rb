@@ -49,11 +49,11 @@ class Audio
   def process_message_data(message_data, series)
     begin
       message_data.each do |message|
-        audio_content = Mediahelper.get_audio_content_for_message(message[0])
-        if audio_content.fetch_all.size == 0 then
-          Immutable.log.info "Message  #{message[0]} does not have any audio content"
+        audio_content = Mediahelper.get_audio_content_for_message(message[0]);
+        if audio_content.fetchable? then
+          front_matter = self.get_jekyll_frontmatter_for_audio(audio_content,series);
         else
-          front_matter = self.get_jekyll_frontmatter_for_audio(audio_content,series)
+          Immutable.log.info "Message  #{message[0]} does not have any audio content";
         end
       end
     end
@@ -70,7 +70,6 @@ class Audio
 				front_matter = ''
 				audio_title = Contenthelper.purify_title_by_removing_special_characters(audio['Title'])
 				audio_description = Contenthelper.purify_by_removing_special_characters(audio['Description'])
-
 				audio_path = audio['LowQFilePath'] + audio['HighQFilePath'];
 				front_matter =  "---\nlayout: music \ntitle: \"#{audio_title}\""
         front_matter += "\nseries: \"#{series[1]}\""

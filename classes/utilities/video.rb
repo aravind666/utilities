@@ -49,11 +49,11 @@ class Video
         begin
             message_data.each do |message|
             media_content = Mediahelper.get_video_media_content_for_message(message[0]);
-            if media_content.fetch_all.size == 0 then
-                Immutable.log.info "Message  #{message[0]} does not have any video content";
-            else
+              if media_content.fetchable? then
                 self.create_video_posts_for_each_video_content(message, series, media_content);
-            end
+              else
+                Immutable.log.info "Message  #{message[0]} does not have any video content";
+              end
             end
         end
     end
@@ -68,10 +68,9 @@ class Video
             media_content.each do |media|
                 if (media['iPodVideo'].length > 0)
                     front_matter = self.get_jekyll_front_matter_video_post(media,series);
-                    self.migrate_by_adding_jekyll_front_matter(front_matter,media);
+                    self.migrate_by_adding_jekyll_front_matter(front_matter, media);
                 end
             end
-
         end
     end
 

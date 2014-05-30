@@ -68,9 +68,10 @@ class Mediahelper
     def get_audio_content_for_message(message_id)
       begin
 
-        audio_sql = "SELECT * FROM mediacontent WHERE mediacontentid"
-        audio_sql += " IN (SELECT messagemediacontent.mediaid FROM messagemediacontent WHERE"
+        audio_sql = "SELECT * FROM mediacontent WHERE mediacontentid";
+        audio_sql += " IN (SELECT messagemediacontent.mediaid FROM messagemediacontent WHERE";
         audio_sql += " messageid = #{message_id}) AND ( HighQFilePath IS NOT NULL)";
+        audio_sql += " AND (ContentTypeID = 5 OR ContentTypeID = 2) AND (HighQFilePath LIKE '%mp3')" ;
 
         message_audio_content_data = Immutable.dbh.execute(audio_sql);
         return message_audio_content_data;
@@ -87,12 +88,14 @@ class Mediahelper
     #
     def get_video_media_content_for_message(message_id)
       begin
-        message_video_media_content_data = Immutable.dbh.execute("SELECT * FROM mediacontent
-        WHERE mediacontentid IN
-        (SELECT messagemediacontent.mediaid FROM messagemediacontent
-            WHERE messageid = #{message_id}) AND
-            ( iPodVideo IS NOT NULL)");
-        return message_video_media_content_data;
+
+        video_sql = "SELECT * FROM mediacontent WHERE mediacontentid";
+        video_sql += " IN (SELECT messagemediacontent.mediaid FROM messagemediacontent WHERE";
+        video_sql += " messageid = #{message_id}) AND ( iPodVideo IS NOT NULL)";
+        video_sql += " AND (ContentTypeID = 4 OR ContentTypeID = 1) AND (iPodVideo LIKE '%mp4')" ;
+
+        message_video_content_data = Immutable.dbh.execute(video_sql);
+        return message_video_content_data;
         rescue DBI::DatabaseError => e
         Immutable.log.error "Error code: #{e.err}"
         Immutable.log.error "Error message: #{e.errstr}"
