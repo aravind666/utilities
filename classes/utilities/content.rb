@@ -5,6 +5,7 @@
 # Copyright:: Copyright (c) 2012 Crossroads
 # License::   MIT
 #
+# Instantiating this class leads to migration
 #
 class Content
 
