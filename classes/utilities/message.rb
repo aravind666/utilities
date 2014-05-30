@@ -70,7 +70,7 @@ class Message
       front_matter = '';
       mainTitle = message_data[2].gsub /"/, '';
       front_matter = "---\nlayout: message\ncategory: message\nseries: \"#{series[1]}\"\ntitle: \"#{mainTitle}\"";
-      front_matter += "\ndate: #{message_data["Date"].strftime("%Y-%m-%d")}";
+      front_matter += "\ndate: #{message_data["Date"].strftime("%Y-%m-%d-%H-%M")}";
       front_matter += "\nmessage_id: #{message_data[0]}";
       front_matter = self.add_media_content_front_matter(media_content,front_matter);
       front_matter += "\n---";
