@@ -51,7 +51,7 @@ class Message
     begin
       message_data.each do |message|
         media_content = Mediahelper.get_media_content_for_message(message[0]);
-        if media_content.column_names.size === 0 then
+        if media_content.fetch_all.size == 0 then
           Immutable.log.info "Message  #{message[0]} does not have any media content";
         else
           front_matter = self.get_jekyll_frontmatter_for_messages(message, series, media_content);
@@ -70,7 +70,8 @@ class Message
       front_matter = '';
       mainTitle = message_data[2].gsub /"/, '';
       front_matter = "---\nlayout: message\ncategory: message\nseries: \"#{series[1]}\"\ntitle: \"#{mainTitle}\"";
-      front_matter += "\ndate: #{message_data["Date"].strftime("%Y-%m-%d")}"
+      front_matter += "\ndate: #{message_data["Date"].strftime("%Y-%m-%d")}";
+      front_matter += "\nmessage_id: #{message_data[0]}";
       front_matter = self.add_media_content_front_matter(media_content,front_matter);
       front_matter += "\n---";
       return front_matter
@@ -96,7 +97,7 @@ class Message
             audio_title = Contenthelper.purify_by_removing_special_characters(media['Title']);
             front_matter += "\naudio-description: \"#{audio_description}\"\naudio: \"#{audio}\"\naudio-title: \"#{audio_title}\""
             front_matter += "\naudio-duration: \"#{media['duration']}\"";
-          when 4
+          when 4, 1
             # Video -- only IPOD video
             if (media['iPodVideo'].length > 0)
               video_description = Contenthelper.purify_by_removing_special_characters(media['Description']);

@@ -19,7 +19,7 @@ class Mediahelper
     #
     def get_all_series
       begin
-        series_data = Immutable.dbh.execute('select * from series order by `StartDate` DESC');
+        series_data = Immutable.dbh.execute('SELECT * FROM series ORDER BY `StartDate` DESC');
         return series_data;
       rescue DBI::DatabaseError => e
         Immutable.log.error "Error code: #{e.err}"
@@ -34,7 +34,7 @@ class Mediahelper
     #
     def get_all_messages_for_series(series_id)
       begin
-        message_data = Immutable.dbh.execute("select * from message where SeriesID = #{series_id} order by date desc");
+        message_data = Immutable.dbh.execute("SELECT * FROM message WHERE SeriesID = #{series_id} ORDER BY date DESC");
         return message_data;
       rescue DBI::DatabaseError => e
         Immutable.log.error "Error code: #{e.err}"
@@ -49,8 +49,10 @@ class Mediahelper
     #
     def get_media_content_for_message(message_id)
       begin
-        message_media_content_data = Immutable.dbh.execute("SELECT * from mediacontent
-where mediacontentid in (select messagemediacontent.mediaid from messagemediacontent where messageid = #{message_id}) AND ( HighQFilePath IS NOT NULL OR iPodVideo IS NOT NULL)");
+        message_sql = "SELECT * FROM mediacontent WHERE mediacontentid IN ";
+        message_sql += "(SELECT messagemediacontent.mediaid FROM messagemediacontent WHERE messageid = #{message_id})";
+        message_sql += " AND ( iPodVideo IS NOT NULL OR HighQFilePath IS NOT NULL) AND (mediacontentid IS NOT NULL) ";
+        message_media_content_data = Immutable.dbh.execute(message_sql);
         return message_media_content_data;
       rescue DBI::DatabaseError => e
         Immutable.log.error "Error code: #{e.err}"
@@ -66,8 +68,8 @@ where mediacontentid in (select messagemediacontent.mediaid from messagemediacon
     def get_audio_content_for_message(message_id)
       begin
 
-        audio_sql = "SELECT * FROM mediacontent where mediacontentid"
-        audio_sql += " IN (select messagemediacontent.mediaid FROM messagemediacontent WHERE"
+        audio_sql = "SELECT * FROM mediacontent WHERE mediacontentid"
+        audio_sql += " IN (SELECT messagemediacontent.mediaid FROM messagemediacontent WHERE"
         audio_sql += " messageid = #{message_id}) AND ( HighQFilePath IS NOT NULL)";
 
         message_audio_content_data = Immutable.dbh.execute(audio_sql);
@@ -85,10 +87,10 @@ where mediacontentid in (select messagemediacontent.mediaid from messagemediacon
     #
     def get_video_media_content_for_message(message_id)
       begin
-        message_video_media_content_data = Immutable.dbh.execute("SELECT * from mediacontent
-        where mediacontentid in 
-        (select messagemediacontent.mediaid from messagemediacontent 
-            where messageid = #{message_id}) AND 
+        message_video_media_content_data = Immutable.dbh.execute("SELECT * FROM mediacontent
+        WHERE mediacontentid IN
+        (SELECT messagemediacontent.mediaid FROM messagemediacontent
+            WHERE messageid = #{message_id}) AND
             ( iPodVideo IS NOT NULL)");
         return message_video_media_content_data;
         rescue DBI::DatabaseError => e
