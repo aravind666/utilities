@@ -50,7 +50,7 @@ class Audio
     begin
       message_data.each do |message|
         audio_content = Mediahelper.get_audio_content_for_message(message[0])
-        if audio_content.column_names.size === 0 then
+        if media_content.fetch_all.size == 0 then
           Immutable.log.info "Message  #{message[0]} does not have any audio content"
         else
           front_matter = self.get_jekyll_frontmatter_for_audio(audio_content,series)

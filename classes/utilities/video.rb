@@ -49,7 +49,7 @@ class Video
         begin
             message_data.each do |message|
             media_content = Mediahelper.get_video_media_content_for_message(message[0]);
-            if media_content.column_names.size === 0 then
+            if media_content.fetch_all.size == 0 then
                 Immutable.log.info "Message  #{message[0]} does not have any video content";
             else
                 self.create_video_posts_for_each_video_content(message, series, media_content);
