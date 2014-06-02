@@ -50,8 +50,8 @@ class Mediahelper
     def get_media_content_for_message(message_id)
       begin
         message_sql = "SELECT * FROM mediacontent WHERE mediacontentid IN ";
-        message_sql += "(SELECT messagemediacontent.mediaid FROM messagemediacontent WHERE messageid = #{message_id})";
-        message_sql += " AND ( iPodVideo IS NOT NULL OR HighQFilePath IS NOT NULL) AND (mediacontentid IS NOT NULL) ";
+        message_sql += "(SELECT messagemediacontent.mediaid FROM messagemediacontent WHERE messageid = 440)";
+        message_sql += "AND ( iPodVideo IS NOT NULL OR HighQFilePath IS NOT NULL ) AND ( iPodVideo != '' OR HighQFilePath != '' )";
         message_media_content_data = Immutable.dbh.execute(message_sql);
         return message_media_content_data;
       rescue DBI::DatabaseError => e
