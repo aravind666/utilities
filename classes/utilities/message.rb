@@ -51,11 +51,12 @@ class Message
     begin
       message_data.each do |message|
         media_content = Mediahelper.get_media_content_for_message(message[0]);
-        if media_content.fetchable? then
-          front_matter = self.get_jekyll_frontmatter_for_messages(message, series, media_content);
-          self.migrate_by_adding_jekyll_front_matter(front_matter, message);
-        else
+        media_content_structure = media_content.fetch_all;
+        if media_content_structure.size == 0 then
           Immutable.log.info "Message  #{message[0]} does not have any media content";
+        else
+          front_matter = self.get_jekyll_frontmatter_for_messages(message, series, media_content_structure);
+          self.migrate_by_adding_jekyll_front_matter(front_matter, message);
         end
       end
     end
@@ -65,14 +66,14 @@ class Message
   # Prepare Jekyll Frontmatter for migrated messages
   #
   #
-  def get_jekyll_frontmatter_for_messages(message_data, series, media_content)
+  def get_jekyll_frontmatter_for_messages(message_data, series, media_content_structure)
     begin
       front_matter = '';
       mainTitle = message_data[2].gsub /"/, '';
       front_matter = "---\nlayout: message\ncategory: message\nseries: \"#{series[1]}\"\ntitle: \"#{mainTitle}\"";
       front_matter += "\ndate: #{message_data["Date"].strftime("%Y-%m-%d-%H-%M")}";
       front_matter += "\nmessage_id: #{message_data[0]}";
-      front_matter = self.add_media_content_front_matter(media_content,front_matter);
+      front_matter = self.add_media_content_front_matter(media_content_structure,front_matter);
       front_matter += "\n---";
       return front_matter
     end
@@ -82,9 +83,9 @@ class Message
   # Add media content front matter which is consumed by
   # liquid variables in message layout .
   #
-  def add_media_content_front_matter(media_content, front_matter)
+  def add_media_content_front_matter(media_content_structure, front_matter)
     begin
-      media_content.each do |media|
+      media_content_structure.each do |media|
         #
         # A message can have multiple media contents we need to look for
         # all possiblilities also each media has its own description and title we need them too ..
@@ -126,12 +127,8 @@ class Message
             program_title = media['Title'];
             front_matter += "\nprogram-description: \"#{program_description}\"\nprogram: \"#{program}\"\nprogram-title: \"#{program_title}\""
           else
-
-
         end
-        front_matter += "\nmediacontentID: \"#{media['MediaContentID']}\""
       end
-
       return front_matter;
     end
   end
@@ -142,7 +139,6 @@ class Message
   #
   def migrate_by_adding_jekyll_front_matter(jekyll_front_matter, message_data)
     begin
-      puts jekyll_front_matter;
       target_file_path = "#{Immutable.config.message_destination_path}/";
       title = Contenthelper.purify_title_by_removing_special_characters(message_data["Title"].downcase.strip);
       target_file_path += "#{message_data["Date"].strftime("%Y-%m-%d")}-#{title}.md";
