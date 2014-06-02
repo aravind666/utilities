@@ -84,11 +84,17 @@ class Audio
       audio_title = Contenthelper.purify_title_by_removing_special_characters(audio['Title'])
       audio_description = Contenthelper.purify_by_removing_special_characters(audio['Description'])
       audio_path = audio['LowQFilePath'] + audio['HighQFilePath'];
+      if audio['ThumbImagePath'] then 
+      	audio_poster = "#{Immutable.config.audio_image_thumb_base_url}#{audio['ThumbImagePath']}";
+      else
+      	audio_poster = "#{Immutable.config.audio_image_thumb_base_url}DefaultVideoImage.jpg";
+      end
       front_matter = "---\nlayout: music \ntitle: \"#{audio_title}\""
       front_matter += "\nseries: \"#{series[1]}\""
       front_matter += "\ndate: #{audio["ActiveDate"].strftime("%Y-%m-%d")}"
       front_matter += " \ndescription: \"#{audio_description}\""
       front_matter += "\naudio: \"#{audio_path}\"\naudio-duration: \"#{audio['duration']}\""
+      front_matter += "\nsrc: \"#{audio_poster}\"";
       front_matter += "\n---"
     end
   end
