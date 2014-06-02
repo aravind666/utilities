@@ -49,10 +49,11 @@ class Mediahelper
     #
     def get_media_content_for_message(message_id)
       begin
-        message_sql = "SELECT * FROM mediacontent WHERE mediacontentid IN ";
-        message_sql += "(SELECT messagemediacontent.mediaid FROM messagemediacontent WHERE messageid = 440)";
-        message_sql += "AND ( iPodVideo IS NOT NULL OR HighQFilePath IS NOT NULL ) AND ( iPodVideo != '' OR HighQFilePath != '' )";
+        message_sql = "SELECT * FROM mediacontent WHERE mediacontentid IN";
+        message_sql += " (SELECT messagemediacontent.mediaid FROM messagemediacontent WHERE messageid = #{message_id})";
+        message_sql += " AND (( iPodVideo IS NOT NULL AND iPodVideo != '') OR (HighQFilePath IS NOT NULL AND HighQFilePath != '' ))";
         message_media_content_data = Immutable.dbh.execute(message_sql);
+
         return message_media_content_data;
       rescue DBI::DatabaseError => e
         Immutable.log.error "Error code: #{e.err}"
@@ -72,7 +73,7 @@ class Mediahelper
         audio_sql += " IN (SELECT messagemediacontent.mediaid FROM messagemediacontent WHERE";
         audio_sql += " messageid = #{message_id}) AND ( HighQFilePath IS NOT NULL)";
         audio_sql += " AND (ContentTypeID = 5 OR ContentTypeID = 2) AND (HighQFilePath LIKE '%mp3')" ;
-        audio_sql += " AND HighQFilePath!=''"
+        audio_sql += " AND HighQFilePath != ''"
 
         message_audio_content_data = Immutable.dbh.execute(audio_sql);
         return message_audio_content_data;
