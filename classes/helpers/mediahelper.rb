@@ -72,6 +72,7 @@ class Mediahelper
         audio_sql += " IN (SELECT messagemediacontent.mediaid FROM messagemediacontent WHERE";
         audio_sql += " messageid = #{message_id}) AND ( HighQFilePath IS NOT NULL)";
         audio_sql += " AND (ContentTypeID = 5 OR ContentTypeID = 2) AND (HighQFilePath LIKE '%mp3')" ;
+        audio_sql += " AND HighQFilePath!=''"
 
         message_audio_content_data = Immutable.dbh.execute(audio_sql);
         return message_audio_content_data;
@@ -93,7 +94,7 @@ class Mediahelper
         video_sql += " IN (SELECT messagemediacontent.mediaid FROM messagemediacontent WHERE";
         video_sql += " messageid = #{message_id}) AND ( iPodVideo IS NOT NULL)";
         video_sql += " AND (ContentTypeID = 4 OR ContentTypeID = 1) AND (iPodVideo LIKE '%mp4')" ;
-
+				video_sql += "AND iPodVideo!=''";
         message_video_content_data = Immutable.dbh.execute(video_sql);
         return message_video_content_data;
         rescue DBI::DatabaseError => e
