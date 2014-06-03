@@ -30,8 +30,8 @@ class Dynamic
   def process_links(links_to_migrate)
     links_to_migrate.each do |link|
       response_from_content_url = Contenthelper.get_content_from_url(link);
-      if(response_from_content_url)
-        front_matter = self.get_jekyll_front_matter_for_content(link,response_from_content_url);
+      if (response_from_content_url)
+        front_matter = self.get_jekyll_front_matter_for_content(link, response_from_content_url);
         content_to_migrate = self.get_content_body_to_migrate(response_from_content_url);
         target_file_location = self.setup_target_file_location(link);
         self.migrate_by_adding_jekyll_front_matter(target_file_location, front_matter, content_to_migrate);
@@ -70,7 +70,7 @@ class Dynamic
   # which needs to be recreated in migrated destination
   #
   def get_exact_filepath_from_url(file_path)
-      return file_path.sub(/[a-zA-Z]/) { |s| s.upcase }
+    return file_path.sub(/[a-zA-Z]/) { |s| s.upcase }
   end
 
   #
@@ -118,24 +118,24 @@ class Dynamic
   #
   # Returns jekyll front matter for content
   #
-  def get_jekyll_front_matter_for_content(content_url,content)
+  def get_jekyll_front_matter_for_content(content_url, content)
 
     # Check if the page has title
     if content.title.nil?
       # if its null make filename as title .
-      file_name_in_location =  File.basename(content_url);
+      file_name_in_location = File.basename(content_url);
       title = file_name_in_location.chomp(File.extname(file_name_in_location));
       title = title.upcase;
     else
       title = content.title;
     end
-      title = title.downcase;
-      title[0] = title[0].capitalize
+    title = title.downcase;
+    title[0] = title[0].capitalize
 
-      # category is nothing but the parent folder
-      # it is the standard followed in migrating managed content
-      category = self.get_complete_directory_path_to_migrate(content_url);
-      category_parts = category.split('/');
+    # category is nothing but the parent folder
+    # it is the standard followed in migrating managed content
+    category = self.get_complete_directory_path_to_migrate(content_url);
+    category_parts = category.split('/');
     return "---\nlayout: right_column \ntitle: \"#{title}\" \ncategory: \"#{category_parts[0]}\"\n---\n";
   end
 

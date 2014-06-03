@@ -166,7 +166,7 @@ class Contenthelper
     #
     def get_content_from_url(content_base_url)
       begin
-        content_url = Immutable.config.dynamic_link_base_url + '/' + content_base_url ;
+        content_url = Immutable.config.dynamic_link_base_url + '/' + content_base_url;
         crawler = Mechanize.new
         response = crawler.get(content_url);
         return response;

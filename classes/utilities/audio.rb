@@ -84,15 +84,15 @@ class Audio
       audio_title = Contenthelper.purify_title_by_removing_special_characters(audio['Title']);
       audio_description = Contenthelper.purify_by_removing_special_characters(audio['Description']);
       audio_path = audio['LowQFilePath'] + audio['HighQFilePath'];
-      if audio['ThumbImagePath'] then 
-      	audio_poster = "#{Immutable.config.audio_image_thumb_base_url}#{audio['ThumbImagePath']}";
+      if audio['ThumbImagePath'] then
+        audio_poster = "#{Immutable.config.audio_image_thumb_base_url}#{audio['ThumbImagePath']}";
       else
-      	audio_poster = "#{Immutable.config.audio_image_thumb_base_url}DefaultVideoImage.jpg";
+        audio_poster = "#{Immutable.config.audio_image_thumb_base_url}DefaultVideoImage.jpg";
       end
       if audio['duration'] == ":" then
-      	audio['duration'] = "00:00"
+        audio['duration'] = "00:00"
       end
-      
+
       front_matter = "---\nlayout: music \ntitle: \"#{audio_title}\"";
       front_matter += "\nseries: \"#{series[1]}\"";
       front_matter += "\ndate: #{audio["ActiveDate"].strftime("%Y-%m-%d")}";
