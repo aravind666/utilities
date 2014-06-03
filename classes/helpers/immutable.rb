@@ -36,11 +36,11 @@ class Immutable
     #
     def dbh
       begin
-         if(@dbh)
-           return @dbh
-         else
-           return self.getconnection;
-         end
+        if (@dbh)
+          return @dbh
+        else
+          return self.getconnection;
+        end
       end
     end
 

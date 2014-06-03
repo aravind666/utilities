@@ -62,7 +62,7 @@ class Mediahelper
         abort('An error occurred while getting message media content data from DB, Check migration log for more details');
       end
     end
-    
+
     #
     # This method gets audio content for a particular message
     #
@@ -72,7 +72,7 @@ class Mediahelper
         audio_sql = "SELECT * FROM mediacontent WHERE mediacontentid";
         audio_sql += " IN (SELECT messagemediacontent.mediaid FROM messagemediacontent WHERE";
         audio_sql += " messageid = #{message_id}) AND ( HighQFilePath IS NOT NULL)";
-        audio_sql += " AND (ContentTypeID = 5 OR ContentTypeID = 2) AND (HighQFilePath LIKE '%mp3')" ;
+        audio_sql += " AND (ContentTypeID = 5 OR ContentTypeID = 2) AND (HighQFilePath LIKE '%mp3')";
         audio_sql += " AND HighQFilePath != ''"
 
         message_audio_content_data = Immutable.dbh.execute(audio_sql);
@@ -94,11 +94,11 @@ class Mediahelper
         video_sql = "SELECT * FROM mediacontent WHERE mediacontentid";
         video_sql += " IN (SELECT messagemediacontent.mediaid FROM messagemediacontent WHERE";
         video_sql += " messageid = #{message_id}) AND ( iPodVideo IS NOT NULL)";
-        video_sql += " AND (ContentTypeID = 4 OR ContentTypeID = 1) AND (iPodVideo LIKE '%mp4')" ;
-				video_sql += "AND iPodVideo!=''";
+        video_sql += " AND (ContentTypeID = 4 OR ContentTypeID = 1) AND (iPodVideo LIKE '%mp4')";
+        video_sql += "AND iPodVideo!=''";
         message_video_content_data = Immutable.dbh.execute(video_sql);
         return message_video_content_data;
-        rescue DBI::DatabaseError => e
+      rescue DBI::DatabaseError => e
         Immutable.log.error "Error code: #{e.err}"
         Immutable.log.error "Error message: #{e.errstr}"
         Immutable.log.error "Error SQLSTATE: #{e.state}"
