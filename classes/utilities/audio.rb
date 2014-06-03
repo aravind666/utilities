@@ -89,6 +89,10 @@ class Audio
       else
       	audio_poster = "#{Immutable.config.audio_image_thumb_base_url}DefaultVideoImage.jpg";
       end
+      if audio['duration'] == ":" then
+      	audio['duration'] = "00:00"
+      end
+      
       front_matter = "---\nlayout: music \ntitle: \"#{audio_title}\"";
       front_matter += "\nseries: \"#{series[1]}\"";
       front_matter += "\ndate: #{audio["ActiveDate"].strftime("%Y-%m-%d")}";
