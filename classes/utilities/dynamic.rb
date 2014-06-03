@@ -29,6 +29,7 @@ class Dynamic
   #
   def process_links(links_to_migrate)
     links_to_migrate.each do |link|
+      link = link.gsub("\n",'');
       response_from_content_url = Contenthelper.get_content_from_url(link);
       if (response_from_content_url)
         front_matter = self.get_jekyll_front_matter_for_content(link, response_from_content_url);
@@ -62,6 +63,10 @@ class Dynamic
     file_name_to_migrate = get_complete_file_name_to_migrate(link);
     directory_to_migrate = self.setup_file_path_to_migrate(directory_path);
     target_file = directory_to_migrate + "/" + file_name_to_migrate;
+    if(File.file?(target_file))
+      Immutable.log.info "File already exists : #{link}"
+      target_file['.htm'] = '-2.htm';
+    end
     return target_file;
   end
 
@@ -110,7 +115,6 @@ class Dynamic
   def migrate_by_adding_jekyll_front_matter(target_file_location, front_matter, content_to_migrate)
     migrated_handler = File.open(target_file_location, 'w');
     migrated_handler.write(front_matter);
-
     migrated_handler.write(content_to_migrate);
     migrated_handler.close;
   end
