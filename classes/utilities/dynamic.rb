@@ -37,17 +37,20 @@ class Dynamic
         self.migrate_by_adding_jekyll_front_matter(target_file_location, front_matter, content_to_migrate);
       end
     end
+    abort("Completed migrating dynamics links, please check migration log for links which returns 404 or 500");
   end
 
   #
   # Returns html part which needs to be migrated
   #
   def get_content_body_to_migrate(response)
+
     if response.search('div#mainContent').nil?
-      post_body = response.search('div#mainContent');
-    else
       post_body = response.search('body');
+    else
+      post_body = response.search('div#mainContent');
     end
+
     return post_body;
   end
 
@@ -117,7 +120,9 @@ class Dynamic
   #
   def get_jekyll_front_matter_for_content(content_url,content)
 
+    # Check if the page has title
     if content.title.nil?
+      # if its null make filename as title .
       file_name_in_location =  File.basename(content_url);
       title = file_name_in_location.chomp(File.extname(file_name_in_location));
       title = title.upcase;
@@ -126,11 +131,13 @@ class Dynamic
     end
       title = title.downcase;
       title[0] = title[0].capitalize
+
+      # category is nothing but the parent folder
+      # it is the standard followed in migrating managed content
       category = self.get_complete_directory_path_to_migrate(content_url);
       category_parts = category.split('/');
-    return "---\nlayout: right_column \ntitle: #{title}\ncategory: #{category_parts[0]}\n---\n";
+    return "---\nlayout: right_column \ntitle: \"#{title}\" \ncategory: \"#{category_parts[0]}\"\n---\n";
   end
-
 
 end
 
