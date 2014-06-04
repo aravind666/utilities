@@ -141,9 +141,20 @@ class Contenthelper
 
       replacements.each { |set| title = title.gsub(set[0], set[1]) }
       return title
-
     end
+    
+		#
+		# This method escapes special characters from the given URL string
+		#
+		def encode_url_string(url)
+			return CGI.escape(url)
+		end
+		
   end
 
 end
+
+
+
+
 

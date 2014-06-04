@@ -95,7 +95,7 @@ class Message
             # Audio
             if (media['HighQFilePath'].length > 0)
               audio_description = Contenthelper.purify_by_removing_special_characters(media['Description']);
-              audio = media['LowQFilePath'] + media['HighQFilePath'];
+              audio = media['LowQFilePath'] + Contenthelper.encode_url_string(media['HighQFilePath']);
               audio_title = Contenthelper.purify_by_removing_special_characters(media['Title']);
               front_matter += "\naudio-description: \"#{audio_description}\"\naudio: \"#{audio}\"\naudio-title: \"#{audio_title}\""
               front_matter += "\naudio-duration: \"#{media['duration']}\"";
@@ -113,7 +113,7 @@ class Message
           when 7
             # Study Notes
             notes_description = Contenthelper.purify_by_removing_special_characters(media['Description']);
-            notes = media['LowQFilePath'] + media['HighQFilePath'];
+            notes = media['LowQFilePath'] + Contenthelper.encode_url_string(media['HighQFilePath']);
             notes_title = Contenthelper.purify_by_removing_special_characters(media['Title']);
             front_matter += "\nnotes-description: \"#{notes_description} \"\nnotes: \"#{notes} \"\nnotes-title: \"#{notes_title}\""
           when 8
@@ -123,7 +123,7 @@ class Message
             else
               program_description = '';
             end
-            program = media['LowQFilePath'] + media['HighQFilePath'];
+            program = media['LowQFilePath'] + Contenthelper.encode_url_string(media['HighQFilePath']);
             program_title = media['Title'];
             front_matter += "\nprogram-description: \"#{program_description}\"\nprogram: \"#{program}\"\nprogram-title: \"#{program_title}\""
           else

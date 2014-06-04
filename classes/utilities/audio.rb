@@ -81,13 +81,13 @@ class Audio
   def get_jekyll_frontmatter_for_audio(audio, series)
     begin
       front_matter = '';
-      audio_title = Contenthelper.purify_title_by_removing_special_characters(audio['Title']);
+      audio_title = audio['Title'].gsub /"/, '';
       audio_description = Contenthelper.purify_by_removing_special_characters(audio['Description']);
-      audio_path = audio['LowQFilePath'] + audio['HighQFilePath'];
+      audio_path = audio['LowQFilePath'] + Contenthelper.encode_url_string(audio['HighQFilePath']);
       if audio['ThumbImagePath'] then 
-      	audio_poster = "#{Immutable.config.audio_image_thumb_base_url}#{audio['ThumbImagePath']}";
+      	audio_poster = Contenthelper.encode_url_string(audio['ThumbImagePath']);
       else
-      	audio_poster = "#{Immutable.config.audio_image_thumb_base_url}DefaultVideoImage.jpg";
+      	audio_poster = "DefaultVideoImage.jpg";
       end
       if audio['duration'] == ":" then
       	audio['duration'] = "00:00"
@@ -98,7 +98,7 @@ class Audio
       front_matter += "\ndate: #{audio["ActiveDate"].strftime("%Y-%m-%d")}";
       front_matter += " \ndescription: \"#{audio_description}\"";
       front_matter += "\naudio: \"#{audio_path}\"\naudio-duration: \"#{audio['duration']}\"";
-      front_matter += "\nsrc: \"#{audio_poster}\"";
+      front_matter += "\nsrc: \"#{Immutable.config.audio_image_thumb_base_url}#{audio_poster}\"";
       front_matter += "\n---"
       return front_matter
     end
