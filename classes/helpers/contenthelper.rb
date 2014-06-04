@@ -142,14 +142,14 @@ class Contenthelper
       replacements.each { |set| title = title.gsub(set[0], set[1]) }
       return title
     end
-    
-		#
-		# This method escapes special characters from the given URL string
-		#
-		def encode_url_string(url)
-			return CGI.escape(url)
-		end
-		
+
+    #
+    # This method escapes special characters from the given URL string
+    #
+    def encode_url_string(url)
+      return CGI.escape(url)
+    end
+
     #
     # This method returns the links to migrate from file ,
     # As an array
@@ -182,7 +182,47 @@ class Contenthelper
       end
     end
 
+    #
+    # This method replaces image sources with
+    # migrated image sources
+    #
+    def replace_image_sources_with_new_paths(source)
+
+      replacements = []
+      replacements << ["uploadedfiles", "img/content"]
+      replacements << ["images/uploadedImages/banners", "img/banners"]
+      replacements << ["images/uploadedImages", "img/content"]
+      replacements.each { |set| source = source.gsub(set[0], set[1]) }
+      return source;
+    end
+
+    #
+    # This method adds slash in the beginning of image sources .
+    # If its missing
+    #
+    def add_trailing_slash_if_it_doesnot_exists(file_path)
+      file_path << '/' if file_path[0] != '/'
+      return file_path;
+    end
+
+    #
+    # This method updates image paths
+    # with the migrated path by
+    # Parsing the content
+    #
+    def update_html_with_new_image_paths(data_to_migrate)
+      doc_to_migrate = Nokogiri::HTML(data_to_migrate);
+      doc_to_migrate.css('img').each do |img|
+        old_src = img.attribute('src').to_s;
+        new_src = Contenthelper.replace_image_sources_with_new_paths(old_src);
+        img['src'] = new_src;
+      end
+      return doc_to_migrate.to_s;
+    end
+
+
   end
+
 end
 
 

@@ -28,6 +28,9 @@ require 'logger';
 # requireed for opening URL in content_migration
 require 'mechanize';
 
+# required for HTML parsing
+require 'nokogiri';
+
 # requireed to escape and un-escape a value to be included in a URL
 require 'cgi'
 

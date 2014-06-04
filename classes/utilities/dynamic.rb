@@ -115,6 +115,7 @@ class Dynamic
   def migrate_by_adding_jekyll_front_matter(target_file_location, front_matter, content_to_migrate)
     migrated_handler = File.open(target_file_location, 'w');
     migrated_handler.write(front_matter);
+    content_to_migrate = Contenthelper.update_html_with_new_image_paths(content_to_migrate);
     migrated_handler.write(content_to_migrate);
     migrated_handler.close;
   end

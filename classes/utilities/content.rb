@@ -99,11 +99,10 @@ class Content
     migrated_file_path = "#{Immutable.config.content_destination_path}/#{category_name}/#{file_name}";
     migrated_content_file_handler = File.open(migrated_file_path, 'w');
     migrated_content_file_handler.write(front_matter);
-
-    # TODO : - Research not sure why this wont work in Mac system
-    # data_to_migrate.delete!("\C-M");
-    migrated_content_file_handler.write(data_to_migrate);
+    data_to_migrate = Contenthelper.update_html_with_new_image_paths(data_to_migrate);
+    migrated_content_file_handler.write(doc_to_migrate);
   end
+
 
   #
   # This method is used to get jekyll front matter for a particular content
