@@ -11,16 +11,25 @@
 
 
 # rconfig is used to read configuration from files
-require 'rconfig'
+require 'rconfig';
 
 # dbi gem is used as an interface to talk to DB
-require 'dbi'
+require 'dbi';
+
+# required for pathname
+require 'pathname'
 
 # require File Utils
-require 'fileutils'
+require 'fileutils';
 
 # required for logging
-require 'logger'
+require 'logger';
+
+# requireed for opening URL in content_migration
+require 'mechanize';
+
+# requireed to escape and un-escape a value to be included in a URL
+require 'cgi'
 
 # Delete the log file during a fresh run
 # FileUtils.rm('migration.log');

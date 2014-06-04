@@ -1,9 +1,7 @@
-
 source 'https://rubygems.org'
-
-gem 'dbi'
 gem 'mysql2'
-gem 'mysql'
+gem 'dbi'
 gem 'dbd-mysql'
 gem 'rconfig'
 gem 'logger'
+gem 'mechanize'

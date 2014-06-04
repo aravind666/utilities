@@ -53,15 +53,15 @@ class Contenthelper
     # This method removes file Extension from file name
     #
     def remove_file_extension_from_filename(file_name)
-       name = file_name.chomp(File.extname(file_name));
-       return name;
+      name = file_name.chomp(File.extname(file_name));
+      return name;
     end
 
     #
     # This method removes all special characters from the string
     #
     def remove_all_special_characters_from_string(string_to_remove)
-        return string_to_remove.gsub!(/[^0-9A-Za-z]/, '');
+      return string_to_remove.gsub!(/[^0-9A-Za-z]/, '');
     end
 
     #
@@ -84,11 +84,11 @@ class Contenthelper
       admin_directory_path = directory+'admin'
 
       # Checking like this is wierd but still can prevent blunders :)
-      if(directory_exists?(pages_directory_path))
+      if (directory_exists?(pages_directory_path))
         abort("Hey looks like you have set source directory as destination please review the configuration, \n Warning you to make sure that you dont clear your production files ");
-      elsif(directory_exists?(ajax_directory_path))
+      elsif (directory_exists?(ajax_directory_path))
         abort("Hey looks like you have set source directory as destination please review the configuration, \n Warning you to make sure that you dont clear your production files ");
-      elsif(directory_exists?(admin_directory_path))
+      elsif (directory_exists?(admin_directory_path))
         abort("Hey looks like you have set source directory as destination please review the configuration, \n Warning you to make sure that you dont clear your production files ");
       else
         Immutable.log.info " - > Source and destination paths seems to be fine to proceed  ";
@@ -128,11 +128,11 @@ class Contenthelper
       replacements = []
       replacements << [' ', '-']
       replacements << ['/', '-']
-      replacements << ['?','']
-      replacements << ['*','']
-      replacements << ['#','']
-      replacements << ['@','']
-      replacements << ['&','-and-']
+      replacements << ['?', '']
+      replacements << ['*', '']
+      replacements << ['#', '']
+      replacements << ['@', '']
+      replacements << ['&', '-and-']
       replacements << ['...', '']
       replacements << [/'/, '']
       replacements << [/"/, '']
@@ -150,8 +150,39 @@ class Contenthelper
 			return CGI.escape(url)
 		end
 		
-  end
+    #
+    # This method returns the links to migrate from file ,
+    # As an array
+    #
+    def get_dynamic_links_to_migrate
 
+      file_with_migrate_link_list = Immutable.config.dynamic_links_list;
+      list_of_links_to_migrate = []
+      File.open(file_with_migrate_link_list) do |links|
+        links.each do |link|
+          list_of_links_to_migrate << link.to_s;
+        end
+      end
+      return list_of_links_to_migrate;
+    end
+
+    #
+    # This method does an http request to the URL
+    # Which needs to be migrated and returns the response
+    #
+    def get_content_from_url(content_base_url)
+      begin
+        content_url = Immutable.config.dynamic_link_base_url + '/' + content_base_url;
+        crawler = Mechanize.new
+        response = crawler.get(content_url);
+        return response;
+      rescue Mechanize::ResponseCodeError => exp
+        Immutable.log.error "URL - #{content_url} Error details #{exp.inspect}";
+        return false;
+      end
+    end
+
+  end
 end
 
 
