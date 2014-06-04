@@ -100,7 +100,7 @@ class Content
     migrated_content_file_handler = File.open(migrated_file_path, 'w');
     migrated_content_file_handler.write(front_matter);
     data_to_migrate = Contenthelper.update_html_with_new_image_paths(data_to_migrate);
-    migrated_content_file_handler.write(doc_to_migrate);
+    migrated_content_file_handler.write(data_to_migrate);
   end
 
 
