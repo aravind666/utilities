@@ -189,11 +189,13 @@ class Contenthelper
     def replace_image_sources_with_new_paths(source)
 
       replacements = []
-      replacements << ["uploadedfiles", "img/content"]
-      replacements << ["images/uploadedImages/banners", "img/banners"]
-      replacements << ["images/uploadedImages", "img/content"]
+      replacements << ["uploadedfiles", "img/legacy/content"]
+      replacements << ["images/uploadedImages/banners", "img/legacy/banners"]
+      replacements << ["images/uploadedImages", "img/legacy/content"]
+      replacements << ["img/icn", "img/legacy/icn"]
       replacements.each { |set| source = source.gsub(set[0], set[1]) }
       return source;
+
     end
 
     #
