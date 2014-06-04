@@ -46,12 +46,17 @@ class Dynamic
   #
   def get_content_body_to_migrate(response)
 
+    response.parser.css('img').each do |img|
+      old_src = img.attribute('src').to_s;
+      new_src = Contenthelper.replace_image_sources_with_new_paths(old_src);
+      img['src'] = new_src;
+    end
+
     if response.search('div#mainContent').nil?
       post_body = response.search('body');
     else
       post_body = response.search('div#mainContent');
     end
-
     return post_body;
   end
 
@@ -115,7 +120,6 @@ class Dynamic
   def migrate_by_adding_jekyll_front_matter(target_file_location, front_matter, content_to_migrate)
     migrated_handler = File.open(target_file_location, 'w');
     migrated_handler.write(front_matter);
-    content_to_migrate = Contenthelper.update_html_with_new_image_paths(content_to_migrate);
     migrated_handler.write(content_to_migrate);
     migrated_handler.close;
   end
