@@ -84,23 +84,21 @@ class Audio
       audio_title = audio['Title'].gsub /"/, '';
       audio_description = Contenthelper.purify_by_removing_special_characters(audio['Description']);
       audio_path = audio['LowQFilePath'] + Contenthelper.encode_url_string(audio['HighQFilePath']);
-      
-      if audio['ThumbImagePath']!='' then 
-      	audio_poster = audio['ThumbImagePath'];
-      else
-      	audio_poster = "DefaultVideoImage.jpg";
+      audio_thumb_image = audio['ThumbImagePath'].to_s
+      if (audio_thumb_image && !audio_thumb_image.nil? && !audio_thumb_image.empty?) then 
+      	audio_poster = "#{Immutable.config.audio_image_thumb_base_url}#{audio['ThumbImagePath']}";
+      else (audio_thumb_image=='' || audio_thumb_image=='NULL' || audio_thumb_image==' ' || audio_thumb_image.empty?)
+      	audio_poster = "#{Immutable.config.audio_image_thumb_base_url}DefaultVideoImage.jpg";
       end
-      
       if audio['duration'] == ":" then
         audio['duration'] = "00:00"
       end
-
       front_matter = "---\nlayout: music \ntitle: \"#{audio_title}\"";
       front_matter += "\nseries: \"#{series[1]}\"";
       front_matter += "\ndate: #{audio["ActiveDate"].strftime("%Y-%m-%d")}";
       front_matter += " \ndescription: \"#{audio_description}\"";
       front_matter += "\naudio: \"#{audio_path}\"\naudio-duration: \"#{audio['duration']}\"";
-      front_matter += "\nsrc: \"#{Immutable.config.audio_image_thumb_base_url}#{audio_poster}\"";
+      front_matter += "\nsrc: \"#{audio_poster}\"";
       front_matter += "\n---"
       return front_matter
     end
