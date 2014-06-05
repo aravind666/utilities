@@ -85,8 +85,8 @@ class Audio
       audio_description = Contenthelper.purify_by_removing_special_characters(audio['Description']);
       audio_path = audio['LowQFilePath'] + Contenthelper.encode_url_string(audio['HighQFilePath']);
       
-      if audio['ThumbImagePath'] then 
-      	audio_poster = Contenthelper.encode_url_string(audio['ThumbImagePath']);
+      if audio['ThumbImagePath']!='' then 
+      	audio_poster = audio['ThumbImagePath'];
       else
       	audio_poster = "DefaultVideoImage.jpg";
       end
