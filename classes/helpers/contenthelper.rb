@@ -192,6 +192,8 @@ class Contenthelper
 
       replacements = []
       replacements << ["uploadedfiles", "content"]
+
+      replacements << ["images/uploadedImages/GOMamelodi", "content/gomamelodi"]
       replacements << ["images/uploadedImages/boxes/New Folder", "boxes"]
       replacements << ["images/uploadedImages/boxes/New%20Folder", "boxes"]
       replacements << ["images/uploadedImages/boxes", "boxes"]
@@ -202,6 +204,7 @@ class Contenthelper
       replacements << ["images/uploadedImages", "content"]
       replacements << ["img/icn", "icn"]
       replacements << ["img/tabs", "tabs"]
+
 
 
       replacements.each { |set| source = source.gsub(set[0], set[1]) }
