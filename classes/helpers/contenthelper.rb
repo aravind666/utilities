@@ -197,6 +197,7 @@ class Contenthelper
       replacements << ["images/uploadedImages/3500%20Madison", "content/3500Madison"]
       replacements << ["images/uploadedImages", "content"]
       replacements << ["img/icn", "icn"]
+      replacements << ["img/tabs", "tabs"]
 
       replacements.each { |set| source = source.gsub(set[0], set[1]) }
       source = Immutable.config.s3url+ source
