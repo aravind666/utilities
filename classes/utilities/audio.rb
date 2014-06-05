@@ -81,15 +81,23 @@ class Audio
   def get_jekyll_frontmatter_for_audio(audio, series)
     begin
       front_matter = '';
+      default_audio_image_thumb = "DefaultVideoImage.jpg"
       audio_title = audio['Title'].gsub /"/, '';
       audio_description = Contenthelper.purify_by_removing_special_characters(audio['Description']);
       audio_path = audio['LowQFilePath'] + Contenthelper.encode_url_string(audio['HighQFilePath']);
       audio_thumb_image = audio['ThumbImagePath'].to_s
       if (audio_thumb_image && !audio_thumb_image.nil? && !audio_thumb_image.empty?) then 
-      	audio_poster = "#{Immutable.config.audio_image_thumb_base_url}#{audio['ThumbImagePath']}";
+      	audio_poster = audio['ThumbImagePath'];
       else (audio_thumb_image=='' || audio_thumb_image=='NULL' || audio_thumb_image==' ' || audio_thumb_image.empty?)
-      	audio_poster = "#{Immutable.config.audio_image_thumb_base_url}DefaultVideoImage.jpg";
+      	audio_poster = default_audio_image_thumb;
       end
+      
+      if (audio['ContentTypeID']==5 && audio_poster!=default_audio_image_thumb) then 
+      	audio_thumb_image_path = "#{Immutable.config.audio_message_image_thumb_base_url}#{audio_poster}"
+      else
+      	audio_thumb_image_path = "#{Immutable.config.audio_image_thumb_base_url}#{audio_poster}"
+      end
+      
       if audio['duration'] == ":" then
         audio['duration'] = "00:00"
       end
@@ -98,7 +106,7 @@ class Audio
       front_matter += "\ndate: #{audio["ActiveDate"].strftime("%Y-%m-%d")}";
       front_matter += " \ndescription: \"#{audio_description}\"";
       front_matter += "\naudio: \"#{audio_path}\"\naudio-duration: \"#{audio['duration']}\"";
-      front_matter += "\nsrc: \"#{audio_poster}\"";
+      front_matter += "\nsrc: \"#{audio_thumb_image_path}\"";
       front_matter += "\n---"
       return front_matter
     end
