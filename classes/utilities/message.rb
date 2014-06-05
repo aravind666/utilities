@@ -73,7 +73,7 @@ class Message
       front_matter = "---\nlayout: message\ncategory: message\nseries: \"#{series[1]}\"\ntitle: \"#{mainTitle}\"";
       front_matter += "\ndate: #{message_data["Date"].strftime("%Y-%m-%d-%H-%M")}";
       front_matter += "\nmessage_id: #{message_data[0]}";
-      front_matter = self.add_media_content_front_matter(media_content_structure,front_matter);
+      front_matter = self.add_media_content_front_matter(media_content_structure, front_matter);
       front_matter += "\n---";
       return front_matter
     end
@@ -95,12 +95,12 @@ class Message
             # Audio
             if (media['HighQFilePath'].length > 0)
               audio_description = Contenthelper.purify_by_removing_special_characters(media['Description']);
-              audio = media['LowQFilePath'] + media['HighQFilePath'];
+              audio = media['LowQFilePath'] + Contenthelper.encode_url_string(media['HighQFilePath']);
               audio_title = Contenthelper.purify_by_removing_special_characters(media['Title']);
               front_matter += "\naudio-description: \"#{audio_description}\"\naudio: \"#{audio}\"\naudio-title: \"#{audio_title}\""
               front_matter += "\naudio-duration: \"#{media['duration']}\"";
             end
-          when 4,1
+          when 4, 1
             # Video -- only IPOD video
             if (media['iPodVideo'].length > 0)
               video_description = Contenthelper.purify_by_removing_special_characters(media['Description']);
@@ -113,17 +113,17 @@ class Message
           when 7
             # Study Notes
             notes_description = Contenthelper.purify_by_removing_special_characters(media['Description']);
-            notes = media['LowQFilePath'] + media['HighQFilePath'];
+            notes = media['LowQFilePath'] + Contenthelper.encode_url_string(media['HighQFilePath']);
             notes_title = Contenthelper.purify_by_removing_special_characters(media['Title']);
             front_matter += "\nnotes-description: \"#{notes_description} \"\nnotes: \"#{notes} \"\nnotes-title: \"#{notes_title}\""
           when 8
             # Weekend Program
-            if(media['Description'].length > 0)
+            if (media['Description'].length > 0)
               program_description = Contenthelper.purify_by_removing_special_characters(media['Description']);
             else
               program_description = '';
             end
-            program = media['LowQFilePath'] + media['HighQFilePath'];
+            program = media['LowQFilePath'] + Contenthelper.encode_url_string(media['HighQFilePath']);
             program_title = media['Title'];
             front_matter += "\nprogram-description: \"#{program_description}\"\nprogram: \"#{program}\"\nprogram-title: \"#{program_title}\""
           else
@@ -146,7 +146,7 @@ class Message
       migrated_message_file_handler.write(jekyll_front_matter);
     end
   end
-  
+
 end
 
 

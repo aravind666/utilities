@@ -33,15 +33,16 @@ class Application
       when 'migrate-messages'
         return;
       when 'migrate-audios'
-        return;        
+        return;
       when 'migrate-videos'
         return;
       when 'migrate-blog'
         return;
+      when 'migrate-dynamic-content'
+        return;
       else
         puts "you have passed #{command_line_argument} -- I have no idea what to do with that.";
-        puts "I know only to process the commands :  ,  \nmigrate-content \nmigrate-messages \nmigrate-videos";
-        puts "migrate-audios \nmigrate-blog";
+        puts "I know only to process the commands :  ,  \nmigrate-content \nmigrate-messages \nmigrate-videos \nmigrate-audios \nmigrate-dynamic-content\nmigrate-blog";
         Immutable.log.error "Invalid command usage !"
         exit(false);
     end
@@ -53,16 +54,17 @@ class Application
   def process_commands(command_line_argument)
     case command_line_argument
       when 'migrate-content'
-       Content.new;
+        Content.new;
       when 'migrate-messages'
-       Message.new;
+        Message.new;
       when 'migrate-audios'
-       Audio.new;
+        Audio.new;
       when 'migrate-videos'
-       Video.new;
+        Video.new;
       when 'migrate-blog'
-       Blog.new;
+        Blog.new;
+      when 'migrate-dynamic-content'
+        Dynamic.new;
     end
   end
-
 end

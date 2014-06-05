@@ -62,7 +62,7 @@ class Content
       FileUtils.mkdir_p(destination_dir)
     end
 
-    dirname = Immutable.config.content_destination_path + '/' + category_name.gsub(/\s/,'-');
+    dirname = Immutable.config.content_destination_path + '/' + category_name.gsub(/\s/, '-');
     unless File.directory?(dirname)
       FileUtils.mkdir_p(dirname)
     end
@@ -77,7 +77,7 @@ class Content
     db_file_path = Contenthelper.purify_file_path(content[1]);
     destination_file_name = content[2];
     complete_source_path = Immutable.config.content_source_path + db_file_path + destination_file_name;
-    category_name = content[3].gsub(/\s/,'-');
+    category_name = content[3].gsub(/\s/, '-');
     status = File.file?(complete_source_path);
     case status
       when true
@@ -92,18 +92,17 @@ class Content
   #
   # This method actually migrates the content by creating the front matter
   #
-  def migrate_by_adding_jekyll_front_matter(complete_source_path, file_name, category_name,front_matter)
+  def migrate_by_adding_jekyll_front_matter(complete_source_path, file_name, category_name, front_matter)
 
     source_file_handler = File.open(complete_source_path)
     data_to_migrate = source_file_handler.read();
     migrated_file_path = "#{Immutable.config.content_destination_path}/#{category_name}/#{file_name}";
     migrated_content_file_handler = File.open(migrated_file_path, 'w');
     migrated_content_file_handler.write(front_matter);
-
-    # TODO : - Research not sure why this wont work in Mac system
-    # data_to_migrate.delete!("\C-M");
+    data_to_migrate = Contenthelper.update_html_with_new_image_paths(data_to_migrate);
     migrated_content_file_handler.write(data_to_migrate);
   end
+
 
   #
   # This method is used to get jekyll front matter for a particular content
@@ -111,10 +110,10 @@ class Content
   def get_jekyll_front_matter_for_content(content)
 
     file_path = content[1];
-    title = content[0].gsub(':','-');
+    title = content[0].gsub(':', '-');
     category = content[3].to_s;
     if file_path['shortlink']
-      return "---\nlayout: #{content[4]}\ntitle: #{title}\ncategory: #{category}\npermalink: /#{content[2].gsub('.htm','');}/\n---\n"
+      return "---\nlayout: #{content[4]}\ntitle: #{title}\ncategory: #{category}\npermalink: /#{content[2].gsub('.htm', '');}/\n---\n"
     else
       return "---\nlayout: #{content[4]}\ntitle: #{title}\ncategory: #{category}\n---\n";
     end
