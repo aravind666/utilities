@@ -21,7 +21,7 @@ class Mediahelper
       begin
         series_data = Immutable.dbh.execute('SELECT * FROM series ORDER BY `StartDate` DESC');
         return series_data;
-      rescue DBI::DatabaseError => e
+        rescue DBI::DatabaseError => e
         Immutable.log.error "Error code: #{e.err}"
         Immutable.log.error "Error message: #{e.errstr}"
         Immutable.log.error "Error SQLSTATE: #{e.state}"
@@ -36,7 +36,7 @@ class Mediahelper
       begin
         message_data = Immutable.dbh.execute("SELECT * FROM message WHERE SeriesID = #{series_id} ORDER BY date DESC");
         return message_data;
-      rescue DBI::DatabaseError => e
+        rescue DBI::DatabaseError => e
         Immutable.log.error "Error code: #{e.err}"
         Immutable.log.error "Error message: #{e.errstr}"
         Immutable.log.error "Error SQLSTATE: #{e.state}"
@@ -55,7 +55,7 @@ class Mediahelper
         message_media_content_data = Immutable.dbh.execute(message_sql);
 
         return message_media_content_data;
-      rescue DBI::DatabaseError => e
+        rescue DBI::DatabaseError => e
         Immutable.log.error "Error code: #{e.err}"
         Immutable.log.error "Error message: #{e.errstr}"
         Immutable.log.error "Error SQLSTATE: #{e.state}"
@@ -77,7 +77,7 @@ class Mediahelper
 
         message_audio_content_data = Immutable.dbh.execute(audio_sql);
         return message_audio_content_data;
-      rescue DBI::DatabaseError => e
+        rescue DBI::DatabaseError => e
         Immutable.log.error "Error code: #{e.err}"
         Immutable.log.error "Error message: #{e.errstr}"
         Immutable.log.error "Error SQLSTATE: #{e.state}"
@@ -90,13 +90,13 @@ class Mediahelper
     #
     def get_video_media_content_for_message(message_id)
       begin
-
         video_sql = "SELECT * FROM mediacontent WHERE mediacontentid";
         video_sql += " IN (SELECT messagemediacontent.mediaid FROM messagemediacontent WHERE";
         video_sql += " messageid = #{message_id}) AND ( iPodVideo IS NOT NULL)";
         video_sql += " AND (ContentTypeID = 4 OR ContentTypeID = 1) AND (iPodVideo LIKE '%mp4')";
         video_sql += "AND iPodVideo!=''";
         message_video_content_data = Immutable.dbh.execute(video_sql);
+
         return message_video_content_data;
       rescue DBI::DatabaseError => e
         Immutable.log.error "Error code: #{e.err}"
@@ -106,5 +106,70 @@ class Mediahelper
       end
     end
 
+    #
+    # Function to get the data related to blog post
+    #
+    def get_all_blog_posts
+      begin
+        # there are too many columns which leads to ambiguity. So, fetch the required columns
+        blog_sql = "SELECT cp.title as title, cp.subtitle, cp.paragraph1, cp.paragraph2, cpx.createdDate,";
+        blog_sql += "c.name, p.FirstName, cpx.postId FROM channelpost as cp";
+        blog_sql += " JOIN channelpostxref as cpx ON cpx.postid = cp.id";
+        blog_sql += " JOIN milacron_migrate_post as mmp ON cp.id = mmp.channelpost_id";
+        blog_sql += " JOIN channel as c ON c.id = cpx.channelid";
+        blog_sql += " JOIN person as p ON p.personId = cpx.createdBy";
+        blog_sql += " WHERE cpx.`channelId` IN (1,2,3,4,5,6,7,8,9)";
+        blog_sql += " AND migrate = 'yes'";
+        blog_sql += " GROUP BY cp.id";
+        blog_sql += " HAVING MAX(cpx.createdDate)";
+
+        blog_post_data = Immutable.dbh.execute(blog_sql);
+        return blog_post_data;
+        rescue DBI::DatabaseError => e
+        Immutable.log.error "Error code: #{e.err}"
+        Immutable.log.error "Error message: #{e.errstr}"
+        Immutable.log.error "Error SQLSTATE: #{e.state}"
+        abort('An error occurred while getting blog post data from DB, Check migration log for more details');
+      end
+    end
+
+    #
+    # function to get the media content information based on the blog post
+    #
+    def get_media_content_by_media_content_id(id)
+        begin
+          content_sql = "SELECT mediacontent.* FROM channelmedia";
+          content_sql += " JOIN mediacontent ON mediacontent.mediaContentId = channelmedia.mediaId";
+          content_sql += " WHERE postId = #{id}";
+          media_content = Immutable.dbh.execute(content_sql);
+
+          return media_content;
+          rescue DBI::DatabaseError => e
+          Immutable.log.error "Error code: #{e.err}"
+          Immutable.log.error "Error message: #{e.errstr}"
+          Immutable.log.error "Error SQLSTATE: #{e.state}"
+          abort('An error occurred while getting media content from DB, Check migration log for more details');
+        end
+    end
+
+    #
+    # method that returns the media element based on the blog post
+    # table are of 3 types - video, audio, image
+    #
+    def get_all_media_for_blog(id, table)
+        begin
+          media_sql = "SELECT #{table}.* FROM channelmedia ";
+          media_sql += " JOIN #{table} ON channelmedia.mediaId = #{table}.mediaContentId";
+          media_sql += " WHERE postId = #{id}";
+          media_blog_post_data = Immutable.dbh.execute(media_sql);
+
+          return media_blog_post_data;
+          rescue DBI::DatabaseError => e
+          Immutable.log.error "Error code: #{e.err}"
+          Immutable.log.error "Error message: #{e.errstr}"
+          Immutable.log.error "Error SQLSTATE: #{e.state}"
+          abort('An error occurred while getting blog post data from DB, Check migration log for more details');
+        end
+    end
   end
 end
