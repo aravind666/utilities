@@ -32,7 +32,7 @@ require 'mechanize';
 require 'nokogiri';
 
 # requireed to escape and un-escape a value to be included in a URL
-require 'cgi'
+require 'uri'
 
 # Delete the log file during a fresh run
 # FileUtils.rm('migration.log');

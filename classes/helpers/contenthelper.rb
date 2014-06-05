@@ -147,7 +147,8 @@ class Contenthelper
     # This method escapes special characters from the given URL string
     #
     def encode_url_string(url)
-      return CGI.escape(url)
+      url_string = URI.escape(url)
+      return url_string
     end
 
     #
