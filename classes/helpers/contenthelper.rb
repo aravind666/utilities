@@ -189,11 +189,12 @@ class Contenthelper
     def replace_image_sources_with_new_paths(source)
 
       replacements = []
-      replacements << ["uploadedfiles", "img/legacy/content"]
-      replacements << ["images/uploadedImages/banners", "img/legacy/banners"]
-      replacements << ["images/uploadedImages", "img/legacy/content"]
-      replacements << ["img/icn", "img/legacy/icn"]
+      replacements << ["uploadedfiles", "content"]
+      replacements << ["images/uploadedImages/banners", "banners"]
+      replacements << ["images/uploadedImages", "content"]
+      replacements << ["img/icn", "icn"]
       replacements.each { |set| source = source.gsub(set[0], set[1]) }
+      source = Immutable.config.s3url+ source
       return source;
 
     end
