@@ -36,9 +36,12 @@ class Application
         return;        
       when 'migrate-videos'
         return;
+      when 'migrate-blog'
+        return;
       else
         puts "you have passed #{command_line_argument} -- I have no idea what to do with that.";
-        puts "I know only to process the commands :  ,  \nmigrate-content \nmigrate-messages \nmigrate-videos \nmigrate-audios";
+        puts "I know only to process the commands :  ,  \nmigrate-content \nmigrate-messages \nmigrate-videos";
+        puts "migrate-audios \nmigrate-blog";
         Immutable.log.error "Invalid command usage !"
         exit(false);
     end
@@ -57,6 +60,8 @@ class Application
        Audio.new;
       when 'migrate-videos'
        Video.new;
+      when 'migrate-blog'
+       Blog.new;
     end
   end
 
