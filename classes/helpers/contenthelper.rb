@@ -238,6 +238,20 @@ class Contenthelper
     end
 
 
+    #
+    # This method updates hrefs to media
+    #
+    def update_html_with_new_media_paths(data_to_migrate)
+      doc_to_migrate = Nokogiri::HTML(data_to_migrate);
+      doc_to_migrate.css('a').each do |img|
+        old_src = img.attribute('href').to_s;
+        if(old_src['.pdf'])
+          Immutable.log.info  "#{old_src} ";
+        end
+
+      end
+    end
+
   end
 
 end
