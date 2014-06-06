@@ -37,6 +37,12 @@ require 'uri'
 # Delete the log file during a fresh run
 # FileUtils.rm('migration.log');
 File.delete('migration.log') if File.exist?('migration.log');
+File.delete('pdfs_missing.log') if File.exist?('pdfs_missing.log');
+File.delete('mp3_missing.log') if File.exist?('mp3_missing.log');
+File.delete('mp4_missing.log') if File.exist?('mp4_missing.log');
+File.delete('docs_missing.log') if File.exist?('docs_missing.log');
+File.delete('everythingelse.log') if File.exist?('everythingelse.log');
+
 
 # Load Configuration path to Rconfig to look for configuration
 CONFIG_DIRECTORY = File.dirname(__FILE__) + '/config/';

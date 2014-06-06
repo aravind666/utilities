@@ -85,7 +85,7 @@ class Content
         front_matter = get_jekyll_front_matter_for_content(content);
         self.migrate_by_adding_jekyll_front_matter(complete_source_path, destination_file_name, category_name, front_matter);
       when false
-       # Immutable.log.warn " - Source WebPage ID #{content['web_page_id']} does not exists at #{complete_source_path} "
+        Immutable.log.warn " - Source WebPage ID #{content['web_page_id']} does not exists at #{complete_source_path} "
     end
   end
 
@@ -93,14 +93,13 @@ class Content
   # This method actually migrates the content by creating the front matter
   #
   def migrate_by_adding_jekyll_front_matter(complete_source_path, file_name, category_name, front_matter)
-
     source_file_handler = File.open(complete_source_path)
     data_to_migrate = source_file_handler.read();
     migrated_file_path = "#{Immutable.config.content_destination_path}/#{category_name}/#{file_name}";
     migrated_content_file_handler = File.open(migrated_file_path, 'w');
     migrated_content_file_handler.write(front_matter);
     data_to_migrate = Contenthelper.update_html_with_new_image_paths(data_to_migrate);
-    Contenthelper.update_html_with_new_media_paths(data_to_migrate);
+    Contenthelper.log_various_href_sources(data_to_migrate);
     migrated_content_file_handler.write(data_to_migrate);
   end
 
