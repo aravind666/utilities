@@ -270,7 +270,7 @@ class Contenthelper
         if(old_src['http://'])
           Immutable.log.info " - > #{ old_src } we do not need this file   ";
         else
-          file_to_copy = legacy_htdocs_path + old_src
+          file_to_copy = Immutable.config.legacy_htdocs_path + old_src
           status = File.file?(file_to_copy);
           case status
             when true
