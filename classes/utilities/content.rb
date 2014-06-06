@@ -22,6 +22,13 @@ class Content
   #
   def clean_old_files
     begin
+
+      File.delete('pdfs_missing.log') if File.exist?('pdfs_missing.log');
+      File.delete('mp3_missing.log') if File.exist?('mp3_missing.log');
+      File.delete('mp4_missing.log') if File.exist?('mp4_missing.log');
+      File.delete('docs_missing.log') if File.exist?('docs_missing.log');
+      File.delete('everythingelse.log') if File.exist?('everythingelse.log');
+
       Contenthelper.validate_content_destination_path;
       FileUtils.rm_rf(Dir.glob(Immutable.config.content_destination_path))
     rescue Errno::ENOENT => e
@@ -100,6 +107,7 @@ class Content
     migrated_content_file_handler.write(front_matter);
     data_to_migrate = Contenthelper.update_html_with_new_image_paths(data_to_migrate);
     Contenthelper.log_various_href_sources(data_to_migrate);
+    Contenthelper.copy_files_to_required_folder(data_to_migrate);
     migrated_content_file_handler.write(data_to_migrate);
   end
 

@@ -259,6 +259,38 @@ class Contenthelper
       end
     end
 
+    #
+    # This method updates hrefs to media
+    #
+    def copy_files_to_required_folder(data_to_migrate)
+      doc_to_migrate = Nokogiri::HTML(data_to_migrate);
+      doc_to_migrate.css('a').each do |img|
+        old_src = img.attribute('href').to_s;
+        old_src.gsub('http://www.crossroads.net/', '/');
+        if(old_src['http://'])
+          Immutable.log.info " - > #{ old_src } we do not need this file   ";
+        else
+          file_to_copy = legacy_htdocs_path + old_src
+          status = File.file?(file_to_copy);
+          case status
+            when true
+              if   old_src['.pdf']
+                FileUtils.cp(file_to_copy, 'pdfs/');
+              elsif old_src['.mp3']
+                FileUtils.cp(file_to_copy, 'mp3/');
+              elsif old_src['.mp4']
+                FileUtils.cp(file_to_copy, 'mp4/');
+              elsif old_src['.doc']
+                FileUtils.cp(file_to_copy, 'doc/') ;
+              else
+                FileUtils.cp(file_to_copy, 'all/') ;
+              end
+            when false
+                Immutable.log.info " - > #{ file_to_copy } does not exists  ";
+            end
+        end
+      end
+    end
   end
 
 end
