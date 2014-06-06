@@ -294,22 +294,11 @@ class Contenthelper
       elsif href['.doc']
         replacements << ["uploadedfiles", "docs"]
         replacements << ["images/uploadedImages", "docs"]
-      else
-        replacements << ["uploadedfiles", "content"]
-        replacements << ["images/uploadedImages/GOMamelodi", "content/gomamelodi"]
-        replacements << ["images/uploadedImages/boxes/New Folder", "boxes"]
-        replacements << ["images/uploadedImages/boxes/New%20Folder", "boxes"]
-        replacements << ["images/uploadedImages/boxes", "boxes"]
-        replacements << ["images/uploadedImages/buttons", "buttons"]
-        replacements << ["images/uploadedImages/banners", "banners"]
-        replacements << ["images/uploadedImages/3500 Madison", "content/3500Madison"]
-        replacements << ["images/uploadedImages/3500%20Madison", "content/3500Madison"]
-        replacements << ["images/uploadedImages", "content"]
-        replacements << ["img/icn", "icn"]
-        replacements << ["img/tabs", "tabs"]
       end
       replacements.each { |set| href = href.gsub(set[0], set[1]) }
-      href = Immutable.config.s3media + href
+      if !replacements.empty?
+        href = Immutable.config.s3media + href
+      end
       return href;
 
     end
