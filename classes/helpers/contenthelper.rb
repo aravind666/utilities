@@ -205,8 +205,6 @@ class Contenthelper
       replacements << ["img/icn", "icn"]
       replacements << ["img/tabs", "tabs"]
 
-
-
       replacements.each { |set| source = source.gsub(set[0], set[1]) }
       source = Immutable.config.s3url+ source
       return source;
@@ -239,7 +237,24 @@ class Contenthelper
 
 
     #
-    # This method updates hrefs to media
+    # This method updates image paths
+    # with the migrated path by
+    # Parsing the content
+    #
+    def update_html_with_new_media_hrefs(data_to_migrate)
+      doc_to_migrate = Nokogiri::HTML(data_to_migrate);
+      doc_to_migrate.css('a').each do |a|
+        href = a.attribute('href').to_s;
+        new_href = Contenthelper.update_href(href);
+        a['href'] = new_href;
+      end
+      return doc_to_migrate.to_s;
+    end
+
+
+    #
+    # This method logs hrefs to media in all
+    # migrated content
     #
     def log_various_href_sources(data_to_migrate)
       doc_to_migrate = Nokogiri::HTML(data_to_migrate);
@@ -259,8 +274,48 @@ class Contenthelper
       end
     end
 
+
+
+
+
     #
-    # This method updates hrefs to media
+    # This method changes all hrefs with new S3 url
+    #
+    def update_href(href)
+
+      href.gsub('http://www.crossroads.net/', '/');
+      replacements = []
+      if href['.pdf']
+        replacements << ["uploadedfiles", "pdf"]
+        replacements << ["images/uploadedImages", "pdf"]
+      elsif href['.mp3']
+        replacements << ["players/media/hq/320", "mp3"]
+        replacements << ["uploadedfiles", "mp3"]
+      elsif href['.doc']
+        replacements << ["uploadedfiles", "docs"]
+        replacements << ["images/uploadedImages", "docs"]
+      else
+        replacements << ["uploadedfiles", "content"]
+        replacements << ["images/uploadedImages/GOMamelodi", "content/gomamelodi"]
+        replacements << ["images/uploadedImages/boxes/New Folder", "boxes"]
+        replacements << ["images/uploadedImages/boxes/New%20Folder", "boxes"]
+        replacements << ["images/uploadedImages/boxes", "boxes"]
+        replacements << ["images/uploadedImages/buttons", "buttons"]
+        replacements << ["images/uploadedImages/banners", "banners"]
+        replacements << ["images/uploadedImages/3500 Madison", "content/3500Madison"]
+        replacements << ["images/uploadedImages/3500%20Madison", "content/3500Madison"]
+        replacements << ["images/uploadedImages", "content"]
+        replacements << ["img/icn", "icn"]
+        replacements << ["img/tabs", "tabs"]
+      end
+      replacements.each { |set| href = href.gsub(set[0], set[1]) }
+      href = Immutable.config.s3media + href
+      return href;
+
+    end
+
+    #
+    # This method copies required media to a folder
     #
     def copy_files_to_required_folder(data_to_migrate)
       doc_to_migrate = Nokogiri::HTML(data_to_migrate);
