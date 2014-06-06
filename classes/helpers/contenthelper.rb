@@ -245,10 +245,17 @@ class Contenthelper
       doc_to_migrate = Nokogiri::HTML(data_to_migrate);
       doc_to_migrate.css('a').each do |img|
         old_src = img.attribute('href').to_s;
-        if(old_src['.pdf'])
-          Immutable.log.info  "#{old_src} ";
+        if   old_src['.pdf']
+            File.open("pdfs_missing.log", 'a+') {|f| f.write(old_src + "\n") }
+        elsif old_src['.mp3']
+            File.open("mp3_missing.log", 'a+') {|f| f.write(old_src + "\n") }
+        elsif old_src['.mp4']
+            File.open("mp4_missing.log", 'a+') {|f| f.write(old_src + "\n") }
+        elsif old_src['.doc']
+            File.open("docs_missing.log", 'a+') {|f| f.write(old_src + "\n") }
+        else
+            File.open("everythingelse.log", 'a+') {|f| f.write(old_src + "\n") }
         end
-
       end
     end
 
