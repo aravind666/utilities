@@ -190,23 +190,29 @@ class Contenthelper
     #
     def replace_image_sources_with_new_paths(source)
 
-      replacements = []
-      replacements << ["uploadedfiles", "content"]
 
-      replacements << ["images/uploadedImages/GOMamelodi", "content/gomamelodi"]
-      replacements << ["images/uploadedImages/boxes/New Folder", "boxes"]
-      replacements << ["images/uploadedImages/boxes/New%20Folder", "boxes"]
-      replacements << ["images/uploadedImages/boxes", "boxes"]
-      replacements << ["images/uploadedImages/buttons", "buttons"]
-      replacements << ["images/uploadedImages/banners", "banners"]
-      replacements << ["images/uploadedImages/3500 Madison", "content/3500Madison"]
-      replacements << ["images/uploadedImages/3500%20Madison", "content/3500Madison"]
-      replacements << ["images/uploadedImages", "content"]
-      replacements << ["img/icn", "icn"]
-      replacements << ["img/tabs", "tabs"]
+      source.gsub('http://www.crossroads.net/', '/');
 
-      replacements.each { |set| source = source.gsub(set[0], set[1]) }
-      source = Immutable.config.s3url+ source
+      if !source['http://']
+
+        replacements = []
+        replacements << ["uploadedfiles", "content"]
+        replacements << ["images/uploadedImages/GOMamelodi", "content/gomamelodi"]
+        replacements << ["images/uploadedImages/boxes/New Folder", "boxes"]
+        replacements << ["images/uploadedImages/boxes/New%20Folder", "boxes"]
+        replacements << ["images/uploadedImages/boxes", "boxes"]
+        replacements << ["images/uploadedImages/buttons", "buttons"]
+        replacements << ["images/uploadedImages/banners", "banners"]
+        replacements << ["images/uploadedImages/3500 Madison", "content/3500Madison"]
+        replacements << ["images/uploadedImages/3500%20Madison", "content/3500Madison"]
+        replacements << ["images/uploadedImages", "content"]
+        replacements << ["img/icn", "icn"]
+        replacements << ["img/tabs", "tabs"]
+        replacements.each { |set| source = source.gsub(set[0], set[1]) }
+        source = Immutable.config.s3url+ source
+
+      end
+
       return source;
 
     end
@@ -229,6 +235,7 @@ class Contenthelper
       doc_to_migrate = Nokogiri::HTML(data_to_migrate);
       doc_to_migrate.css('img').each do |img|
         old_src = img.attribute('src').to_s;
+
         new_src = Contenthelper.replace_image_sources_with_new_paths(old_src);
         img['src'] = new_src;
       end
