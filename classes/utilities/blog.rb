@@ -124,11 +124,11 @@ class Blog
     def get_jekyll_front_matter_blog_post(data, mediaElements)
         mainTitle = data['title'].gsub /"/, '';
         tagCategory = Contenthelper.purify_title_by_removing_special_characters(data['name'].downcase.strip);
-        front_matter = "---\nlayout: blog\ntitle: \"#{mainTitle}\"";
+        front_matter = "---\nlayout: post\ntitle: \"#{mainTitle}\"";
         front_matter += "\nsubtitle: \"#{data['subtitle']}\"";
-        front_matter += "\ndate: #{data["createdDate"].strftime("%Y-%m-%d")}";
+        front_matter += "\ndate: #{data["createdDate"].strftime("%Y-%m-%d %H:%M:%S")}";
         front_matter += "\ncategory: \"#{data['name']}\"";
-        front_matter += "\ntag: \"#{tagCategory}\"";
+        front_matter += "\ntag: \n - #{tagCategory}";
         front_matter += "\ncomments: true";
         front_matter += "\ncreated-by: \"#{data['FirstName']}\"";
         front_matter += mediaElements;
