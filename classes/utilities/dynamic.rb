@@ -34,6 +34,8 @@ class Dynamic
       if (response_from_content_url)
         front_matter = self.get_jekyll_front_matter_for_content(link, response_from_content_url);
         content_to_migrate = self.get_content_body_to_migrate(response_from_content_url);
+        Contenthelper.log_various_href_sources(content_to_migrate.to_s);
+        content_to_migrate = Contenthelper.update_html_with_new_media_hrefs(content_to_migrate.to_s);
         target_file_location = self.setup_target_file_location(link);
         self.migrate_by_adding_jekyll_front_matter(target_file_location, front_matter, content_to_migrate);
       end
@@ -51,6 +53,8 @@ class Dynamic
       new_src = Contenthelper.replace_image_sources_with_new_paths(old_src);
       img['src'] = new_src;
     end
+
+
 
     if response.search('div#mainContent').nil?
       post_body = response.search('body');
