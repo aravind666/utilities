@@ -21,7 +21,6 @@ class Blog
     # function to get the blog post which are ready to migrate
     #
     def migrate_blog
-        File.delete('blog_images_missing.log') if File.exist?('blog_images_missing.log');
         blog_data = Mediahelper.get_all_blog_posts();
         self.process_blog_data(blog_data);
     end
@@ -37,14 +36,12 @@ class Blog
                 if (getMediaElements == 'FLV')
                     self.log_flv_videos(data);
                 else
-                   # front_matter = self.get_jekyll_front_matter_blog_post(data, getMediaElements);
-                   # content = self.get_jekyll_content_matter(data);
-
-                   # file_write_data = front_matter + content;
-                   # self.migrate_by_adding_jekyll_front_matter(file_write_data, data);
+                    front_matter = self.get_jekyll_front_matter_blog_post(data, getMediaElements);
+                    content = self.get_jekyll_content_matter(data);
+                    file_write_data = front_matter + content;
+                    self.migrate_by_adding_jekyll_front_matter(file_write_data, data);
                 end
             end
-
         else
             Immutable.log.info "No blog post available";
         end
@@ -106,11 +103,8 @@ class Blog
                 end
                 front_matter = "\naudio: \"#{url}\"";
               when 'image'
-
                 poster = list['imageUrl'] + list['path'];
-
                 poster = Contenthelper.replace_image_sources_with_new_paths(poster);
-
                 front_matter = "\nimage: \"#{poster}\"";
                 if (list['width'] == 0)
                   list['width'] = '';

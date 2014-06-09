@@ -195,7 +195,7 @@ class Contenthelper
 
       if !source['http://']
 
-        Contenthelper.copy_required_blog_images_to_folder(source);
+       # Contenthelper.copy_required_blog_images_to_folder(source);
         replacements = []
         replacements << ["uploadedfiles", "content"]
         replacements << ["images/uploadedImages/GOMamelodi", "content/gomamelodi"]
@@ -211,7 +211,6 @@ class Contenthelper
         replacements << ["img/tabs", "tabs"]
         replacements.each { |set| source = source.gsub(set[0], set[1]) }
         source = Immutable.config.s3url+ source
-        File.open("blog_images_missing.log", 'a+') { |f| f.write(source + "\n") }
 
       end
 
@@ -361,7 +360,6 @@ class Contenthelper
     # to respective folder
     #
     def copy_required_blog_images_to_folder(old_src)
-
       old_src.gsub('http://www.crossroads.net/', '/');
       if (old_src['http://'])
         Immutable.log.info " - > #{ old_src } we do not need this file   ";
