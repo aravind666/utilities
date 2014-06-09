@@ -190,8 +190,8 @@ class Contenthelper
     #
     def replace_image_sources_with_new_paths(source)
 
-
-      source.gsub('http://www.crossroads.net/', '/');
+      source = source.gsub("https://www.crossroads.net/", '/');
+      source = source.gsub("http://www.crossroads.net/", '/');
 
       if !source['http://']
 
