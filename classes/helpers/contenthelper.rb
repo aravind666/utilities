@@ -210,7 +210,7 @@ class Contenthelper
         replacements << ["img/tabs", "tabs"]
         replacements.each { |set| source = source.gsub(set[0], set[1]) }
         source = Immutable.config.s3url+ source
-        File.open("blog_images_missing.log", 'a+') {|f| f.write(source + "\n") }
+        File.open("blog_images_missing.log", 'a+') { |f| f.write(source + "\n") }
         Contenthelper.copy_required_blog_images_to_folder(source);
       end
 
@@ -273,21 +273,21 @@ class Contenthelper
         if old_src['http://'] || old_src['https://'] || old_src['itpc://'] || old_src['mailto:'] || old_src['.jpg']
           Immutable.log.info " - > #{ old_src } -- we do not to do any thing with this since its external   ";
         elsif old_src['.pdf']
-            File.open("pdfs_missing.log", 'a+') {|f| f.write(old_src + "\n") }
+          File.open("pdfs_missing.log", 'a+') { |f| f.write(old_src + "\n") }
         elsif old_src['.mp3']
-            File.open("mp3_missing.log", 'a+') {|f| f.write(old_src + "\n") }
+          File.open("mp3_missing.log", 'a+') { |f| f.write(old_src + "\n") }
         elsif old_src['.mp4']
-            File.open("mp4_missing.log", 'a+') {|f| f.write(old_src + "\n") }
+          File.open("mp4_missing.log", 'a+') { |f| f.write(old_src + "\n") }
         elsif old_src['.doc']
-            File.open("docs_missing.log", 'a+') {|f| f.write(old_src + "\n") }
+          File.open("docs_missing.log", 'a+') { |f| f.write(old_src + "\n") }
         elsif old_src[/^#.+/]
-            Immutable.log.info " - > #{ old_src } -- we do not need this since it is just hash tag";
+          Immutable.log.info " - > #{ old_src } -- we do not need this since it is just hash tag";
         elsif old_src['.php']
-          File.open("php_links_in_milacron.log", 'a+') {|f| f.write(old_src + "\n") }
+          File.open("php_links_in_milacron.log", 'a+') { |f| f.write(old_src + "\n") }
         elsif old_src['mysend/']
-          File.open("mysend_links_in_milacron.log", 'a+') {|f| f.write(old_src + "\n") }
+          File.open("mysend_links_in_milacron.log", 'a+') { |f| f.write(old_src + "\n") }
         elsif !old_src.empty?
-            File.open("everythingelse.log", 'a+') {|f| f.write(old_src + "\n") }
+          File.open("everythingelse.log", 'a+') { |f| f.write(old_src + "\n") }
         end
       end
     end
@@ -330,7 +330,7 @@ class Contenthelper
       doc_to_migrate.css('a').each do |img|
         old_src = img.attribute('href').to_s;
         old_src.gsub('http://www.crossroads.net/', '/');
-        if(old_src['http://'])
+        if (old_src['http://'])
           Immutable.log.info " - > #{ old_src } we do not need this file   ";
         else
           file_to_copy = Immutable.config.legacy_htdocs_path + old_src
@@ -344,42 +344,39 @@ class Contenthelper
               elsif old_src['.mp4']
                 FileUtils.cp(file_to_copy, 'mp4/');
               elsif old_src['.doc']
-                FileUtils.cp(file_to_copy, 'doc/') ;
+                FileUtils.cp(file_to_copy, 'doc/');
               else
-                FileUtils.cp(file_to_copy, 'all/') ;
-              end
-            when false
-                Immutable.log.info " - > #{ file_to_copy } does not exists  ";
-            end
-        end
-      end
-    end
-
-    #
-    # This method copies required media to its respective folder
-    #
-    def copy_required_blog_images_to_folder(old_src)
-
-      old_src.gsub('http://www.crossroads.net/', '/');
-        if(old_src['http://'])
-          Immutable.log.info " - > #{ old_src } we do not need this file   ";
-        else
-          file_to_copy = Immutable.config.legacy_htdocs_path + old_src
-          status = File.file?(file_to_copy);
-          case status
-            when true
-                FileUtils.cp(file_to_copy, 'blogimages/') ;
+                FileUtils.cp(file_to_copy, 'all/');
               end
             when false
               Immutable.log.info " - > #{ file_to_copy } does not exists  ";
           end
         end
+      end
+    end
 
+    #
+    # This method copies required images for blog
+    # to respective folder 
+    #
+    def copy_required_blog_images_to_folder(old_src)
+
+      old_src.gsub('http://www.crossroads.net/', '/');
+      if (old_src['http://'])
+        Immutable.log.info " - > #{ old_src } we do not need this file   ";
+      else
+        file_to_copy = Immutable.config.legacy_htdocs_path + old_src
+        status = File.file?(file_to_copy);
+        case status
+          when true
+            FileUtils.cp(file_to_copy, 'blogimages/');
+          when false
+            Immutable.log.info " - > #{ file_to_copy } does not exists  ";
+        end
+      end
     end
   end
-
 end
-
 
 
 
