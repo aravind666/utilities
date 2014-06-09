@@ -260,7 +260,11 @@ class Contenthelper
       doc_to_migrate = Nokogiri::HTML(data_to_migrate);
       doc_to_migrate.css('a').each do |img|
         old_src = img.attribute('href').to_s;
-        if   old_src['.pdf']
+        old_src.gsub('http://www.crossroads.net/', '/');
+        replacements = []
+        if old_src['http://'] || old_src['https://'] || old_src['itpc://'] || old_src['mailto:'] || old_src['.jpg']
+          Immutable.log.info " - > #{ old_src } -- we do not to do any thing with this since its external   ";
+        elsif old_src['.pdf']
             File.open("pdfs_missing.log", 'a+') {|f| f.write(old_src + "\n") }
         elsif old_src['.mp3']
             File.open("mp3_missing.log", 'a+') {|f| f.write(old_src + "\n") }
@@ -268,15 +272,17 @@ class Contenthelper
             File.open("mp4_missing.log", 'a+') {|f| f.write(old_src + "\n") }
         elsif old_src['.doc']
             File.open("docs_missing.log", 'a+') {|f| f.write(old_src + "\n") }
-        else
+        elsif old_src[/^#.+/]
+            Immutable.log.info " - > #{ old_src } -- we do not need this since it is just hash tag";
+        elsif old_src['.php']
+          File.open("php_links_in_milacron.log", 'a+') {|f| f.write(old_src + "\n") }
+        elsif old_src['mysend/']
+          File.open("mysend_links_in_milacron.log", 'a+') {|f| f.write(old_src + "\n") }
+        elsif !old_src.empty?
             File.open("everythingelse.log", 'a+') {|f| f.write(old_src + "\n") }
         end
       end
     end
-
-
-
-
 
     #
     # This method changes all hrefs with new S3 url
@@ -285,7 +291,9 @@ class Contenthelper
 
       href.gsub('http://www.crossroads.net/', '/');
       replacements = []
-      if href['.pdf']
+      if href['http://'] || href['https://']
+        Immutable.log.info " - > #{ href } -- we do not to do any thing with this since its external   ";
+      elsif href['.pdf']
         replacements << ["uploadedfiles", "pdf"]
         replacements << ["images/uploadedImages", "pdf"]
       elsif href['.mp3']
@@ -294,6 +302,9 @@ class Contenthelper
       elsif href['.doc']
         replacements << ["uploadedfiles", "docs"]
         replacements << ["images/uploadedImages", "docs"]
+      elsif href['.jpg']
+        replacements << ["uploadedfiles", "content"]
+        replacements << ["images/uploadedImages", "content"]
       end
       replacements.each { |set| href = href.gsub(set[0], set[1]) }
       if !replacements.empty?
@@ -304,7 +315,7 @@ class Contenthelper
     end
 
     #
-    # This method copies required media to a folder
+    # This method copies required media to its respective folder
     #
     def copy_files_to_required_folder(data_to_migrate)
       doc_to_migrate = Nokogiri::HTML(data_to_migrate);

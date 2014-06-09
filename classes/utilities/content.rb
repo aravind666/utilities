@@ -22,13 +22,13 @@ class Content
   #
   def clean_old_files
     begin
-
       File.delete('pdfs_missing.log') if File.exist?('pdfs_missing.log');
       File.delete('mp3_missing.log') if File.exist?('mp3_missing.log');
       File.delete('mp4_missing.log') if File.exist?('mp4_missing.log');
       File.delete('docs_missing.log') if File.exist?('docs_missing.log');
       File.delete('everythingelse.log') if File.exist?('everythingelse.log');
-
+      File.delete('php_links_in_milacron.log') if File.exist?('php_links_in_milacron.log');
+      File.delete('mysend_links_in_milacron.log') if File.exist?('mysend_links_in_milacron.log');
       Contenthelper.validate_content_destination_path;
       FileUtils.rm_rf(Dir.glob(Immutable.config.content_destination_path))
     rescue Errno::ENOENT => e
