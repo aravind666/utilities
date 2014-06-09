@@ -210,7 +210,8 @@ class Contenthelper
         replacements << ["img/tabs", "tabs"]
         replacements.each { |set| source = source.gsub(set[0], set[1]) }
         source = Immutable.config.s3url+ source
-
+        File.open("blog_images_missing.log", 'a+') {|f| f.write(source + "\n") }
+        Contenthelper.copy_required_blog_images_to_folder(source);
       end
 
       return source;
@@ -352,6 +353,28 @@ class Contenthelper
             end
         end
       end
+    end
+
+    #
+    # This method copies required media to its respective folder
+    #
+    def copy_required_blog_images_to_folder(old_src)
+
+      old_src.gsub('http://www.crossroads.net/', '/');
+        if(old_src['http://'])
+          Immutable.log.info " - > #{ old_src } we do not need this file   ";
+        else
+          file_to_copy = Immutable.config.legacy_htdocs_path + old_src
+          status = File.file?(file_to_copy);
+          case status
+            when true
+                FileUtils.cp(file_to_copy, 'blogimages/') ;
+              end
+            when false
+              Immutable.log.info " - > #{ file_to_copy } does not exists  ";
+          end
+        end
+
     end
   end
 
