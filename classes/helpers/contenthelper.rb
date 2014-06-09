@@ -195,6 +195,7 @@ class Contenthelper
 
       if !source['http://']
 
+        Contenthelper.copy_required_blog_images_to_folder(source);
         replacements = []
         replacements << ["uploadedfiles", "content"]
         replacements << ["images/uploadedImages/GOMamelodi", "content/gomamelodi"]
@@ -211,7 +212,7 @@ class Contenthelper
         replacements.each { |set| source = source.gsub(set[0], set[1]) }
         source = Immutable.config.s3url+ source
         File.open("blog_images_missing.log", 'a+') { |f| f.write(source + "\n") }
-        Contenthelper.copy_required_blog_images_to_folder(source);
+
       end
 
       return source;
@@ -357,7 +358,7 @@ class Contenthelper
 
     #
     # This method copies required images for blog
-    # to respective folder 
+    # to respective folder
     #
     def copy_required_blog_images_to_folder(old_src)
 
