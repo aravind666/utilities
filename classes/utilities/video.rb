@@ -98,8 +98,12 @@ class Video
 
     mainTitle = media['Title'].gsub /"/, '';
     video_description = Contenthelper.purify_by_removing_special_characters(media['Description']);
-    video_poster = Immutable.config.image_thumb_base_url + media['ThumbImagePath'];
-
+    video_poster = media['ThumbImagePath'];
+    Contenthelper.copy_required_audio_images_to_folder(video_poster)
+    video_poster = "/uploadedfiles/#{video_poster}"
+    video_poster = Contenthelper.replace_image_sources_with_new_paths(video_poster)
+   
+		
     front_matter = "---\nlayout: media\ncategory: media\ntitle: \"#{mainTitle}\"";
     front_matter += "\ndate: #{media["UploadDate"].strftime("%Y-%m-%d")}";
     front_matter += "\ndescription: \"#{video_description}\""
