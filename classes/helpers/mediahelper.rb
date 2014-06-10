@@ -98,7 +98,26 @@ class Mediahelper
         message_video_content_data = Immutable.dbh.execute(video_sql);
 
         return message_video_content_data;
-      rescue DBI::DatabaseError => e
+        rescue DBI::DatabaseError => e
+        Immutable.log.error "Error code: #{e.err}"
+        Immutable.log.error "Error message: #{e.errstr}"
+        Immutable.log.error "Error SQLSTATE: #{e.state}"
+        abort('An error occurred while getting message video content data from DB, Check migration log for more details');
+      end
+    end
+
+    #
+    # Get all media content
+    #
+    def get_media_content
+      begin
+        video_sql = "SELECT * FROM mediacontent";
+        video_sql += " WHERE  ContentTypeID = 1";
+        video_sql += " AND ( iPodVideo IS NOT NULL AND iPodVideo != '') AND (iPodVideo LIKE '%mp4')";
+        message_video_content_data = Immutable.dbh.execute(video_sql);
+
+        return message_video_content_data;
+        rescue DBI::DatabaseError => e
         Immutable.log.error "Error code: #{e.err}"
         Immutable.log.error "Error message: #{e.errstr}"
         Immutable.log.error "Error SQLSTATE: #{e.state}"
