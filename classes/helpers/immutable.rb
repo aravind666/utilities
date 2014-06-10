@@ -32,6 +32,14 @@ class Immutable
     end
 
     #
+    # Selfie to get logger
+    #
+    def baseURL
+      return "http://milacron.crossroads.net"
+    end
+
+
+    #
     # Selfie to get database handler
     #
     def dbh
