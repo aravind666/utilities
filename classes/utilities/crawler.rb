@@ -68,7 +68,7 @@ class Crawler
         end
       end
       if  broken_links != ''
-        log_message += "Broken links : - " + broken_links;
+        log_message += "Broken links : - \n " + broken_links;
         File.open("links_broken.log", 'a+') { |f| f.write(log_message + "\n") }
       end
     end
