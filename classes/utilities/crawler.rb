@@ -13,9 +13,7 @@ class Crawler
   # starts crawling
   #
   def initialize
-    File.delete('everythingelse.log') if File.exist?('everythingelse.log');
-    File.delete('php_links_in_milacron.log') if File.exist?('php_links_in_milacron.log');
-    File.delete('mysend_links_in_milacron.log') if File.exist?('mysend_links_in_milacron.log');
+    File.delete('links_broken.log') if File.exist?('links_broken.log');
     self.crawl_milacron();
   end
 
@@ -49,24 +47,24 @@ class Crawler
   # This method logs each hrefs based on classification
   #
   def log_hrefs_crawled(href_hash)
+    log_message = '';
     href_hash.each do |link, href_list|
+      log_message += "\n URL : #{link} \n";
       href_list.each do |href|
         href.gsub('http://www.crossroads.net/', '/');
-        log_message = "\n URL : #{link} \n";
-        log_message + "\n links : \n"
-        log_message + "\n" + href + "\n";
         if href['http://'] || href['https://'] || href['itpc://'] || href['mailto:'] || href['.jpg']
           Immutable.log.info " - > #{ href } -- we do not to do any thing with this since its external   ";
         elsif href[/^#.+/]
           Immutable.log.info " - > #{ href } -- we do not need this since it is just hash tag";
         elsif href['.php']
-          File.open("php_links_in_milacron.log", 'a+') { |f| f.write(log_message + "\n") }
+          log_message =+ href + "\n";
         elsif href['mysend/']
-          File.open("mysend_links_in_milacron.log", 'a+') { |f| f.write(log_message + "\n") }
+          log_message =+ href + "\n";
         elsif !href.empty?
-          File.open("everythingelse.log", 'a+') { |f| f.write(log_message + "\n") }
+          log_message =+ href + "\n";
         end
       end
     end
+    File.open("links_broken.log", 'a+') { |f| f.write(log_message + "\n") }
   end
 end
