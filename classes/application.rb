@@ -40,6 +40,8 @@ class Application
         return;
       when 'migrate-dynamic-content'
         return;
+      when 'crawl-for-links'
+        return;
       else
         puts "you have passed #{command_line_argument} -- I have no idea what to do with that.";
         puts "I know only to process the commands :  ,  \nmigrate-content \nmigrate-messages \nmigrate-videos \nmigrate-audios \nmigrate-dynamic-content\nmigrate-blog";
@@ -65,6 +67,8 @@ class Application
         Blog.new;
       when 'migrate-dynamic-content'
         Dynamic.new;
+      when 'crawl-for-links'
+        Crawler.new;
     end
   end
 end

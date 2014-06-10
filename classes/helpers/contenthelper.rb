@@ -266,8 +266,8 @@ class Contenthelper
     #
     def log_various_href_sources(data_to_migrate)
       doc_to_migrate = Nokogiri::HTML(data_to_migrate);
-      doc_to_migrate.css('a').each do |img|
-        old_src = img.attribute('href').to_s;
+      doc_to_migrate.css('a').each do |a|
+        old_src = a.attribute('href').to_s;
         old_src.gsub('http://www.crossroads.net/', '/');
         replacements = []
         if old_src['http://'] || old_src['https://'] || old_src['itpc://'] || old_src['mailto:'] || old_src['.jpg']

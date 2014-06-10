@@ -1,0 +1,17 @@
+db_user_name = root
+db_password = root
+db_name = crossroadsdotnet
+db_host = localhost
+content_source_path = ../prod_content/
+content_destination_path = /home/aravind/Projects/milacron/milacron_final/crdschurch-dev2/app/_content
+message_destination_path = /home/aravind/Projects/milacron/milacron_final/crdschurch-dev2/app/_messages
+audio_destination_path = /home/costrategix/test/milacron_final/app/_music
+video_destination_path = /home/costrategix/test/milacron_final/app/_media
+blog_destination_path = /home/aravind/Projects/milacron/milacron_final/crdschurch-dev2/app/_posts/migrated
+image_thumb_base_url = https://www.crossroads.net/uploadedfiles/
+audio_image_thumb_base_url = http://www.crossroads.net/players/media/mediumHz/
+dynamic_links_list = ./data/dynamic_links_to_migrate.list
+crawl_links_list = ./data/crawl_site_maps.list
+dynamic_link_base_url = http://www.crossroads.net/index.php?action=viewpage&filepath=pages
+s3url = http://s3.amazonaws.com/crossroads-media/images/legacy
+s3media = http://s3.amazonaws.com/crossroads-media/media/legacy
