@@ -97,12 +97,15 @@ class Audio
       
       if (audio_thumb_image && !audio_thumb_image.nil? && !audio_thumb_image.empty?) then 
       	audio_poster = audio['ThumbImagePath']
-      	Contenthelper.copy_required_audio_images_to_folder(audio_poster)
-		    audio_poster = "#{Immutable.config.s3url}/uploadedfiles/#{audio_poster}"
+      	
+		    audio_poster = "#{audio_poster}"
 		    #audio_poster = Contenthelper.replace_image_sources_with_new_paths(audio_poster)
       else (audio_thumb_image=='' || audio_thumb_image=='NULL' || audio_thumb_image==' ' || audio_thumb_image.empty?)
-      	audio_poster = "#{Immutable.config.s3url}/uploadedfiles/#{default_audio_image_thumb}"
-      end      
+      	audio_poster = "#{default_audio_image_thumb}"
+      end
+      Contenthelper.copy_required_audio_images_to_folder(audio_poster)
+      audio_poster = "/uploadedfiles/#{audio_poster}"
+      audio_poster = Contenthelper.replace_image_sources_with_new_paths(audio_poster)    
       if audio['duration'] == ":" then
         audio['duration'] = "00:00"
       end
