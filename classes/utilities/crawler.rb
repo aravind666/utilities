@@ -49,8 +49,10 @@ class Crawler
   def log_hrefs_crawled(href_hash)
     log_message = '';
     href_hash.each do |link, href_list|
-      log_message += "\n URL : #{link} \n";
+      log_message += "\n URL : -  #{link} \n";
+      broken_links = '';
       href_list.each do |href|
+        broken_links = "Broken links : - "
         href.gsub('http://www.crossroads.net/', '/');
         if href['http://'] || href['https://'] || href['itpc://'] || href['mailto:'] || href['.jpg']
           Immutable.log.info " - > #{ href } -- we do not to do any thing with this since its external   ";
@@ -59,14 +61,17 @@ class Crawler
         elsif href[/^#.+/]
           Immutable.log.info " - > #{ href } -- we do not need this since it is just hash tag";
         elsif href['.php']
-          log_message += href + "\n";
+          broken_links += href + "\n";
         elsif href['mysend/']
-          log_message += href + "\n";
+          broken_links += href + "\n";
         elsif !href.empty?
-          log_message += href + "\n";
+          broken_links += href + "\n";
         end
       end
-      File.open("links_broken.log", 'a+') { |f| f.write(log_message + "\n") }
+      if !broken_links.empty?
+        log_message += broken_links
+        File.open("links_broken.log", 'a+') { |f| f.write(log_message + "\n") }
+      end
     end
   end
 end
