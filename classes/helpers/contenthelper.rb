@@ -388,8 +388,8 @@ class Contenthelper
 			elsif(File.file?(Immutable.config.legacy_htdocs_path + "/players/media/smallThumbs/" + old_src))
 				 status = true
 			 	 source_file_path = Immutable.config.legacy_htdocs_path + "/players/media/mediumHz/" + old_src
-			elsif(Immutable.config.legacy_htdocs_path+"/uploadedfiles" + old_src)
-				source_file_path = Immutable.config.legacy_htdocs_path+"/uploadedfiles" + old_src
+			elsif(Immutable.config.legacy_htdocs_path+"/uploadedfiles/" + old_src)
+				source_file_path = Immutable.config.legacy_htdocs_path+"/uploadedfiles/" + old_src
 				File.open("audio_images.log", 'a+') { |f| f.write(old_src + "\n") }
 			end
 			
