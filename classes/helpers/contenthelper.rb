@@ -383,12 +383,12 @@ class Contenthelper
 		def copy_required_audio_images_to_folder(old_src)
 			
 			status = false
-			if(File.file?(Immutable.config.legacy_htdocs_path+"/players/media/smallThumbs" + old_src))
+			if(File.file?(Immutable.config.legacy_htdocs_path+"/players/media/smallThumbs/" + old_src))
 			 status = true
-			 source_file_path = Immutable.config.legacy_htdocs_path + "/players/media/smallThumbs" + old_src
+			 source_file_path = Immutable.config.legacy_htdocs_path + "/players/media/smallThumbs/" + old_src
 			elsif(File.file?(Immutable.config.legacy_htdocs_path + "/players/media/mediumHz/" + old_src))
 				 status = true
-			 	 source_file_path = Immutable.config.legacy_htdocs_path + "/players/media/mediumHz" + old_src
+			 	 source_file_path = Immutable.config.legacy_htdocs_path + "/players/media/mediumHz/" + old_src
 			elsif(Immutable.config.legacy_htdocs_path+"uploadedfiles/" + old_src)
 				source_file_path = Immutable.config.legacy_htdocs_path+"/uploadedfiles/" + old_src
 			end
