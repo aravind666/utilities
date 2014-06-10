@@ -195,7 +195,7 @@ class Contenthelper
 
       if !source['http://']
 
-       # Contenthelper.copy_required_blog_images_to_folder(source);
+       #Contenthelper.copy_required_blog_images_to_folder(source);
         replacements = []
         replacements << ["uploadedfiles", "content"]
         replacements << ["images/uploadedImages/GOMamelodi", "content/gomamelodi"]
@@ -374,6 +374,34 @@ class Contenthelper
         end
       end
     end
+    
+    #
+    # This method copies required images for audio content
+    # to respective folder
+    #
+		def copy_required_audio_images_to_folder(old_src)
+			
+			status = false
+			if(File.file?(Immutable.config.legacy_htdocs_path+"/players/media/smallThumbs/" + old_src))
+			 status = true
+			 source_file_path = Immutable.config.legacy_htdocs_path + "/players/media/smallThumbs/" + old_src
+			elsif(File.file?(Immutable.config.legacy_htdocs_path + "/players/media/smallThumbs/" + old_src))
+				 status = true
+			 	 source_file_path = Immutable.config.legacy_htdocs_path + "/players/media/mediumHz/" + old_src
+			elsif(Immutable.config.legacy_htdocs_path+"/uploadedfiles" + old_src)
+				source_file_path = Immutable.config.legacy_htdocs_path+"/uploadedfiles" + old_src
+				File.open("audio_images.log", 'a+') { |f| f.write(old_src + "\n") }
+			end
+			
+			case status
+			when true
+				FileUtils.cp(source_file_path, 'audio_images/');
+			when false
+				Immutable.log.info " - > #{ source_file_path } does not exists  ";
+				File.open("audio_images.log", 'a+') { |f| f.write(old_src + "\n") }
+			end
+		end
+    
   end
 end
 
