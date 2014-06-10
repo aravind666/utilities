@@ -52,7 +52,7 @@ class Crawler
       log_message += "\n URL : -  #{link} \n";
       broken_links = '';
       href_list.each do |href|
-        broken_links = "Broken links : - "
+
         href.gsub('http://www.crossroads.net/', '/');
         if href['http://'] || href['https://'] || href['itpc://'] || href['mailto:'] || href['.jpg']
           Immutable.log.info " - > #{ href } -- we do not to do any thing with this since its external   ";
@@ -69,7 +69,7 @@ class Crawler
         end
       end
       if !broken_links.empty?
-        log_message += broken_links
+        log_message += "Broken links : - " + broken_links;
         File.open("links_broken.log", 'a+') { |f| f.write(log_message + "\n") }
       end
     end
