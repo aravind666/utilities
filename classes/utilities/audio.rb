@@ -16,7 +16,7 @@ class Audio
   # Create Content object by initilizing the migration flow
   #
   def initialize
-  	File.delete('audio_images.log') if File.exist?('audio_images.log');
+  	#File.delete('media_images.log') if File.exist?('media_images.log');
     self.migrate_audio()
   end
 

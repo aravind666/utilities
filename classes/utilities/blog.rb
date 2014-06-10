@@ -156,8 +156,8 @@ class Blog
         if (!para2.nil? && !para1.nil?)
             content = para1 + para2;
         end
-        mainContent = Contenthelper.purify_by_removing_special_characters(content);
-        return mainContent;
+        #mainContent = Contenthelper.purify_by_removing_special_characters(content);
+        return content;
     end
 
     #

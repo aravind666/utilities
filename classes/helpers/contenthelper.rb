@@ -380,7 +380,7 @@ class Contenthelper
     # This method copies required images for audio content
     # to respective folder
     #
-		def copy_required_audio_images_to_folder(old_src)
+		def copy_required_media_images_to_folder(old_src)
 			
 			status = false
 			if(File.file?(Immutable.config.legacy_htdocs_path+"/players/media/smallThumbs/" + old_src))
@@ -395,11 +395,11 @@ class Contenthelper
 			
 			case status
 			when true
-				FileUtils.cp(source_file_path, 'audio_images/');
+				FileUtils.cp(source_file_path, 'media_images/');
 			when false
 				Immutable.log.info " - > #{ source_file_path } does not exists  ";
 			end
-				File.open("audio_images.log", 'a+') { |f| f.write(source_file_path + "\n") }
+				File.open("media_images.log", 'a+') { |f| f.write(source_file_path + "\n") }
 		end
     
   end
