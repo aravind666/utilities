@@ -56,9 +56,9 @@ class Crawler
         log_message + "\n links : \n"
         log_message + "\n" + href + "\n";
         if href['http://'] || href['https://'] || href['itpc://'] || href['mailto:'] || href['.jpg']
-          Immutable.log.info " - > #{ old_src } -- we do not to do any thing with this since its external   ";
-        elsif old_src[/^#.+/]
-          Immutable.log.info " - > #{ old_src } -- we do not need this since it is just hash tag";
+          Immutable.log.info " - > #{ href } -- we do not to do any thing with this since its external   ";
+        elsif href[/^#.+/]
+          Immutable.log.info " - > #{ href } -- we do not need this since it is just hash tag";
         elsif href['.php']
           File.open("php_links_in_milacron.log", 'a+') { |f| f.write(log_message + "\n") }
         elsif href['mysend/']
