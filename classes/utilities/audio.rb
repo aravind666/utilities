@@ -24,8 +24,8 @@ class Audio
   #
   def migrate_audio
     begin
-      series_data = Mediahelper.get_all_series()
-      self.process_series_data(series_data)
+      audio_data = Mediahelper.get_audio_content()
+      self.create_audio_posts_for_each_audio_content(audio_data)
     end
   end
 
@@ -50,7 +50,9 @@ class Audio
     begin
       message_data.each do |message|
         audio_content = Mediahelper.get_audio_content_for_message(message[0]);
-        if audio_content.fetchable? then
+         audio_content_structure = audio_content.fetch_all;
+        puts audio_content_structure.size
+        if audio_content_structure.size > 0 then
           self.create_audio_posts_for_each_audio_content(message, series, audio_content);
         else
           Immutable.log.info "Message  #{message[0]} does not have any audio content";
@@ -61,15 +63,20 @@ class Audio
 
 
   #
-  # Add media video content front matter
+  # Add media audio content front matter
   # this can be used by liquid variables in media layout .
   #
-  def create_audio_posts_for_each_audio_content(message, series, audio_content)
+  def create_audio_posts_for_each_audio_content(audio_content)
     begin
       audio_content.each do |audio|
-        audio_front_matter = self.get_jekyll_frontmatter_for_audio(audio, series);
-        self.migrate_audio_by_adding_jekyll_front_matter(audio_front_matter, audio);
+      	if  audio[0] > 0 then
+		      audio_front_matter = self.get_jekyll_frontmatter_for_audio(audio);
+		      self.migrate_audio_by_adding_jekyll_front_matter(audio_front_matter, audio);
+        else
+          Immutable.log.info "Audio  #{audio[0]} does not have any audio content";
+        end
       end
+      abort('Successfully migrated audio content in specified destination');
     end
   end
 
@@ -78,7 +85,7 @@ class Audio
   # Prepare Jekyll Frontmatter for migrated audio content
   #
   #
-  def get_jekyll_frontmatter_for_audio(audio, series)
+  def get_jekyll_frontmatter_for_audio(audio)
     begin
       front_matter = '';
       default_audio_image_thumb = "DefaultVideoImage.jpg"
@@ -86,27 +93,22 @@ class Audio
       audio_description = Contenthelper.purify_by_removing_special_characters(audio['Description']);
       audio_path = audio['LowQFilePath'] + Contenthelper.encode_url_string(audio['HighQFilePath']);
       audio_thumb_image = audio['ThumbImagePath'].to_s
+      
       if (audio_thumb_image && !audio_thumb_image.nil? && !audio_thumb_image.empty?) then 
       	audio_poster = audio['ThumbImagePath'];
       else (audio_thumb_image=='' || audio_thumb_image=='NULL' || audio_thumb_image==' ' || audio_thumb_image.empty?)
       	audio_poster = default_audio_image_thumb;
       end
-      
-      if (audio['ContentTypeID']==5 && audio_poster!=default_audio_image_thumb) then 
-      	audio_thumb_image_path = "#{Immutable.config.audio_message_image_thumb_base_url}#{audio_poster}"
-      else
-      	audio_thumb_image_path = "#{Immutable.config.audio_image_thumb_base_url}#{audio_poster}"
-      end
-      
+           
       if audio['duration'] == ":" then
         audio['duration'] = "00:00"
       end
+      
       front_matter = "---\nlayout: music \ntitle: \"#{audio_title}\"";
-      front_matter += "\nseries: \"#{series[1]}\"";
-      front_matter += "\ndate: #{audio["ActiveDate"].strftime("%Y-%m-%d")}";
+      front_matter += "\ndate: #{audio["UploadDate"].strftime("%Y-%m-%d")}";
       front_matter += " \ndescription: \"#{audio_description}\"";
       front_matter += "\naudio: \"#{audio_path}\"\naudio-duration: \"#{audio['duration']}\"";
-      front_matter += "\nsrc: \"#{audio_thumb_image_path}\"";
+      front_matter += "\nsrc: \"#{Immutable.config.audio_image_thumb_base_url}#{audio_poster}\"";
       front_matter += "\n---"
       return front_matter
     end
@@ -117,10 +119,9 @@ class Audio
   #
   def migrate_audio_by_adding_jekyll_front_matter(audio_front_matter, audio_data)
     begin
-
       target_file_path = "#{Immutable.config.audio_destination_path}/";
       title = Contenthelper.purify_title_by_removing_special_characters(audio_data["Title"].downcase.strip);
-      target_file_path += "#{audio_data["ActiveDate"].strftime("%Y-%m-%d-%H-%M-%S")}-#{title}.md";
+      target_file_path += "#{audio_data["UploadDate"].strftime("%Y-%m-%d-%H-%M-%S")}-#{title}.md";
       migrated_audio_file_handler = File.open(target_file_path, 'w');
       migrated_audio_file_handler.write(audio_front_matter);
     end

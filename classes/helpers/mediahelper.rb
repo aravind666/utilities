@@ -190,5 +190,24 @@ class Mediahelper
           abort('An error occurred while getting blog post data from DB, Check migration log for more details');
         end
     end
+    
+    #
+    # This method gets all audio contents
+    #
+    def get_audio_content
+      begin
+        audio_sql = "SELECT * FROM mediacontent WHERE HighQFilePath IS NOT NULL";
+        audio_sql += " AND (ContentTypeID = 2) AND (HighQFilePath LIKE '%mp3')";
+        audio_sql += " AND HighQFilePath != ''"
+        audio_content_data = Immutable.dbh.execute(audio_sql);
+        return audio_content_data;
+        rescue DBI::DatabaseError => e
+        Immutable.log.error "Error code: #{e.err}"
+        Immutable.log.error "Error message: #{e.errstr}"
+        Immutable.log.error "Error SQLSTATE: #{e.state}"
+        abort('An error occurred while getting audio content data from DB, Check migration log for more details');
+      end
+    end
+    
   end
 end
