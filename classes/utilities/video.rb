@@ -7,7 +7,7 @@
 # Copyright:: Copyright (c) 2014 Crossroads
 # License::   MIT
 #
-# Instiating this class leads to migration of videos
+# Initiating this class leads to migration of videos
 #
 class Video
 
@@ -15,11 +15,11 @@ class Video
   # Create Video object by initializing the migration flow
   #
   def initialize
-    self.migrate_media();
+    self.migrate_media_content();
   end
 
   #
-  # Function to migrate the media content
+  # Function to migrate the media content - FOR LATER USE
   #
   def migrate_media
     begin
@@ -29,7 +29,7 @@ class Video
   end
 
   #
-  # Function to process the series data.
+  # Function to process the series data. - FOR LATER USE
   #
   def process_series_data(series_data)
     begin
@@ -42,15 +42,30 @@ class Video
   end
 
   #
+  # Function to get the media content
+  #
+  def migrate_media_content
+    begin
+      media_content = Mediahelper.get_media_content;
+      if media_content.fetchable? then
+        self.create_video_posts_for_each_video_content(media_content);
+      else
+        Immutable.log.info "There are no media content available";
+      end
+    end
+    abort('Successfully migrated media in the specified destination');
+  end
+
+  #
   # This method will process message details by collecting
-  # all its media content before migration
+  # all its media content before migration - FOR LATER USE
   #
   def process_message_data(message_data, series)
     begin
       message_data.each do |message|
         media_content = Mediahelper.get_video_media_content_for_message(message[0]);
         if media_content.fetchable? then
-          self.create_video_posts_for_each_video_content(message, series, media_content);
+          self.create_video_posts_for_each_video_content(media_content);
         else
           Immutable.log.info "Message  #{message[0]} does not have any video content";
         end
@@ -63,11 +78,11 @@ class Video
   # Add media video content front matter
   # this can be used by liquid variables in media layout .
   #
-  def create_video_posts_for_each_video_content(message, series, media_content)
+  def create_video_posts_for_each_video_content(media_content)
     begin
       media_content.each do |media|
         if (media['iPodVideo'].length > 0)
-          front_matter = self.get_jekyll_front_matter_video_post(media, series);
+          front_matter = self.get_jekyll_front_matter_video_post(media);
           self.migrate_by_adding_jekyll_front_matter(front_matter, media);
         end
       end
@@ -78,17 +93,18 @@ class Video
   # This method returns the frontmatter YAML for the media
   # which is about to get migrated
   #
-  def get_jekyll_front_matter_video_post(media, series)
+  def get_jekyll_front_matter_video_post(media)
+    front_matter = '';
 
     mainTitle = media['Title'].gsub /"/, '';
     video_description = Contenthelper.purify_by_removing_special_characters(media['Description']);
-    video_poster = media['ThumbImagePath'];
+    video_poster = Immutable.config.image_thumb_base_url + media['ThumbImagePath'];
 
-    front_matter = "---\nlayout: media\ncategory: media\nseries: \"#{series[1]}\"\ntitle: \"#{mainTitle}\"";
-    front_matter += "\ndate: #{media["ActiveDate"].strftime("%Y-%m-%d")}";
+    front_matter = "---\nlayout: media\ncategory: media\ntitle: \"#{mainTitle}\"";
+    front_matter += "\ndate: #{media["UploadDate"].strftime("%Y-%m-%d")}";
     front_matter += "\ndescription: \"#{video_description}\""
     front_matter += "\nvideo: \"#{media['iPodVideo']}\"";
-    front_matter += "\nvideo-poster: \"#{Immutable.config.image_thumb_base_url}#{video_poster}\"";
+    front_matter += "\nvideo-poster: \"#{video_poster}\"";
     front_matter += "\n---";
     return front_matter;
   end
@@ -101,8 +117,8 @@ class Video
     begin
       target_file_path = "#{Immutable.config.video_destination_path}/";
       title = Contenthelper.purify_title_by_removing_special_characters(media["Title"].downcase.strip);
-      target_file_path += "#{media["ActiveDate"].strftime("%Y-%m-%d-%H-%M-%S")}-#{title}.md"
-      migrated_message_file_handler = File.open(target_file_path, 'w');
+      target_file_path += "#{media["UploadDate"].strftime("%Y-%m-%d-%H-%M-%S")}-#{title}.md"
+      migrated_message_file_handler = File.open(target_file_path, 'w')
       migrated_message_file_handler.write(jekyll_front_matter);
     end
   end
