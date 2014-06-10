@@ -54,6 +54,8 @@ class Crawler
         href.gsub('http://www.crossroads.net/', '/');
         if href['http://'] || href['https://'] || href['itpc://'] || href['mailto:'] || href['.jpg']
           Immutable.log.info " - > #{ href } -- we do not to do any thing with this since its external   ";
+        elsif href['/tags/']
+          Immutable.log.info " - > #{ href } -- we do not to do any thing with this since its tags link in the right nav";
         elsif href[/^#.+/]
           Immutable.log.info " - > #{ href } -- we do not need this since it is just hash tag";
         elsif href['.php']
