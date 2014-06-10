@@ -59,14 +59,14 @@ class Crawler
         elsif href[/^#.+/]
           Immutable.log.info " - > #{ href } -- we do not need this since it is just hash tag";
         elsif href['.php']
-          log_message += log_message + href + "\n";
+          log_message += href + "\n";
         elsif href['mysend/']
           log_message += href + "\n";
         elsif !href.empty?
           log_message += href + "\n";
         end
       end
+      File.open("links_broken.log", 'a+') { |f| f.write(log_message + "\n") }
     end
-    File.open("links_broken.log", 'a+') { |f| f.write(log_message + "\n") }
   end
 end
