@@ -152,7 +152,7 @@ class Copy
         else
           content_to_migrate = response_from_content_url.search('div#mainContent');
         end
-        Contenthelper.copy_content_media_references(content_to_migrate.to_s);
+        self.copy_content_media_references(content_to_migrate.to_s);
       end
     end
   end
