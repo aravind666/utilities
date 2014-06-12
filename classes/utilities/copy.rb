@@ -152,7 +152,8 @@ class Copy
         else
           content_to_migrate = response_from_content_url.search('div#mainContent');
         end
-        self.copy_content_media_references(content_to_migrate.to_s);
+        self.parse_hrefs_media(content_to_migrate);
+        self.parse_content_for_images(content_to_migrate);  
       end
     end
   end
