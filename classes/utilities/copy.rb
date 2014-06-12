@@ -86,6 +86,7 @@ class Copy
   def copy_dynamic_content_media_references
     links_to_migrate = Contenthelper.get_dynamic_links_to_migrate();
     self.process_parse_dynamic_content(links_to_migrate);
+    puts "Completed copying dynamic content media elements";
   end
 
 
@@ -109,7 +110,7 @@ class Copy
     message_media_data.each do |media|
       lqpath = media['LowQFilePath'];
 
-      if !lqpath['s3.amazonaws.com']
+      if !lqpath['s3.amazonaws.com'] && !lqpath['video.crossroads.net']
         file = media['LowQFilePath'] + media['HighQFilePath'];
         file.gsub('http://www.crossroads.net/', '/');
         file.gsub('https://www.crossroads.net/', '/');
@@ -117,23 +118,28 @@ class Copy
       end
 
       status = false
-      thumbnail = media['ThumbImagePath'];
-      if (File.file?(Immutable.config.legacy_htdocs_path+"/players/media/smallThumbs/" + thumbnail))
-        status = true;
-        thumbnail_path = Immutable.config.legacy_htdocs_path + "/players/media/smallThumbs/" + thumbnail;
-      elsif (File.file?(Immutable.config.legacy_htdocs_path + "/players/media/mediumHz/" + thumbnail))
-        status = true;
-        thumbnail_path = Immutable.config.legacy_htdocs_path + "/players/media/mediumHz/" + thumbnail;
-      elsif (File.file?(Immutable.config.legacy_htdocs_path+"/uploadedfiles/" + thumbnail))
-        status = true;
-        thumbnail_path = Immutable.config.legacy_htdocs_path+"/uploadedfiles/" + thumbnail;
-      elsif (File.file?(Immutable.config.legacy_htdocs_path+"/images/uploadedImages/" + thumbnail))
-        status = true;
-        thumbnail_path = Immutable.config.legacy_htdocs_path+"/uploadedfiles/" + thumbnail;
+      thumbnail = media['ThumbImagePath'].to_s;
+
+      if !thumbnail.empty?
+        if (File.file?(Immutable.config.legacy_htdocs_path+"/players/media/smallThumbs/" + thumbnail))
+          status = true;
+          thumbnail_path = Immutable.config.legacy_htdocs_path + "/players/media/smallThumbs/" + thumbnail;
+        elsif (File.file?(Immutable.config.legacy_htdocs_path + "/players/media/mediumHz/" + thumbnail))
+          status = true;
+          thumbnail_path = Immutable.config.legacy_htdocs_path + "/players/media/mediumHz/" + thumbnail;
+        elsif (File.file?(Immutable.config.legacy_htdocs_path+"/uploadedfiles/" + thumbnail))
+          status = true;
+          thumbnail_path = Immutable.config.legacy_htdocs_path+"/uploadedfiles/" + thumbnail;
+        elsif (File.file?(Immutable.config.legacy_htdocs_path+"/images/uploadedImages/" + thumbnail))
+          status = true;
+          thumbnail_path = Immutable.config.legacy_htdocs_path+"/uploadedfiles/" + thumbnail;
+        end
+        if status
+          self.copy_files_to_appropriate_folders(thumbnail_path);
+        end
       end
-      if status?
-        self.copy_files_to_appropriate_folders(thumbnail_path);
-      end
+
+
     end
   end
 
