@@ -224,23 +224,23 @@ class Copy
     status = File.file?(file_to_copy);
     case status
       when true
-        if old_src['.pdf']
+        if file_to_copy['.pdf']
           FileUtils.cp(file_to_copy, 'pdf/');
-        elsif old_src['.jpg']
+        elsif file_to_copy['.jpg']
           FileUtils.cp(file_to_copy, 'jpg/');
-        elsif old_src['.jpeg']
+        elsif file_to_copy['.jpeg']
           FileUtils.cp(file_to_copy, 'jpeg/');
-        elsif old_src['.png']
+        elsif file_to_copy['.png']
           FileUtils.cp(file_to_copy, 'png/');
-        elsif old_src['.gif']
+        elsif file_to_copy['.gif']
           FileUtils.cp(file_to_copy, 'gif/');
-        elsif old_src['.mp3']
+        elsif file_to_copy['.mp3']
           FileUtils.cp(file_to_copy, 'mp3/');
-        elsif old_src['.mp4']
+        elsif file_to_copy['.mp4']
           FileUtils.cp(file_to_copy, 'mp4/');
-        elsif old_src['.doc']
+        elsif file_to_copy['.doc']
           FileUtils.cp(file_to_copy, 'doc/');
-        elsif old_src['.flv']
+        elsif file_to_copy['.flv']
           FileUtils.cp(file_to_copy, 'flv/');
         else
           FileUtils.cp(file_to_copy, 'all/');
