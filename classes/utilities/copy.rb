@@ -193,7 +193,7 @@ class Copy
       if (src['http://'])
         Immutable.log.info " - > #{ src } we do not need this file   ";
       else
-        self.copy_files_to_appropriate_folders(file)
+        self.copy_files_to_appropriate_folders(src)
       end
     end
   end
@@ -210,7 +210,7 @@ class Copy
       if (src['http://'])
         Immutable.log.info " - > #{ src } we do not need this file   ";
       else
-        self.copy_files_to_appropriate_folders(file)
+        self.copy_files_to_appropriate_folders(src)
       end
     end
   end
