@@ -153,7 +153,7 @@ class Copy
           content_to_migrate = response_from_content_url.search('div#mainContent');
         end
         self.parse_hrefs_media(content_to_migrate);
-        self.parse_content_for_images(content_to_migrate);  
+        self.parse_content_for_images(content_to_migrate);
       end
     end
   end
@@ -187,7 +187,7 @@ class Copy
   # and calls the copy function to copy them
   #
   def parse_hrefs_media(data_to_migrate)
-    doc_to_migrate = Nokogiri::HTML(data_to_migrate);
+    doc_to_migrate = Nokogiri::HTML(data_to_migrate.to_s);
     doc_to_migrate.css('a').each do |a|
       src = a.attribute('href').to_s;
       src.gsub('http://www.crossroads.net/', '/');
@@ -204,7 +204,7 @@ class Copy
   # and calls the copy function to copy them
   #
   def parse_content_for_images(data_to_migrate)
-    doc_to_migrate = Nokogiri::HTML(data_to_migrate);
+    doc_to_migrate = Nokogiri::HTML(data_to_migrate.to_s);
     doc_to_migrate.css('img').each do |img|
       src = img.attribute('src').to_s;
       src.gsub('http://www.crossroads.net/', '/');
