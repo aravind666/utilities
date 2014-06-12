@@ -15,6 +15,7 @@ class Video
   # Create Video object by initializing the migration flow
   #
   def initialize
+    #File.delete('media_images.log') if File.exist?('media_images.log');
     self.migrate_media_content();
   end
 
@@ -99,7 +100,7 @@ class Video
     mainTitle = media['Title'].gsub /"/, '';
     video_description = Contenthelper.purify_by_removing_special_characters(media['Description']);
     video_poster = media['ThumbImagePath'];
-    Contenthelper.copy_required_audio_images_to_folder(video_poster)
+    #Contenthelper.copy_required_media_images_to_folder(video_poster)
     video_poster = "/uploadedfiles/#{video_poster}"
     video_poster = Contenthelper.replace_image_sources_with_new_paths(video_poster)
 
