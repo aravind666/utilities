@@ -147,10 +147,10 @@ class Copy
       link = link.gsub("\n", '');
       response_from_content_url = Contenthelper.get_content_from_url(link);
       if (response_from_content_url)
-        if response.search('div#mainContent').nil?
-          content_to_migrate = response.search('body');
+        if response_from_content_url.search('div#mainContent').nil?
+          content_to_migrate = response_from_content_url.search('body');
         else
-          content_to_migrate = response.search('div#mainContent');
+          content_to_migrate = response_from_content_url.search('div#mainContent');
         end
         Contenthelper.copy_content_media_references(content_to_migrate.to_s);
       end
@@ -205,7 +205,7 @@ class Copy
   def parse_content_for_images(data_to_migrate)
     doc_to_migrate = Nokogiri::HTML(data_to_migrate);
     doc_to_migrate.css('img').each do |img|
-      src = img.attribute('href').to_s;
+      src = img.attribute('src').to_s;
       src.gsub('http://www.crossroads.net/', '/');
       if (src['http://'])
         Immutable.log.info " - > #{ src } we do not need this file   ";
