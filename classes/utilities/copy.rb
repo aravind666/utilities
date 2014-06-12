@@ -164,8 +164,8 @@ class Copy
   def parse_content(content)
     begin
       while row = content.fetch do
-        db_file_path = Contenthelper.purify_file_path(content[1]);
-        destination_file_name = content[2];
+        db_file_path = Contenthelper.purify_file_path(row[1]);
+        destination_file_name = row[2];
         complete_source_path = Immutable.config.content_source_path + db_file_path + destination_file_name;
         status = File.file?(complete_source_path);
         case status
@@ -175,7 +175,7 @@ class Copy
             self.parse_hrefs_media(data_to_process);
             self.parse_content_for_images(data_to_process);
           when false
-            Immutable.log.warn " - Source WebPage ID #{content['web_page_id']} does not exists at #{complete_source_path} "
+            Immutable.log.warn " - Source WebPage ID #{row['web_page_id']} does not exists at #{complete_source_path} "
         end
       end
     end
