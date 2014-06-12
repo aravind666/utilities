@@ -38,7 +38,7 @@ class Crawlhelper
     def get_first_level_links_from_response_by_crawling(links_to_crawl)
       response_hash = Hash.new
       links_to_crawl.each do |link|
-        link = link.gsub("\n",'');
+        link = link.gsub("\n", '');
         crawler = Mechanize.new;
         response = Crawlhelper.get_response_from_url(link);
         response_hash[link] = get_links_within_response_body(response);

@@ -107,7 +107,7 @@ class Content
     migrated_content_file_handler.write(front_matter);
     data_to_migrate = Contenthelper.update_html_with_new_image_paths(data_to_migrate);
     Contenthelper.log_various_href_sources(data_to_migrate);
-    data_to_migrate = Contenthelper.update_html_with_new_media_hrefs(data_to_migrate); 
+    data_to_migrate = Contenthelper.update_html_with_new_media_hrefs(data_to_migrate);
     migrated_content_file_handler.write(data_to_migrate);
   end
 

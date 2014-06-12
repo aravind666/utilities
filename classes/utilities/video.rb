@@ -102,8 +102,8 @@ class Video
     Contenthelper.copy_required_audio_images_to_folder(video_poster)
     video_poster = "/uploadedfiles/#{video_poster}"
     video_poster = Contenthelper.replace_image_sources_with_new_paths(video_poster)
-   
-		
+
+
     front_matter = "---\nlayout: media\ncategory: media\ntitle: \"#{mainTitle}\"";
     front_matter += "\ndate: #{media["UploadDate"].strftime("%Y-%m-%d")}";
     front_matter += "\ndescription: \"#{video_description}\""

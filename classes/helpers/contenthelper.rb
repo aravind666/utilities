@@ -195,8 +195,8 @@ class Contenthelper
 
       if !source['http://']
 
-       #Contenthelper.copy_required_blog_images_to_folder(source);
-       
+        #Contenthelper.copy_required_blog_images_to_folder(source);
+
         replacements = []
         replacements << ["uploadedfiles", "content"]
         replacements << ["images/uploadedImages/GOMamelodi", "content/gomamelodi"]
@@ -323,38 +323,6 @@ class Contenthelper
 
     end
 
-    #
-    # This method copies required media to its respective folder
-    #
-    def copy_files_to_required_folder(data_to_migrate)
-      doc_to_migrate = Nokogiri::HTML(data_to_migrate);
-      doc_to_migrate.css('a').each do |img|
-        old_src = img.attribute('href').to_s;
-        old_src.gsub('http://www.crossroads.net/', '/');
-        if (old_src['http://'])
-          Immutable.log.info " - > #{ old_src } we do not need this file   ";
-        else
-          file_to_copy = Immutable.config.legacy_htdocs_path + old_src
-          status = File.file?(file_to_copy);
-          case status
-            when true
-              if   old_src['.pdf']
-                FileUtils.cp(file_to_copy, 'pdfs/');
-              elsif old_src['.mp3']
-                FileUtils.cp(file_to_copy, 'mp3/');
-              elsif old_src['.mp4']
-                FileUtils.cp(file_to_copy, 'mp4/');
-              elsif old_src['.doc']
-                FileUtils.cp(file_to_copy, 'doc/');
-              else
-                FileUtils.cp(file_to_copy, 'all/');
-              end
-            when false
-              Immutable.log.info " - > #{ file_to_copy } does not exists  ";
-          end
-        end
-      end
-    end
 
     #
     # This method copies required images for blog
@@ -375,33 +343,8 @@ class Contenthelper
         end
       end
     end
-    
-    #
-    # This method copies required images for audio content
-    # to respective folder
-    #
-		def copy_required_audio_images_to_folder(old_src)
-			
-			status = false
-			if(File.file?(Immutable.config.legacy_htdocs_path+"/players/media/smallThumbs/" + old_src))
-			 status = true
-			 source_file_path = Immutable.config.legacy_htdocs_path + "/players/media/smallThumbs/" + old_src
-			elsif(File.file?(Immutable.config.legacy_htdocs_path + "/players/media/mediumHz/" + old_src))
-				 status = true
-			 	 source_file_path = Immutable.config.legacy_htdocs_path + "/players/media/mediumHz/" + old_src
-			elsif(Immutable.config.legacy_htdocs_path+"uploadedfiles/" + old_src)
-				source_file_path = Immutable.config.legacy_htdocs_path+"/uploadedfiles/" + old_src
-			end
-			
-			case status
-			when true
-				FileUtils.cp(source_file_path, 'audio_images/');
-			when false
-				Immutable.log.info " - > #{ source_file_path } does not exists  ";
-			end
-				File.open("audio_images.log", 'a+') { |f| f.write(source_file_path + "\n") }
-		end
-    
+
+
   end
 end
 

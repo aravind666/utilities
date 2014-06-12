@@ -28,6 +28,8 @@ class Application
     # This has to be done post integration with Rspec in future .
     #
     case command_line_argument
+      when 'copy-media'
+        return;
       when 'migrate-content'
         return;
       when 'migrate-messages'
@@ -44,7 +46,7 @@ class Application
         return;
       else
         puts "you have passed #{command_line_argument} -- I have no idea what to do with that.";
-        puts "I know only to process the commands :  ,  \nmigrate-content \nmigrate-messages \nmigrate-videos \nmigrate-audios \nmigrate-dynamic-content\nmigrate-blog \ncrawl-for-links\n";
+        puts "I know only to process the commands :  \ncopy-media\nmigrate-content \nmigrate-messages \nmigrate-videos \nmigrate-audios \nmigrate-dynamic-content\nmigrate-blog \ncrawl-for-links\n";
         Immutable.log.error "Invalid command usage !"
         exit(false);
     end
@@ -55,6 +57,8 @@ class Application
   #
   def process_commands(command_line_argument)
     case command_line_argument
+      when 'copy-media'
+        Copy.new;
       when 'migrate-content'
         Content.new;
       when 'migrate-messages'
