@@ -153,16 +153,13 @@ class Blog
       content = '';
     end
 
-<<<<<<< HEAD
     if (!para2.nil? && !para1.nil?)
       content = para1 + para2;
-=======
-        if (!para2.nil? && !para1.nil?)
-            content = para1 + para2;
-        end
-        #mainContent = Contenthelper.purify_by_removing_special_characters(content);
-        return content;
->>>>>>> df870294cb4f7cb615f4ba6d1f45c86c049dec73
+      if (!para2.nil? && !para1.nil?)
+        content = para1 + para2;
+      end
+      #mainContent = Contenthelper.purify_by_removing_special_characters(content);
+      return content;
     end
     mainContent = Contenthelper.purify_by_removing_special_characters(content);
     return mainContent;

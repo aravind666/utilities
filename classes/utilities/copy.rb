@@ -40,7 +40,7 @@ class Copy
   # It also clears the directories to freshly migrate things
   #
   def setup_folders_required
-    dirlist = ['doc','png','jpg','jpeg','gif','pdf','mp3','flv','mp4','all'];
+    dirlist = ['doc', 'png', 'jpg', 'jpeg', 'gif', 'pdf', 'mp3', 'flv', 'mp4', 'all'];
     dirlist.each do |dirname|
       unless File.directory?(dirname)
         FileUtils.mkdir_p(dirname);
@@ -87,7 +87,6 @@ class Copy
     links_to_migrate = Contenthelper.get_dynamic_links_to_migrate();
     self.process_parse_dynamic_content(links_to_migrate);
   end
-
 
 
   #
