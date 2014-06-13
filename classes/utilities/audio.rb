@@ -57,6 +57,7 @@ class Audio
   # *audio* - audio content data to prepare jekyll front matter
   #
   # Returns audio content jekyll front matter
+  #
   def get_jekyll_front_matter_for_audio(audio)
     begin
       front_matter = ''
@@ -96,6 +97,7 @@ class Audio
   # *audio_data* - audio data to create a file with title and date
   #
   # Return file by writing the audio content front matter to the given destination path
+  #
   def migrate_audio_by_adding_jekyll_front_matter(audio_front_matter, audio_data)
     begin
       target_file_path = "#{Immutable.config.audio_destination_path}/"
