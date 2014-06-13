@@ -155,6 +155,7 @@ class Contenthelper
       replacements << ['|', '']
       replacements << [':', '']
       replacements << ['.', '']
+      replacements << ['---', '-']
       replacements.each { |set| title = title.gsub(set[0], set[1]) }
       title
     end
