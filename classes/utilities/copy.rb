@@ -25,7 +25,6 @@ class Copy
   #
   def copy_media
     begin
-
       self.setup_folders_required();
       self.copy_content_media_references();
       self.copy_dynamic_content_media_references();
