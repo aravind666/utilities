@@ -112,7 +112,6 @@ class Video
   #
   # video.get_jekyll_front_matter_video_post(array)
   #
-  #
   def get_jekyll_front_matter_video_post(media)
     front_matter = "";
 
