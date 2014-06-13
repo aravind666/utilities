@@ -18,6 +18,12 @@ class Crawlhelper
     # This method returns the links to crawl from crawl sitemap list ,
     # As an array
     #
+    # * get the links that needs to be crawled
+    # * opens each of the link and convert to string
+    # * and returns the list
+    #
+    # crawlhelper.get_links_to_crawl
+    #
     def get_links_to_crawl
 
       file_with_crawl_links = Immutable.config.crawl_links_list;
@@ -35,6 +41,12 @@ class Crawlhelper
     # In the form of hash where key is the crawled link and
     # value is the Urls list .
     #
+    # * for each new line
+    # * checks for the anchor tag href response and list them
+    # * returns the link back
+    #
+    # crawlhelper.get_first_level_links_from_response_by_crawling('string links')
+    #
     def get_first_level_links_from_response_by_crawling(links_to_crawl)
       response_hash = Hash.new
       links_to_crawl.each do |link|
@@ -48,6 +60,11 @@ class Crawlhelper
 
     #
     # This method gets the response body of the URL passed
+    #
+    # * get the response from the link
+    # * and log them on error with the error response
+    #
+    # crawlhelper.get_response_from_url('string link')
     #
     def get_response_from_url(link)
       begin
@@ -64,6 +81,11 @@ class Crawlhelper
     # This method gets the response body of the URL passed
     # To parse and process
     #
+    # * check the response from the particular div with id container
+    # * if doesn't exists then search in the body
+    #
+    # crawlhelper.get_response_body_to_crawl('string')
+    #
     def get_response_body_to_crawl(response_body)
       if response_body.search('div#container').nil?
         body_to_parse = response.search('body');
@@ -76,6 +98,10 @@ class Crawlhelper
     #
     # This method will parse the responsebody
     # and returns links which exists there
+    #
+    # * for each anchor tag get the href associated to it
+    #
+    # crawlhelper.get_links_within_response_body('string')
     #
     def get_links_within_response_body(body_to_parse)
       hrefs_list = [];

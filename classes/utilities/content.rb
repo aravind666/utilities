@@ -10,7 +10,7 @@
 class Content
 
   #
-  # Create Content object by initilizing the migration flow
+  # Create Content object by initializing the migration flow
   #
   def initialize
     self.clean_old_files();
@@ -19,6 +19,13 @@ class Content
 
   #
   # This method clears old files by deleting the destination directory to recreate it
+  #
+  # * checks if the log files exists in the location and deletes only on exist
+  # * validates the destination path
+  # * if exists removes the directory
+  # * logs the error message
+  #
+  # content.clean_old_files
   #
   def clean_old_files
     begin
@@ -39,6 +46,9 @@ class Content
   #
   # Migration bootstrap
   #
+  # * gets all the content from the database
+  # * sends for processing
+  #
   def migrate_content
     content_data = Contenthelper.get_content_from_database();
     self.process_content(content_data);
@@ -46,6 +56,10 @@ class Content
 
   #
   # This method is used to process fetched content
+  #
+  # * for each content process it for migration
+  #
+  # content.process_content(array)
   #
   def process_content(content)
     begin
@@ -61,6 +75,11 @@ class Content
   # This method is used to setup folders for category
   # and also the content directory,
   # It deletes the content directory if it exists and re creates it
+  #
+  # * create the destination path directory
+  # * add the category name to the path
+  #
+  # content.setup_file_path('india')
   #
   def setup_file_path(category_name)
 
@@ -79,6 +98,12 @@ class Content
   #
   # This method initiates migration based on the
   # status of the content which is about to get migrated
+  #
+  # * check the status of the content
+  # * if it is available in the directory then process
+  # * if not log the web page id in the log file
+  #
+  # content.build_content_based_on_status(array)
   #
   def build_content_based_on_status(content)
     db_file_path = Contenthelper.purify_file_path(content[1]);
@@ -99,6 +124,11 @@ class Content
   #
   # This method actually migrates the content by creating the front matter
   #
+  # * open the source file and read them and process it to change the references
+  # * open the migrate file write the front matter
+  #
+  # content.migrate_by_adding_jekyll_front_matter('_prodContent', 'medalli', 'india', 'string')
+  #
   def migrate_by_adding_jekyll_front_matter(complete_source_path, file_name, category_name, front_matter)
     source_file_handler = File.open(complete_source_path)
     data_to_migrate = source_file_handler.read();
@@ -114,6 +144,10 @@ class Content
 
   #
   # This method is used to get jekyll front matter for a particular content
+  #
+  # * add the required front matter if short link exists
+  #
+  # content.get_jekyll_front_matter_for_content(array)
   #
   def get_jekyll_front_matter_for_content(content)
 

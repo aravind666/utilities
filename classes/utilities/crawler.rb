@@ -12,6 +12,8 @@ class Crawler
   #
   # starts crawling
   #
+  # * checks if the log file exists and deletes on existence
+  #
   def initialize
     File.delete('links_broken.log') if File.exist?('links_broken.log');
     self.crawl_milacron();
@@ -19,6 +21,12 @@ class Crawler
 
   #
   # Start crawling the site
+  #
+  # * get the required links that needs to be crawled
+  # * get the hash response from the link
+  # * process the links from the hash response
+  #
+  # crawler.crawl_milacron
   #
   def crawl_milacron
     links_to_crawl = Crawlhelper.get_links_to_crawl();
@@ -31,11 +39,15 @@ class Crawler
   #
   # This method will get the URLs in the response body of each links
   #
+  # * for each href list get the existing href response
+  #
+  # crawler.process_each_url_for_links('string link')
+  #
   def process_each_url_for_links(response_hash)
     href_hash = Hash.new;
     response_hash.each do |link, href_list|
       href_list.each do |href|
-        href = Immutable.baseURL + href;
+        href = "#{Immutable.baseURL} #{href}";
         response = Crawlhelper.get_response_from_url(href);
         href_hash[href] = Crawlhelper.get_links_within_response_body(response);
       end
@@ -45,6 +57,12 @@ class Crawler
 
   #
   # This method logs each hrefs based on classification
+  #
+  # * checks for different occurence of links
+  # * If it inlcudes http, https, itpc, mailto, jpg, tags, php OR even empty
+  # * log each of these broken links
+  #
+  # crawler.log_hrefs_crawled('string link')
   #
   def log_hrefs_crawled(href_hash)
     log_message = '';
@@ -60,15 +78,15 @@ class Crawler
         elsif href['tags']
           Immutable.log.info " - > #{ href } -- we do not to do any thing with this since its tags link in the right nav";
         elsif href['.php']
-          broken_links += href + "\n";
+          broken_links += "#{href} \n";
         elsif href['mysend/']
-          broken_links += href + "\n";
+          broken_links += "#{href} \n";
         elsif !href.empty?
-          broken_links += href + "\n";
+          broken_links += "#{href} \n";
         end
       end
       if  broken_links != ''
-        log_message += "Broken links : - \n " + broken_links;
+        log_message += "Broken links : - \n #{broken_links}";
         File.open("links_broken.log", 'a+') { |f| f.write(log_message + "\n") }
       end
     end
