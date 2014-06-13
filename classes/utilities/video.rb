@@ -32,6 +32,10 @@ class Video
   #
   # Function to process the series data. - FOR LATER USE
   #
+  # * get the message for each series
+  #
+  # video.process_series_data(array)
+  #
   def process_series_data(series_data)
     begin
       series_data.each do |series|
@@ -44,6 +48,8 @@ class Video
 
   #
   # Function to get the media content
+  # * gets all media content
+  # * for every content creates the video post
   #
   def migrate_media_content
     begin
@@ -79,10 +85,16 @@ class Video
   # Add media video content front matter
   # this can be used by liquid variables in media layout .
   #
+  #  * for every post check for video availability
+  #  * add the jekyll matter for every video file
+  #  * migrate the file to destination
+  #
+  #  video.create_video_posts_for_each_video_content(array)
+  #
   def create_video_posts_for_each_video_content(media_content)
     begin
       media_content.each do |media|
-        if (media['iPodVideo'].length > 0)
+        if media['iPodVideo'].length > 0
           front_matter = self.get_jekyll_front_matter_video_post(media);
           self.migrate_by_adding_jekyll_front_matter(front_matter, media);
         end
@@ -94,8 +106,15 @@ class Video
   # This method returns the frontmatter YAML for the media
   # which is about to get migrated
   #
+  # * purify the description to have a clean data
+  # * get the related information for jekyll front matter
+  # * prepares the layout required for jekyll
+  #
+  # video.get_jekyll_front_matter_video_post(array)
+  #
+  #
   def get_jekyll_front_matter_video_post(media)
-    front_matter = '';
+    front_matter = "";
 
     mainTitle = media['Title'].gsub /"/, '';
     video_description = Contenthelper.purify_by_removing_special_characters(media['Description']);
@@ -116,7 +135,14 @@ class Video
 
 
   #
-  # Creates a jekyll page by applying neccessary frontmatter
+  # Creates a jekyll page by applying necessary front matter
+  #
+  # * specifies the destination path
+  # * lower case the title and remove the trailing and leading spaces
+  # * the file name format needs to be with the date, time appended to a title
+  # * open the file and write the data
+  #
+  # video.migrate_by_adding_jekyll_front_matter(string, array)
   #
   def migrate_by_adding_jekyll_front_matter(jekyll_front_matter, media)
     begin
@@ -127,5 +153,4 @@ class Video
       migrated_message_file_handler.write(jekyll_front_matter);
     end
   end
-
 end
