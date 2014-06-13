@@ -17,6 +17,10 @@ class Mediahelper
     #
     # This method is used to get all series from database
     #
+    # * this function will get all the series by start date in descending order
+    #
+    # mediahelper.get_all_series
+    #
     def get_all_series
       begin
         series_data = Immutable.dbh.execute('SELECT * FROM series ORDER BY `StartDate` DESC');
@@ -32,6 +36,11 @@ class Mediahelper
     #
     # This method is used to get all messages with in a particular series
     #
+    # * this function will get message details for a particular series id
+    # * and orders by date in descending
+    #
+    # mediahelper.get_all_messages_for_series(121)
+    #
     def get_all_messages_for_series(series_id)
       begin
         message_data = Immutable.dbh.execute("SELECT * FROM message WHERE SeriesID = #{series_id} ORDER BY date DESC");
@@ -46,6 +55,12 @@ class Mediahelper
 
     #
     # This method gets mediacontent for a particular message
+    #
+    # * this function will get media content searching the various mediacontent id's
+    # * for a particular message id
+    # * checks if ipodvideo, highqfilepath exists and is not empty
+    #
+    # mediahelper.get_media_content_for_message(1245)
     #
     def get_media_content_for_message(message_id)
       begin
@@ -66,6 +81,12 @@ class Mediahelper
     #
     # This method gets audio content for a particular message
     #
+    # * this function will get only the audio related media content
+    # * for a particular message id
+    # * checks if  highqfilepath exists and is not empty and checks for particular content type id 5 and 2
+    #
+    # mediahelper.get_audio_content_for_message(1245)
+    #
     def get_audio_content_for_message(message_id)
       begin
 
@@ -85,6 +106,14 @@ class Mediahelper
       end
     end
 
+    #
+    # This method gets all media from all the messages
+    #
+    # * this function will get all the media content
+    # * checks if  highqfilepath exists and is not empty
+    #
+    # mediahelper.get_all_media_from_all_messages
+    #
     def get_all_media_from_all_messages
       begin
         media_sql = "SELECT * FROM mediacontent WHERE mediacontentid IN";
@@ -102,6 +131,13 @@ class Mediahelper
 
     #
     # This method gets only the video mediacontent for a particular message
+    #
+    # * this function will get only the video related media content
+    # * for a particular message id
+    # * checks if  ipodvideo exists and is not empty and checks for particular content type id 4 and 1
+    # * and is of type mp4
+    #
+    # mediahelper.get_video_media_content_for_message(1245)
     #
     def get_video_media_content_for_message(message_id)
       begin
@@ -124,6 +160,11 @@ class Mediahelper
     #
     # Get all media content
     #
+    # * this function will get all media content
+    # * checks if ipodvideo is not empty and exists and is of type mp4
+    #
+    # mediahelper.get_media_content
+    #
     def get_media_content
       begin
         video_sql = "SELECT * FROM mediacontent";
@@ -143,6 +184,11 @@ class Mediahelper
     #
     # Function to get the data related to blog post
     #
+    # * this function will get all the blog posts
+    # * for channels id's in 1,2,3,4,5,6,7,8,9 and the migrate flag need to be yes
+    #
+    # mediahelper.get_all_blog_posts
+    #
     def get_all_blog_posts
       begin
         # there are too many columns which leads to ambiguity. So, fetch the required columns
@@ -159,7 +205,7 @@ class Mediahelper
 
         blog_post_data = Immutable.dbh.execute(blog_sql);
         return blog_post_data;
-      rescue DBI::DatabaseError => e
+        rescue DBI::DatabaseError => e
         Immutable.log.error "Error code: #{e.err}"
         Immutable.log.error "Error message: #{e.errstr}"
         Immutable.log.error "Error SQLSTATE: #{e.state}"
@@ -169,6 +215,11 @@ class Mediahelper
 
     #
     # function to get the media content information based on the blog post
+    #
+    # * this function will get mediacontent
+    # * for a particular post id
+    #
+    # mediahelper.get_media_content_by_media_content_id(1245)
     #
     def get_media_content_by_media_content_id(id)
       begin
@@ -189,6 +240,11 @@ class Mediahelper
     # method that returns the media element based on the blog post
     # table are of 3 types - video, audio, image
     #
+    # * this function will get list of media elements that may be either in image, audio OR video
+    # * for a particular message id
+    #
+    # mediahelper.get_all_media_for_blog(1245, 'video')
+    #
     def get_all_media_for_blog(id, table)
       begin
         media_sql = "SELECT #{table}.* FROM channelmedia ";
@@ -207,6 +263,12 @@ class Mediahelper
 
     #
     # This method gets all audio contents
+    #
+    # * this function will get only the audio related media content
+    # * checks if  highqfilepath exists and is not empty and checks for particular content type id 2
+    # * and is of type mp3
+    #
+    # mediahelper.get_audio_content
     #
     def get_audio_content
       begin

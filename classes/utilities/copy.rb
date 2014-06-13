@@ -23,20 +23,27 @@ class Copy
   #
   # This method initiates copying
   #
+  #
   def copy_media
     begin
-      self.setup_folders_required();
-      self.copy_content_media_references();
-      self.copy_dynamic_content_media_references();
-      self.copy_message_media_references();
-      self.copy_audio_post_media_references();
-      self.copy_video_post_media_references();
+      self.setup_folders_required;
+      self.copy_content_media_references;
+      self.copy_dynamic_content_media_references;
+      self.copy_message_media_references;
+      self.copy_audio_post_media_references;
+      self.copy_video_post_media_references;
     end
   end
 
   #
   # This method creates required directory
   # It also clears the directories to freshly migrate things
+  #
+  # * Create directories for the mentioned list
+  # * doc, png, jpg, jpeg, gif, pdf, mp3, flv, mp4, all
+  # * and removes the mentioned sub files/directories
+  #
+  # copy.setup_folders_required
   #
   def setup_folders_required
     dirlist = ['doc', 'png', 'jpg', 'jpeg', 'gif', 'pdf', 'mp3', 'flv', 'mp4', 'all'];
@@ -52,7 +59,11 @@ class Copy
   # This method copies all message media references to
   # it appropriate folders
   #
-  def copy_message_media_references()
+  # * get all the media content related to message and process them
+  #
+  # copy.copy_message_media_references
+  #
+  def copy_message_media_references
     message_media_data = Mediahelper.get_all_media_from_all_messages();
     self.process_media_data(message_media_data);
     puts "Completed copying message post media elements";
@@ -62,7 +73,11 @@ class Copy
   # This method copies all audio posts media references to
   # it appropriate folders
   #
-  def copy_audio_post_media_references()
+  # * get all the media references relate to audio and process them
+  #
+  # copy.copy_audio_post_media_references
+  #
+  def copy_audio_post_media_references
     audio_data = Mediahelper.get_audio_content();
     self.process_media_data(audio_data);
     puts "Completed copying audio post media elements";
@@ -72,7 +87,11 @@ class Copy
   # This method copies all video posts media references to
   # it appropriate folders
   #
-  def copy_video_post_media_references()
+  # * get all the media references relate to video and process them
+  #
+  # copy.copy_video_post_media_references
+  #
+  def copy_video_post_media_references
     video_data = Mediahelper.get_media_content();
     self.process_media_data(video_data);
     puts "Completed copying video post media elements";
@@ -81,6 +100,10 @@ class Copy
   #
   # This method copies all dynamic content  posts media references to
   # it appropriate folders
+  #
+  # * get all the media references relate to links and process them
+  #
+  # copy.copy_dynamic_content_media_references
   #
   def copy_dynamic_content_media_references
     links_to_migrate = Contenthelper.get_dynamic_links_to_migrate();
@@ -93,6 +116,10 @@ class Copy
   # This method copies all content media references to
   # it appropriate folders
   #
+  # * get all the media references relate to content and process them
+  #
+  # copy.copy_content_media_references
+  #
   def copy_content_media_references
     content_data = Contenthelper.get_content_from_database();
     self.parse_content(content_data);
@@ -104,6 +131,13 @@ class Copy
   # This method processes media data
   # by collecting the things required to
   # migrate
+  #
+  # * get the media path and replace the domain with /
+  # * copies them to the related folder
+  # * check for all the possible paths in the legacy htdocs path
+  # * append the existing thumbnail image to the path to process
+  #
+  # copy.process_media_data(array)
   #
   def process_media_data(message_media_data)
     message_media_data.each do |media|
@@ -147,6 +181,12 @@ class Copy
   # This method is used to process and parse the
   # for media content from the dynamic content
   #
+  # * for each link check in the div with if main content
+  # * if the above data is missing then check in the body
+  # * and parse the hrefs and the images from anchor tag and img src respectively
+  #
+  # copy.process_parse_dynamic_content('string link')
+  #
   def process_parse_dynamic_content(links_to_migrate)
     links_to_migrate.each do |link|
       link = link.gsub("\n", '');
@@ -166,6 +206,12 @@ class Copy
   #
   # This method parses the content by reading each file from
   # database
+  #
+  # * purify the file path
+  # * get the source path and read
+  # * and parse the hrefs and the images from anchor tag and img src respectively
+  #
+  # copy.parse_content(array)
   #
   def parse_content(content)
     begin
@@ -191,6 +237,12 @@ class Copy
   # This method parses each file for a tags
   # and calls the copy function to copy them
   #
+  # * for each anchor tag get the href associated to it
+  # * replace the domain with /
+  # * and process it to appropriate folders
+  #
+  # copy.parse_hrefs_media(string)
+  #
   def parse_hrefs_media(data_to_migrate)
     doc_to_migrate = Nokogiri::HTML(data_to_migrate.to_s);
     doc_to_migrate.css('a').each do |a|
@@ -208,6 +260,12 @@ class Copy
   # This method parses each file for image tags media
   # and calls the copy function to copy them
   #
+  # * for each img tag get the src associated to it
+  # * replace the domain with /
+  # * and process it to appropriate folders
+  #
+  # copy.parse_content_for_images(string)
+  #
   def parse_content_for_images(data_to_migrate)
     doc_to_migrate = Nokogiri::HTML(data_to_migrate.to_s);
     doc_to_migrate.css('img').each do |img|
@@ -224,6 +282,13 @@ class Copy
   #
   # This method  copies required files to
   # appropriate folders which will be moved to S3
+  #
+  # * for each file
+  # * check the following extensions to copy to the folder
+  # * such as pdf, jpg, jpeg, png, gif, mp3, mp4, doc, flv and all
+  # * and process it to appropriate folders
+  #
+  # copy.copy_files_to_appropriate_folders(file)
   #
   def copy_files_to_appropriate_folders(file)
     file_to_copy = Immutable.config.legacy_htdocs_path + file
