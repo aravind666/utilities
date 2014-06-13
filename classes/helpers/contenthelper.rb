@@ -195,21 +195,19 @@ class Contenthelper
 
       if !source['http://']
 
-        #Contenthelper.copy_required_blog_images_to_folder(source);
-
         replacements = []
         replacements << ["uploadedfiles", "content"]
-        replacements << ["images/uploadedImages/GOMamelodi", "content/gomamelodi"]
-        replacements << ["images/uploadedImages/boxes/New Folder", "boxes"]
-        replacements << ["images/uploadedImages/boxes/New%20Folder", "boxes"]
-        replacements << ["images/uploadedImages/boxes", "boxes"]
-        replacements << ["images/uploadedImages/buttons", "buttons"]
-        replacements << ["images/uploadedImages/banners", "banners"]
-        replacements << ["images/uploadedImages/3500 Madison", "content/3500Madison"]
-        replacements << ["images/uploadedImages/3500%20Madison", "content/3500Madison"]
+        replacements << ["images/uploadedImages/GOMamelodi", "content"]
+        replacements << ["images/uploadedImages/boxes/New Folder", "content"]
+        replacements << ["images/uploadedImages/boxes/New%20Folder", "content"]
+        replacements << ["images/uploadedImages/boxes", "content"]
+        replacements << ["images/uploadedImages/buttons", "content"]
+        replacements << ["images/uploadedImages/banners", "content"]
+        replacements << ["images/uploadedImages/3500 Madison", "content"]
+        replacements << ["images/uploadedImages/3500%20Madison", "content"]
         replacements << ["images/uploadedImages", "content"]
-        replacements << ["img/icn", "icn"]
-        replacements << ["img/tabs", "tabs"]
+        replacements << ["img/icn", "content"]
+        replacements << ["img/tabs", "content"]
         replacements.each { |set| source = source.gsub(set[0], set[1]) }
         source = Immutable.config.s3url+ source
 
