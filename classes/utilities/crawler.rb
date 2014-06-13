@@ -47,7 +47,7 @@ class Crawler
     href_hash = Hash.new;
     response_hash.each do |link, href_list|
       href_list.each do |href|
-        href = "#{Immutable.baseURL} #{href}";
+        href = "#{Immutable.baseURL}#{href}";
         response = Crawlhelper.get_response_from_url(href);
         href_hash[href] = Crawlhelper.get_links_within_response_body(response);
       end
