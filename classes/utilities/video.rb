@@ -85,11 +85,11 @@ class Video
   # Add media video content front matter
   # this can be used by liquid variables in media layout .
   #
-  #  * for every post check for video availability
-  #  * add the jekyll matter for every video file
-  #  * migrate the file to destination
+  # * for every post check for video availability
+  # * add the jekyll matter for every video file
+  # * migrate the file to destination
   #
-  #  video.create_video_posts_for_each_video_content(array)
+  # video.create_video_posts_for_each_video_content(array)
   #
   def create_video_posts_for_each_video_content(media_content)
     begin
