@@ -9,18 +9,19 @@
 #
 # Initiating this class leads to migration of messages content
 #
-
 class Message
 
   #
-  # Create Message object by initializing the migration flow
+  # Initializing the message content migration process
   #
   def initialize
     self.migrate_messages
   end
 
+  # Public: migrate message content
   #
-  # This method actually migrates the content by creating the front matter
+  # Get all series from DB
+  # to generate message content jekyll front matter
   #
   def migrate_messages
     begin
@@ -29,8 +30,11 @@ class Message
     end
   end
 
+  # Public: process series data by collecting all its respective messages
   #
-  # This method will process series data by collecting all its respective messages
+  # *series_data* - array of series content records
+  #
+  # Returns success message
   #
   def process_series_data(series_data)
     begin
@@ -42,9 +46,12 @@ class Message
     end
   end
 
+  # Public: process message details to generate jekyll front matter
   #
-  # This method will process message details by collecting
-  # all its media content before migration
+  # *message_data* - Array message data
+  # *series* - Array series data
+  # Returns the front matter YAML for the message
+  # which is about to get migrated
   #
   def process_message_data(message_data, series)
     begin
@@ -61,9 +68,13 @@ class Message
     end
   end
 
+  # Public: prepares jekyll front matter for message content
   #
-  # Prepare Jekyll Front matter for migrated messages
+  # *message_data* - Array message data to prepare jekyll front matter
+  # *series* - Array series data need to prepare jekyll front matter
+  # *media_content_structure* - Array media content data
   #
+  # Returns message content jekyll front matter
   #
   def get_jekyll_frontmatter_for_messages(message_data, series, media_content_structure)
     begin
@@ -78,9 +89,13 @@ class Message
     end
   end
 
+  # Public: prepares jekyll front matter for message media content
   #
-  # Add media content front matter which is consumed by
-  # liquid variables in message layout .
+  # *media_content_structure* - String message data to prepare jekyll front matter
+  # *front_matter* - String series jekyll front matter
+  # *message_id* - Int message id used in front matters
+  #
+  # Returns message media content jekyll front matter
   #
   def add_media_content_front_matter(media_content_structure, front_matter, message_id)
     begin
@@ -132,8 +147,12 @@ class Message
     end
   end
 
+  # Public: creates a jekyll page for message content
   #
-  # Creates a jekyll page by applying neccessary frontmatter
+  # *jekyll_front_matter* - String message content jekyll front matter to write to the file
+  # *message_data* - Array message data to create a file name with title and date
+  #
+  # Return file by writing the message content front matter to the given destination path
   #
   def migrate_by_adding_jekyll_front_matter(jekyll_front_matter, message_data)
     begin
@@ -145,8 +164,10 @@ class Message
     end
   end
 
+  # Public: get audio duration for a message content
   #
-  # This method get audio dution for a message content
+  # *message_id* - Int used to get the audio duration from media content table
+  # Return audio duration
   #
   def get_audio_duration(message_id)
     begin

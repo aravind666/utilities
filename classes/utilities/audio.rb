@@ -12,7 +12,7 @@
 class Audio
 
   #
-  # initialize the audio content migration process
+  # Initialize the audio content migration process
   #
   def initialize
     File.delete('audio_images.log') if File.exist?('audio_images.log')
@@ -33,10 +33,9 @@ class Audio
 
   # Public: generates jekyll front matter for each audio post
   #
-  # *audio_content* - array of audio content records
+  # *audio_content* - Array of audio content records
   #
-  # Returns the audio content jekyll front matter file
-  # or logs audio content info to log file
+  # Returns success message
   #
   def create_audio_posts_for_each_audio_content(audio_content)
     begin
@@ -54,7 +53,7 @@ class Audio
 
   # Public: prepares jekyll front matter for audio content
   #
-  # *audio* - audio content data to prepare jekyll front matter
+  # *audio* - Array audio content data to prepare jekyll front matter
   #
   # Returns audio content jekyll front matter
   #
@@ -64,11 +63,10 @@ class Audio
       default_audio_image_thumb = 'DefaultVideoImage.jpg'
       audio_title = audio['Title'].gsub /"/, ''
       audio_description = Contenthelper.purify_by_removing_special_characters(audio['Description'])
-      audio_path = "#{audio['LowQFilePath']} <#{Contenthelper.encode_url_string(audio['HighQFilePath'])}>"
+      audio_path = "#{audio['LowQFilePath']}#{Contenthelper.encode_url_string(audio['HighQFilePath'])}"
       audio_thumb_image = audio['ThumbImagePath'].to_s
-
+      audio_poster = ''
       if audio_thumb_image && !audio_thumb_image.nil? && !audio_thumb_image.empty?
-        audio_poster = ''
         audio_poster = audio['ThumbImagePath']
         audio_poster = "#{audio_poster}"
         #audio_poster = Contenthelper.replace_image_sources_with_new_paths(audio_poster)
@@ -76,7 +74,7 @@ class Audio
         audio_poster = default_audio_image_thumb
       end
 
-      audio_poster = "/uploadedfiles/ <#{audio_poster}>"
+      audio_poster = "/uploadedfiles/#{audio_poster}"
       audio_poster = Contenthelper.replace_image_sources_with_new_paths(audio_poster)
       if audio['duration'] == ':'
         audio['duration'] = '00:00'
@@ -93,8 +91,8 @@ class Audio
 
   # Public: creates a jekyll page for audio content
   #
-  # *audio_front_matter* - audio content jekyll front matter to write to the file
-  # *audio_data* - audio data to create a file with title and date
+  # *audio_front_matter* - String audio content jekyll front matter to write to the file
+  # *audio_data* - Array audio data to create a file name with title and date
   #
   # Return file by writing the audio content front matter to the given destination path
   #
@@ -107,4 +105,5 @@ class Audio
       migrated_audio_file_handler.write(audio_front_matter)
     end
   end
+
 end
