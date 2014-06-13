@@ -55,7 +55,7 @@ class Crawlhelper
         response = crawler.get(link);
         return response;
       rescue Mechanize::ResponseCodeError => exp
-        Immutable.log.error "URL - #{content_url} Error details #{exp.inspect}";
+        Immutable.log.error "URL - #{link} Error details #{exp.inspect}";
         return false;
       end
     end
@@ -85,17 +85,6 @@ class Crawlhelper
       end
       return hrefs_list;
     end
-
-    #
-    # This method will process response hash
-    # which was created by get_first_level_response_by_crawling
-    # each key in the response hash is a url
-    # each value is an Nokogiri Mechanize page object
-    #
-    def process_response_of_each_url
-
-    end
-
 
   end
 end
