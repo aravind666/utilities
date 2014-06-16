@@ -292,7 +292,7 @@ class Contenthelper
         old_src = img.attribute('src').to_s
         old_file_name = File.basename(old_src);
         s3_file_name = old_file_name.gsub(' ','+');
-        old_src = gsub(old_file_name,s3_file_name);
+        old_src = old_src.gsub(old_file_name,s3_file_name);
         new_src = Contenthelper.replace_image_sources_with_new_paths(old_src)
 
         img['src'] = new_src
@@ -314,7 +314,7 @@ class Contenthelper
         href = a.attribute('href').to_s
         old_file_name = File.basename(href);
         s3_file_name = old_file_name.gsub(' ','+');
-        href = gsub(old_file_name,s3_file_name);
+        href = href.gsub(old_file_name,s3_file_name);
         new_href = Contenthelper.update_href(href)
         a['href'] = new_href
       end
