@@ -221,10 +221,7 @@ class Contenthelper
       source = source.gsub('../', '/')
 
       if !source['http://']
-        replacements = []
-        replacements << ["../../", "/"]
-        replacements << ["../", "/"]
-
+        replacements = [] 
         #
         # image/uploadedImages folder
         #
@@ -292,9 +289,7 @@ class Contenthelper
         old_src = img.attribute('src').to_s
         old_file_name = File.basename(old_src);
         s3_file_name = old_file_name.gsub(' ','+');
-        old_src = old_src.gsub(old_file_name,s3_file_name);
         new_src = Contenthelper.replace_image_sources_with_new_paths(old_src)
-
         img['src'] = new_src
       end
       doc_to_migrate.to_s
