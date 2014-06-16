@@ -63,17 +63,22 @@ class Audio
       default_audio_image_thumb = 'DefaultVideoImage.jpg'
       audio_title = audio['Title'].gsub /"/, ''
       audio_description = Contenthelper.purify_by_removing_special_characters(audio['Description'])
-      audio_path = "#{audio['LowQFilePath']}#{Contenthelper.encode_url_string(audio['HighQFilePath'])}"
+      lq_file_path = audio['LowQFilePath']
+      if lq_file_path['www.crossroads.net']
+        audio_file_path = lq_file_path.gsub('http://www.crossroads.net/', '/')
+        audio_file_path = lq_file_path.gsub('https://www.crossroads.net/', '/')
+        audio_file_path = "#{Immutable.config.s3media}/mp3/#{Contenthelper.encode_url_string(audio['HighQFilePath'])}"
+      else
+        audio_file_path = "#{lq_file_path}#{Contenthelper.encode_url_string(audio['HighQFilePath'])}"
+      end
       audio_thumb_image = audio['ThumbImagePath'].to_s
       audio_poster = ''
       if audio_thumb_image && !audio_thumb_image.nil? && !audio_thumb_image.empty?
         audio_poster = audio['ThumbImagePath']
         audio_poster = "#{audio_poster}"
-        #audio_poster = Contenthelper.replace_image_sources_with_new_paths(audio_poster)
       elsif audio_thumb_image=='' || audio_thumb_image=='NULL' || audio_thumb_image==' ' || audio_thumb_image.empty?
         audio_poster = default_audio_image_thumb
       end
-
       audio_poster = "/uploadedfiles/#{audio_poster}"
       audio_poster = Contenthelper.replace_image_sources_with_new_paths(audio_poster)
       if audio['duration'] == ':'
@@ -82,7 +87,7 @@ class Audio
       front_matter = "---\nlayout: music \ntitle: \"#{audio_title}\""
       front_matter += "\ndate: #{audio['UploadDate'].strftime('%Y-%m-%d')}"
       front_matter += " \ndescription: \"#{audio_description}\""
-      front_matter += "\naudio: \"#{audio_path}\"\naudio-duration: \"#{audio['duration']}\""
+      front_matter += "\naudio: \"#{audio_file_path}\"\naudio-duration: \"#{audio['duration']}\""
       front_matter += "\nsrc: \"#{audio_poster}\""
       front_matter += "\n---"
       return front_matter
@@ -105,5 +110,4 @@ class Audio
       migrated_audio_file_handler.write(audio_front_matter)
     end
   end
-
 end
