@@ -79,7 +79,7 @@ class Audio
       elsif audio_thumb_image=='' || audio_thumb_image=='NULL' || audio_thumb_image==' ' || audio_thumb_image.empty?
         audio_poster = default_audio_image_thumb
       end
-      audio_poster = "/uploadedfiles/#{audio_poster}"
+      audio_poster = "/images/uploadedImages/#{audio_poster}"
       audio_poster = Contenthelper.replace_image_sources_with_new_paths(audio_poster)
       if audio['duration'] == ':'
         audio['duration'] = '00:00'
