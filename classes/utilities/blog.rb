@@ -39,7 +39,8 @@ class Blog
           content = Contenthelper.get_blog_content_matter(data);
           content = Contenthelper.update_html_with_new_image_paths(content.to_s);
           content = Contenthelper.update_html_with_new_media_hrefs(content.to_s);
-          file_write_data = front_matter + content;
+          file_write_data = front_matter.force_encoding("UTF-8") + content.force_encoding("UTF-8");
+
           self.migrate_by_adding_jekyll_front_matter(file_write_data, data);
         else
           self.log_flv_videos(data, media_front_matter);
