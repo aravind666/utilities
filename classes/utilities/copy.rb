@@ -26,12 +26,13 @@ class Copy
   #
   def copy_media
     begin
-      self.setup_folders_required;
-      self.copy_content_media_references;
-      self.copy_dynamic_content_media_references;
-      self.copy_message_media_references;
-      self.copy_audio_post_media_references;
-      self.copy_video_post_media_references;
+    #  self.setup_folders_required;
+   #   self.copy_content_media_references;
+    #  self.copy_dynamic_content_media_references;
+   #   self.copy_message_media_references;
+   #   self.copy_audio_post_media_references;
+   #   self.copy_video_post_media_references;
+      self.copy_blog_post_media_references;
     end
   end
 
@@ -53,6 +54,13 @@ class Copy
       end
       FileUtils.rm_rf(Dir.glob("#{dirname}/*"));
     end
+  end
+
+  def copy_blog_post_media_references
+    blog_data = Contenthelper.get_all_blog_posts();
+    self.process_blog_data_for_media(blog_data);
+
+    puts "Completed copying blog post media elements";
   end
 
   #
@@ -175,6 +183,66 @@ class Copy
   end
 
 
+
+  def process_blog_data_for_media(blog_data)
+    if blog_data.fetchable? then
+      blog_data.each do |data|
+        content = '';
+        blog_media_list = Mediahelper.media_for_blog_post(data['postId']);
+        if blog_media_list.fetchable? then
+          blog_media_list.each do |media|
+            case media[10] # checking for content type
+              when 5, 11 # type audio
+                table = 'audio';
+                audio_list = Mediahelper.get_all_media_for_blog(data['postId'], table);
+                self.process_media_for_blog_post(audio_list,table)
+              when 10 # type image
+                table = 'image';
+                image_list = Mediahelper.get_all_media_for_blog(data['postId'], table);
+                self.process_media_for_blog_post(image_list,table)
+            end
+          end
+        end
+        content_to_migrate = Contenthelper.get_blog_content_matter(data);
+        self.parse_hrefs_media(content_to_migrate);
+        self.parse_content_for_images(content_to_migrate);
+      end
+    else
+      Immutable.log.info "No blog post available";
+    end
+  end
+
+  def process_media_for_blog_post(media_list,table)
+    if media_list.fetchable? then
+      media_list.each do |media|
+        case table
+          when 'video'
+            still_image_path = media['playerUrl'] + media['stillImage'];
+            still_image_path = still_image_path.to_s;
+            still_image_path = still_image_path.gsub('http://www.crossroads.net/', '/');
+            still_image_path = still_image_path.gsub('https://www.crossroads.net/', '/');
+            self.copy_files_to_appropriate_folders(still_image_path);
+          when 'audio'
+            if (media['path'].nil? && media['hosturl'].nil?)
+              url = '';
+            else
+              url = media['hostUrl'] + media['path'];
+            end
+            media_path = url.to_s;
+            media_path = media_path.gsub('http://www.crossroads.net/', '/');
+            media_path = media_path.gsub('https://www.crossroads.net/', '/');
+            self.copy_files_to_appropriate_folders(media_path);
+          when 'image'
+            poster_path = media['imageUrl'] + media['path'];
+            poster_path = poster_path.to_s;
+            poster_path = poster_path.gsub('http://www.crossroads.net/', '/');
+            poster_path = poster_path.gsub('https://www.crossroads.net/', '/');
+            self.copy_files_to_appropriate_folders(poster_path);
+        end
+      end
+    end
+  end
+
   #
   # This method is used to process and parse the
   # for media content from the dynamic content
@@ -276,6 +344,8 @@ class Copy
       end
     end
   end
+
+
 
   #
   # This method  copies required files to

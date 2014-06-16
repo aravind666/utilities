@@ -218,7 +218,16 @@ class Contenthelper
       source = source.gsub("http://www.crossroads.net/", '/')
       if !source['http://']
         replacements = []
-        replacements << ["uploadedfiles", "content"]
+        replacements << ["../../", "/"]
+        replacements << ["../", "/"]
+
+        #
+        # image/uploadedImages folder
+        #
+        replacements << ["images/uploadedImages/Corporate Blogger", "content"]
+        replacements << ["images/uploadedImages/Corporate%20Blogger", "content"]
+        replacements << ["images/uploadedImages/Journey Materials/Consumed", "content"]
+        replacements << ["images/uploadedImages/kidsmusic", "content"]
         replacements << ["images/uploadedImages/GOMamelodi", "content"]
         replacements << ["images/uploadedImages/boxes/New Folder", "content"]
         replacements << ["images/uploadedImages/boxes/New%20Folder", "content"]
@@ -228,8 +237,25 @@ class Contenthelper
         replacements << ["images/uploadedImages/3500 Madison", "content"]
         replacements << ["images/uploadedImages/3500%20Madison", "content"]
         replacements << ["images/uploadedImages", "content"]
+
+        #
+        # img  folder
+        #
         replacements << ["img/icn", "content"]
         replacements << ["img/tabs", "content"]
+
+        #
+        # uploadedfiles  folder
+        #
+        replacements << ["uploadedfiles/1", "content"]
+        replacements << ["uploadedfiles", "content"]
+
+        #
+        # players folder
+        #
+        replacements << ["players/media/smallThumbs", "content"]
+        replacements << ["players/media/series", "content"]
+
         replacements.each { |set| source = source.gsub(set[0], set[1]) }
         source = Immutable.config.s3url+ source
       end
@@ -333,17 +359,45 @@ class Contenthelper
       if href['http://'] || href['https://']
         Immutable.log.info " - > #{ href } -- we do not to do any thing with this since its external"
       elsif href['.pdf']
-        replacements << ["uploadedfiles", "documents"]
+        replacements << ["images/uploadedImages/Corporate Blogger", "documents"]
+        replacements << ["images/uploadedImages/Journey%20Materials/Consumed", "documents"]
+        replacements << ["images/uploadedimages/gomamelodi/podcasts", "documents"]
+        replacements << ["images/uploadedImages/audio", "documents"]
+        replacements << ["images/uploadedImages/banners", "documents"]
+        replacements << ["images/uploadedImages/Reset", "documents"]
         replacements << ["images/uploadedImages", "documents"]
+        replacements << ["uploadedfiles", "documents"]
+
       elsif href['.mp3']
+        replacements << ["images/uploadedImages/Corporate Blogger", "mp3"]
+        replacements << ["images/uploadedImages/Journey%20Materials/Consumed", "mp3"]
+        replacements << ["images/uploadedimages/gomamelodi/podcasts", "mp3"]
+        replacements << ["images/uploadedImages/audio", "mp3"]
+        replacements << ["images/uploadedImages/banners", "mp3"]
+        replacements << ["images/uploadedImages/Reset", "mp3"]
+        replacements << ["images/uploadedImages", "mp3"]
         replacements << ["players/media/hq/320", "mp3"]
         replacements << ["uploadedfiles", "mp3"]
       elsif href['.doc']
-        replacements << ["uploadedfiles", "documents"]
+
+        replacements << ["images/uploadedImages/Corporate Blogger", "documents"]
+        replacements << ["images/uploadedImages/Journey%20Materials/Consumed", "documents"]
+        replacements << ["images/uploadedimages/gomamelodi/podcasts", "documents"]
+        replacements << ["images/uploadedImages/audio", "documents"]
+        replacements << ["images/uploadedImages/banners", "documents"]
+        replacements << ["images/uploadedImages/Reset", "documents"]
         replacements << ["images/uploadedImages", "documents"]
+        replacements << ["uploadedfiles", "documents"]
+
       elsif href['.jpg']
-        replacements << ["uploadedfiles", "content"]
+        replacements << ["images/uploadedImages/Corporate Blogger", "content"]
+        replacements << ["images/uploadedImages/Journey%20Materials/Consumed", "content"]
+        replacements << ["images/uploadedimages/gomamelodi/podcasts", "content"]
+        replacements << ["images/uploadedImages/audio", "content"]
+        replacements << ["images/uploadedImages/banners", "content"]
+        replacements << ["images/uploadedImages/Reset", "content"]
         replacements << ["images/uploadedImages", "content"]
+        replacements << ["uploadedfiles", "content"]
       end
       replacements.each { |set| href = href.gsub(set[0], set[1]) }
       if !replacements.empty?
@@ -404,6 +458,27 @@ class Contenthelper
         Immutable.log.error "Error SQLSTATE: #{e.state}"
         abort('An error occurred while getting blog post data from DB, Check migration log for more details');
       end
+    end
+
+    #
+    # Gets the actual blog content
+    #
+    def get_blog_content_matter(blog_post)
+      para1 = blog_post['paragraph1'];
+      para2 = blog_post['paragraph2'];
+
+      if (para1.nil?)
+        content = para2;
+      elsif (para2.nil?)
+        content = para1;
+      else
+        content = '';
+      end
+
+      if (!para2.nil? && !para1.nil?)
+        content = para1 + para2;
+      end
+      return content;
     end
   end
 end

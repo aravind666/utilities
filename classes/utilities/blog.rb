@@ -36,7 +36,9 @@ class Blog
         media_front_matter = self.process_blog_media_list(data['postId'], blog_media_list);
         if media_front_matter != 'FLV'
           front_matter = self.get_jekyll_front_matter_blog_post(data, media_front_matter);
-          content = self.get_jekyll_content_matter(data);
+          content = Contenthelper.get_blog_content_matter(data);
+          content = Contenthelper.update_html_with_new_image_paths(content.to_s);
+          content = Contenthelper.update_html_with_new_media_hrefs(content.to_s);
           file_write_data = front_matter + content;
           self.migrate_by_adding_jekyll_front_matter(file_write_data, data);
         else
@@ -133,32 +135,6 @@ class Blog
     return front_matter;
   end
 
-  #
-  # Gets the actual blog content
-  #
-  def get_jekyll_content_matter(data)
-    para1 = data['paragraph1'];
-    para2 = data['paragraph2'];
-
-    if (para1.nil?)
-      content = para2;
-    elsif (para2.nil?)
-      content = para1;
-    else
-      content = '';
-    end
-
-    if (!para2.nil? && !para1.nil?)
-      content = para1 + para2;
-      if (!para2.nil? && !para1.nil?)
-        content = para1 + para2;
-      end
-      #mainContent = Contenthelper.purify_by_removing_special_characters(content);
-      return content;
-    end
-    mainContent = Contenthelper.purify_by_removing_special_characters(content);
-    return mainContent;
-  end
 
   #
   # adds the jekyll front matter and the content to a file and moves to the destination path
