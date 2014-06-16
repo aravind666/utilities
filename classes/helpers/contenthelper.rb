@@ -214,8 +214,12 @@ class Contenthelper
     # Return new S3 bucket url
     #
     def replace_image_sources_with_new_paths(source)
+      source = source.strip;
       source = source.gsub("https://www.crossroads.net/", '/')
       source = source.gsub("http://www.crossroads.net/", '/')
+      source = source.gsub('../../', '/')
+      source = source.gsub('../', '/')
+
       if !source['http://']
         replacements = []
         replacements << ["../../", "/"]
@@ -287,6 +291,9 @@ class Contenthelper
       doc_to_migrate.css('img').each do |img|
         old_src = img.attribute('src').to_s
         new_src = Contenthelper.replace_image_sources_with_new_paths(old_src)
+        old_file_name = File.basename(new_src);
+        s3_file_name = old_file_name.gsub(' ','+');
+        new_src = gsub(old_file_name,s3_file_name);
         img['src'] = new_src
       end
       doc_to_migrate.to_s
@@ -305,6 +312,9 @@ class Contenthelper
       doc_to_migrate.css('a').each do |a|
         href = a.attribute('href').to_s
         new_href = Contenthelper.update_href(href)
+        old_file_name = File.basename(new_href);
+        s3_file_name = old_file_name.gsub(' ','+');
+        new_href = gsub(old_file_name,s3_file_name);
         a['href'] = new_href
       end
       return doc_to_migrate.to_s
@@ -354,6 +364,7 @@ class Contenthelper
     # Return new S3 bucket url
     #
     def update_href(href)
+      href = href.strip;
       href = href.gsub('http://www.crossroads.net/', '/')
       href = href.gsub('../../', '/')
       href = href.gsub('../', '/')
