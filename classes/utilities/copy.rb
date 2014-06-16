@@ -156,23 +156,21 @@ class Copy
       if !thumbnail.empty?
         if (File.file?(Immutable.config.legacy_htdocs_path+"/players/media/smallThumbs/" + thumbnail))
           status = true;
-          thumbnail_path = Immutable.config.legacy_htdocs_path + "/players/media/smallThumbs/" + thumbnail;
+          thumbnail_path =  "/players/media/smallThumbs/" + thumbnail;
         elsif (File.file?(Immutable.config.legacy_htdocs_path + "/players/media/mediumHz/" + thumbnail))
           status = true;
-          thumbnail_path = Immutable.config.legacy_htdocs_path + "/players/media/mediumHz/" + thumbnail;
+          thumbnail_path = "/players/media/mediumHz/" + thumbnail;
         elsif (File.file?(Immutable.config.legacy_htdocs_path+"/uploadedfiles/" + thumbnail))
           status = true;
-          thumbnail_path = Immutable.config.legacy_htdocs_path+"/uploadedfiles/" + thumbnail;
+          thumbnail_path =  "/uploadedfiles/" + thumbnail;
         elsif (File.file?(Immutable.config.legacy_htdocs_path+"/images/uploadedImages/" + thumbnail))
           status = true;
-          thumbnail_path = Immutable.config.legacy_htdocs_path+"/uploadedfiles/" + thumbnail;
+          thumbnail_path =  "/uploadedfiles/" + thumbnail;
         end
         if status
           self.copy_files_to_appropriate_folders(thumbnail_path);
         end
       end
-
-
     end
   end
 

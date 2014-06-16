@@ -21,7 +21,7 @@ class Blog
   # function to get the blog post which are ready to migrate
   #
   def migrate_blog
-    blog_data = Mediahelper.get_all_blog_posts();
+    blog_data = Contenthelper.get_all_blog_posts();
     self.process_blog_data(blog_data);
   end
 
@@ -32,14 +32,15 @@ class Blog
     if blog_data.fetchable? then
       blog_data.each do |data|
         content = '';
-        getMediaElements = self.media_for_blog_post(data['postId']);
-        if (getMediaElements == 'FLV')
-          self.log_flv_videos(data);
-        else
-          front_matter = self.get_jekyll_front_matter_blog_post(data, getMediaElements);
+        blog_media_list = Mediahelper.media_for_blog_post(data['postId']);
+        media_front_matter = self.process_blog_media_list(data['postId'], blog_media_list);
+        if media_front_matter != 'FLV'
+          front_matter = self.get_jekyll_front_matter_blog_post(data, media_front_matter);
           content = self.get_jekyll_content_matter(data);
           file_write_data = front_matter + content;
           self.migrate_by_adding_jekyll_front_matter(file_write_data, data);
+        else
+          self.log_flv_videos(data, media_front_matter);
         end
       end
     else
@@ -48,34 +49,29 @@ class Blog
     abort('Successfully migrated blog posts in the specified destination');
   end
 
-  #
-  # get all the media elements of a blog post
-  #
-  def media_for_blog_post(id)
-    media_data = Mediahelper.get_media_content_by_media_content_id(id); #this to know the type of media used in a blog
+  def process_blog_media_list(id, media_data)
     media_front_matter = '';
     if media_data.fetchable? then
       media_data.each do |media|
         case media[10] # checking for content type
           when 1, 4, 9 # type video
             table = 'video';
-            media_list = Mediahelper.get_all_media_for_blog(id, table);
-            media_front_matter = self.get_media_front_matter_data(media_list, table);
+            video_list = Mediahelper.get_all_media_for_blog(id, table);
+            media_front_matter = self.get_media_front_matter_data(video_list, table);
           when 5, 11 # type audio
             table = 'audio';
-            media_list = Mediahelper.get_all_media_for_blog(id, table);
-            media_front_matter = self.get_media_front_matter_data(media_list, table);
+            audio_list = Mediahelper.get_all_media_for_blog(id, table);
+            media_front_matter = self.get_media_front_matter_data(audio_list, table);
           when 10 # type image
             table = 'image';
-            media_list = Mediahelper.get_all_media_for_blog(id, table);
-            media_front_matter = self.get_media_front_matter_data(media_list, table);
-          else
-            media_front_matter = '';
+            image_list = Mediahelper.get_all_media_for_blog(id, table);
+            media_front_matter = self.get_media_front_matter_data(image_list, table);
         end
       end
     end
     return media_front_matter;
   end
+
 
   #
   # function get the media related front matter based on its type
@@ -93,7 +89,6 @@ class Blog
             front_matter += "\nvideo-image: #{image}";
             if (list['hiDownload'].nil?)
               front_matter = 'FLV';
-              return front_matter;
             end
           when 'audio'
             if (list['path'].nil? && list['hosturl'].nil?)
@@ -181,11 +176,12 @@ class Blog
   #
   # method to log the non mp4 type files
   #
-  def log_flv_videos(data)
+  def log_flv_videos(data, front_matter)
     begin
       Immutable.log.info "Post-id: #{data['postId']}";
       Immutable.log.info "Title: #{data['title']}";
       Immutable.log.info "Tag: #{data['name']}";
+      Immutable.log.info "Front-Matter: #{front_matter}";
       Immutable.log.info "-------------------------";
     end
   end

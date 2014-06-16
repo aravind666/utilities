@@ -182,38 +182,6 @@ class Mediahelper
     end
 
     #
-    # Function to get the data related to blog post
-    #
-    # * this function will get all the blog posts
-    # * for channels id's in 1,2,3,4,5,6,7,8,9 and the migrate flag need to be yes
-    #
-    # mediahelper.get_all_blog_posts
-    #
-    def get_all_blog_posts
-      begin
-        # there are too many columns which leads to ambiguity. So, fetch the required columns
-        blog_sql = "SELECT cp.title as title, cp.subtitle, cp.paragraph1, cp.paragraph2, cpx.createdDate,";
-        blog_sql += "c.name, p.FirstName, cpx.postId FROM channelpost as cp";
-        blog_sql += " JOIN channelpostxref as cpx ON cpx.postid = cp.id";
-        blog_sql += " JOIN milacron_migrate_post as mmp ON cp.id = mmp.channelpost_id";
-        blog_sql += " JOIN channel as c ON c.id = cpx.channelid";
-        blog_sql += " JOIN person as p ON p.personId = cpx.createdBy";
-        blog_sql += " WHERE cpx.`channelId` IN (1,2,3,4,5,6,7,8,9)";
-        blog_sql += " AND migrate = 'yes'";
-        blog_sql += " GROUP BY cp.id";
-        blog_sql += " HAVING MAX(cpx.createdDate)";
-
-        blog_post_data = Immutable.dbh.execute(blog_sql);
-        return blog_post_data;
-        rescue DBI::DatabaseError => e
-        Immutable.log.error "Error code: #{e.err}"
-        Immutable.log.error "Error message: #{e.errstr}"
-        Immutable.log.error "Error SQLSTATE: #{e.state}"
-        abort('An error occurred while getting blog post data from DB, Check migration log for more details');
-      end
-    end
-
-    #
     # function to get the media content information based on the blog post
     #
     # * this function will get mediacontent
@@ -284,6 +252,15 @@ class Mediahelper
         abort('An error occurred while getting audio content data from DB, Check migration log for more details');
       end
     end
+
+    #
+    # get all the media elements of a blog post
+    #
+    def media_for_blog_post(id)
+      media_data = Mediahelper.get_media_content_by_media_content_id(id);
+      return media_data;
+    end
+
 
   end
 end
