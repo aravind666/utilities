@@ -369,8 +369,7 @@ class Copy
   # copy.copy_files_to_appropriate_folders(file)
   #
   def copy_files_to_appropriate_folders(file)
-    file_to_copy = Immutable.config.legacy_htdocs_path + file
-    puts file_to_copy;
+    file_to_copy = Immutable.config.legacy_htdocs_path + file 
     status = File.file?(file_to_copy);
     case status
       when true
