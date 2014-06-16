@@ -165,7 +165,7 @@ class Message
           else
         end
       end
-      front_matter += "\nflag: \"#{isadult}\"";
+      front_matter += "\nexplicit: \"#{isadult}\"";
       return front_matter;
     end
   end
