@@ -173,7 +173,7 @@ class Copy
           thumbnail_path =  "/uploadedfiles/" + thumbnail;
         elsif (File.file?(Immutable.config.legacy_htdocs_path+"/images/uploadedImages/" + thumbnail))
           status = true;
-          thumbnail_path =  "/uploadedfiles/" + thumbnail;
+          thumbnail_path =  "/images/uploadedImages/" + thumbnail;
         end
         if status
           self.copy_files_to_appropriate_folders(thumbnail_path);
