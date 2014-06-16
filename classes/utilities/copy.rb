@@ -219,10 +219,6 @@ class Copy
           when 'video'
             still_image_path = media['playerUrl'] + media['stillImage'];
             still_image_path = still_image_path.to_s;
-            still_image_path = still_image_path.gsub('../../', '/');
-            still_image_path = still_image_path.gsub('../', '/');
-            still_image_path = still_image_path.gsub('http://www.crossroads.net/', '/');
-            still_image_path = still_image_path.gsub('https://www.crossroads.net/', '/');
             self.copy_files_to_appropriate_folders(still_image_path);
           when 'audio'
             if (media['path'].nil? && media['hosturl'].nil?)
@@ -231,18 +227,10 @@ class Copy
               url = media['hostUrl'] + media['path'];
             end
             media_path = url.to_s;
-            media_path = media_path.gsub('../../', '/');
-            media_path = media_path.gsub('../', '/');
-            media_path = media_path.gsub('http://www.crossroads.net/', '/');
-            media_path = media_path.gsub('https://www.crossroads.net/', '/');
             self.copy_files_to_appropriate_folders(media_path);
           when 'image'
             poster_path = media['imageUrl'] + media['path'];
             poster_path = poster_path.to_s;
-            poster_path = poster_path.gsub('../../', '/');
-            poster_path = poster_path.gsub('../', '/');
-            poster_path = poster_path.gsub('http://www.crossroads.net/', '/');
-            poster_path = poster_path.gsub('https://www.crossroads.net/', '/');
             self.copy_files_to_appropriate_folders(poster_path);
         end
       end
@@ -319,9 +307,6 @@ class Copy
     doc_to_migrate = Nokogiri::HTML(data_to_migrate.to_s);
     doc_to_migrate.css('a').each do |a|
       src = a.attribute('href').to_s;
-      src = src.gsub('../../', '/');
-      src = src.gsub('../', '/');
-      src.gsub('http://www.crossroads.net/', '/');
       if (src['http://'])
         Immutable.log.info " - > #{ src } we do not need this file   ";
       else
@@ -344,9 +329,6 @@ class Copy
     doc_to_migrate = Nokogiri::HTML(data_to_migrate.to_s);
     doc_to_migrate.css('img').each do |img|
       src = img.attribute('src').to_s;
-      src = src.gsub('../../', '/');
-      src = src.gsub('../', '/');
-      src.gsub('http://www.crossroads.net/', '/');
       if (src['http://'])
         Immutable.log.info " - > #{ src } we do not need this file   ";
       else
@@ -369,7 +351,15 @@ class Copy
   # copy.copy_files_to_appropriate_folders(file)
   #
   def copy_files_to_appropriate_folders(file)
-    file_to_copy = Immutable.config.legacy_htdocs_path + file 
+
+    file = file.gsub('http://www.crossroads.net/', '/');
+    file = file.gsub('https://www.crossroads.net/', '/');
+    file = file.gsub('../../', '/');
+    file = file.gsub('../', '/');
+    file = file.gsub('%20', ' ');
+
+    file_to_copy = Immutable.config.legacy_htdocs_path + file
+    #puts file_to_copy;
     status = File.file?(file_to_copy);
     case status
       when true
