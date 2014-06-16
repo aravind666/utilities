@@ -277,11 +277,32 @@ class Mediahelper
         audio_sql += " AND HighQFilePath != ''"
         audio_content_data = Immutable.dbh.execute(audio_sql);
         return audio_content_data;
-      rescue DBI::DatabaseError => e
+        rescue DBI::DatabaseError => e
         Immutable.log.error "Error code: #{e.err}"
         Immutable.log.error "Error message: #{e.errstr}"
         Immutable.log.error "Error SQLSTATE: #{e.state}"
         abort('An error occurred while getting audio content data from DB, Check migration log for more details');
+      end
+    end
+
+    # Public: get audio duration for a message content
+    #
+    # *message_id* - Int used to get the audio duration from media content table
+    # Return audio duration
+    #
+    def get_audio_duration(message_id)
+      begin
+        audio_sql ="SELECT duration FROM mediacontent WHERE mediacontentid IN";
+        audio_sql +=" (SELECT messagemediacontent.mediaid FROM messagemediacontent";
+        audio_sql +=" WHERE messageid =#{message_id}) AND (HighQFilePath IS NOT NULL";
+        audio_sql +=" AND HighQFilePath != ' ' ) AND ContentTypeID=5";
+        audio_result = Immutable.dbh.select_one(audio_sql);
+        return audio_result;
+        rescue DBI::DatabaseError => e
+        Immutable.log.error "Error code: #{e.err}";
+        Immutable.log.error "Error message: #{e.errstr}";
+        Immutable.log.error "Error SQLSTATE: #{e.state}";
+        abort('An error occurred while getting message data for series from DB, Check migration log for more details')
       end
     end
 
