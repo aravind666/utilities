@@ -435,7 +435,7 @@ class Contenthelper
     # * this function will get all the blog posts
     # * for channels id's in 1,2,3,4,5,6,7,8,9 and the migrate flag need to be yes
     #
-    # mediahelper.get_all_blog_posts
+    # Contenthelper.get_all_blog_posts
     #
     def get_all_blog_posts
       begin
@@ -461,7 +461,12 @@ class Contenthelper
     end
 
     #
-    # Gets the actual blog content
+    # Function to get the data related to blog post
+    # used to get the actual blog content
+    #
+    # *blog_post* - String blog content data
+    #
+    # Returns blog content (concatenation of para1 and para2)
     #
     def get_blog_content_matter(blog_post)
       para1 = blog_post['paragraph1'];
@@ -474,7 +479,6 @@ class Contenthelper
       else
         content = '';
       end
-
       if (!para2.nil? && !para1.nil?)
         content = para1 + para2;
       end

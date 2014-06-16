@@ -182,8 +182,16 @@ class Copy
     end
   end
 
-
-
+  #
+  # This method processes blog data to get all
+  # media data required to move to s3
+  #
+  # * get all audio files related to blog post
+  # * get all image files related to blog post
+  # * get all inline media files related to blog post
+  #
+  # copy.process_blog_data_for_media(array)
+  #
   def process_blog_data_for_media(blog_data)
     if blog_data.fetchable? then
       blog_data.each do |data|
@@ -212,6 +220,16 @@ class Copy
     end
   end
 
+  #
+  # This method is used to copy all blog media files
+  # required to move to s3
+  #
+  # * copy all audio files related to blog post
+  # * copy all video files related to blog post
+  # * copy all image files related to blog post
+  #
+  # copy.process_media_for_blog_post(media_list,table)
+  #
   def process_media_for_blog_post(media_list,table)
     if media_list.fetchable? then
       media_list.each do |media|
@@ -336,8 +354,6 @@ class Copy
       end
     end
   end
-
-
 
   #
   # This method  copies required files to
