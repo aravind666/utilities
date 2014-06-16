@@ -10,15 +10,21 @@
 # Initiating this class leads to migration of blog
 #
 class Blog
+
   #
-  # Create Blog object by initializing the migration flow
+  # Initialize the blog content migration process
   #
   def initialize
     self.migrate_blog();
   end
 
-  #
+  # Public:
   # function to get the blog post which are ready to migrate
+  #
+  # Public: migrate blog content
+  #
+  # Gets all blog post from DB
+  # to generate blog content jekyll front matter
   #
   def migrate_blog
     blog_data = Contenthelper.get_all_blog_posts();
@@ -26,7 +32,11 @@ class Blog
   end
 
   #
-  # Process the received data into a jekyll format
+  # Public: generates jekyll front matter for each blog post
+  #
+  # *blog_data* - Array of blog post records
+  #
+  # Returns success message
   #
   def process_blog_data(blog_data)
     if blog_data.fetchable? then
@@ -39,7 +49,7 @@ class Blog
           content = Contenthelper.get_blog_content_matter(data);
           content = Contenthelper.update_html_with_new_image_paths(content.to_s);
           content = Contenthelper.update_html_with_new_media_hrefs(content.to_s);
-          file_write_data = front_matter.force_encoding("UTF-8") + content.force_encoding("UTF-8");
+          file_write_data = front_matter.force_encoding('UTF-8') + content.force_encoding('UTF-8');
 
           self.migrate_by_adding_jekyll_front_matter(file_write_data, data);
         else
@@ -52,6 +62,16 @@ class Blog
     abort('Successfully migrated blog posts in the specified destination');
   end
 
+  #
+  # This method processes blog data to get all
+  # media data related to blog
+  #
+  # * get all audio files related to blog post
+  # * get all image files related to blog post
+  # * get all inline media files related to blog post
+  #
+  # Blog.process_blog_media_list(id, media_data)
+  #
   def process_blog_media_list(id, media_data)
     media_front_matter = '';
     if media_data.fetchable? then
@@ -75,9 +95,13 @@ class Blog
     return media_front_matter;
   end
 
-
   #
-  # function get the media related front matter based on its type
+  # This method processes blog media data to get all
+  # blog media content front matter
+  #
+  # Blog.get_media_front_matter_data(media_list, table)
+  #
+  # Returns blog media content front matter
   #
   def get_media_front_matter_data(media_list, table)
     front_matter = '';
@@ -118,14 +142,19 @@ class Blog
   end
 
   #
-  # Function which returns the actual and complete front matter
+  # This method generates the actual and complete front matter for
+  # blog content
+  #
+  # Blog.get_jekyll_front_matter_blog_post(data, mediaElements)
+  #
+  # Returns blog post jekyll front matter
   #
   def get_jekyll_front_matter_blog_post(data, mediaElements)
     mainTitle = data['title'].gsub /"/, '';
     tagCategory = Contenthelper.purify_title_by_removing_special_characters(data['name'].downcase.strip);
     front_matter = "---\nlayout: post\ntitle: \"#{mainTitle}\"";
     front_matter += "\nsubtitle: \"#{data['subtitle']}\"";
-    front_matter += "\ndate: #{data["createdDate"].strftime("%Y-%m-%d %H:%M:%S")}";
+    front_matter += "\ndate: #{data['createdDate'].strftime('%Y-%m-%d %H:%M:%S')}";
     front_matter += "\ncategory: \"#{data['name']}\"";
     front_matter += "\ntag: \n - #{tagCategory}";
     front_matter += "\ncomments: true";
@@ -136,22 +165,32 @@ class Blog
     return front_matter;
   end
 
-
   #
-  # adds the jekyll front matter and the content to a file and moves to the destination path
+  # creates a jekyll front matter page for blog post
+  #
+  # adds the jekyll front matter and the content to a file
+  # and moves to the destination path
+  #
+  # Blog.migrate_by_adding_jekyll_front_matter(html_data, blog_data)
+  #
+  # Return file by writing the blog post front matter to the given destination path
   #
   def migrate_by_adding_jekyll_front_matter(html_data, blog_data)
     begin
       target_file_path = "#{Immutable.config.blog_destination_path}/";
-      title = Contenthelper.purify_title_by_removing_special_characters(blog_data["title"].downcase.strip);
-      target_file_path += "#{blog_data["createdDate"].strftime("%Y-%m-%d-%H-%M-%S")}-#{title}.html"
+      title = Contenthelper.purify_title_by_removing_special_characters(blog_data['title'].downcase.strip);
+      target_file_path += "#{blog_data['createdDate'].strftime('%Y-%m-%d-%H-%M-%S')}-#{title}.html"
       migrated_blog_file_handler = File.open(target_file_path, 'w');
       migrated_blog_file_handler.write(html_data);
     end
   end
 
   #
-  # method to log the non mp4 type files
+  # used to log the non mp4 type files
+  #
+  # Blog.log_flv_videos(data, front_matter)
+  #
+  # Return non mp4 log information
   #
   def log_flv_videos(data, front_matter)
     begin
@@ -159,7 +198,7 @@ class Blog
       Immutable.log.info "Title: #{data['title']}";
       Immutable.log.info "Tag: #{data['name']}";
       Immutable.log.info "Front-Matter: #{front_matter}";
-      Immutable.log.info "-------------------------";
+      Immutable.log.info '-------------------------';
     end
   end
 end
