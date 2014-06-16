@@ -354,7 +354,10 @@ class Contenthelper
     # Return new S3 bucket url
     #
     def update_href(href)
-      href.gsub('http://www.crossroads.net/', '/')
+      href = href.gsub('http://www.crossroads.net/', '/')
+      href = href.gsub('../../', '/')
+      href = href.gsub('../', '/')
+
       replacements = []
       if href['http://'] || href['https://']
         Immutable.log.info " - > #{ href } -- we do not to do any thing with this since its external"
@@ -377,6 +380,11 @@ class Contenthelper
         replacements << ["images/uploadedImages/Reset", "mp3"]
         replacements << ["images/uploadedImages", "mp3"]
         replacements << ["players/media/hq/320", "mp3"]
+        replacements << ["players/media/hq", "mp3"]
+        replacements << ["teams/audio/Media", "mp3"]
+        replacements << ["audio/Media", "mp3"]
+        replacements << ["audio", "mp3"]
+        replacements << ["webmedia/JourneyMedia/Reset", "mp3"]
         replacements << ["uploadedfiles", "mp3"]
       elsif href['.doc']
 
