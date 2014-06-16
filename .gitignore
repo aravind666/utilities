@@ -1,3 +1,4 @@
+*.lock
 *.conf
 *.gem
 *.rbc
