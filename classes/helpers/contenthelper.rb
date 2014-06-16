@@ -290,10 +290,11 @@ class Contenthelper
       doc_to_migrate = Nokogiri::HTML(data_to_migrate)
       doc_to_migrate.css('img').each do |img|
         old_src = img.attribute('src').to_s
-        new_src = Contenthelper.replace_image_sources_with_new_paths(old_src)
-        old_file_name = File.basename(new_src);
+        old_file_name = File.basename(old_src);
         s3_file_name = old_file_name.gsub(' ','+');
-        new_src = gsub(old_file_name,s3_file_name);
+        old_src = gsub(old_file_name,s3_file_name);
+        new_src = Contenthelper.replace_image_sources_with_new_paths(old_src)
+
         img['src'] = new_src
       end
       doc_to_migrate.to_s
@@ -311,10 +312,10 @@ class Contenthelper
       doc_to_migrate = Nokogiri::HTML(data_to_migrate)
       doc_to_migrate.css('a').each do |a|
         href = a.attribute('href').to_s
-        new_href = Contenthelper.update_href(href)
-        old_file_name = File.basename(new_href);
+        old_file_name = File.basename(href);
         s3_file_name = old_file_name.gsub(' ','+');
-        new_href = gsub(old_file_name,s3_file_name);
+        href = gsub(old_file_name,s3_file_name);
+        new_href = Contenthelper.update_href(href)
         a['href'] = new_href
       end
       return doc_to_migrate.to_s
