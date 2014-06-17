@@ -318,6 +318,49 @@ class Contenthelper
     end
 
     #
+    # Public static: updates anchor paths
+    # with the migrated path by Parsing the content
+    #
+    # *data_to_migrate* - String data which needs to updated href references
+    #
+    # Returns new href src for blog links
+    #
+    def update_html_with_new_blog_hrefs(data_to_migrate)
+      doc_to_migrate = Nokogiri::HTML(data_to_migrate)
+      new_href = '/';
+      doc_to_migrate.css('a').each do |a|
+        href = a.attribute('href').to_s
+        if href['/blog/view']
+          post_id = href.split('/').last
+          blog_post_info = self.get_post_info_by_id(post_id);
+          new_href = self.get_new_blog_reference_url(blog_post_info);
+        end
+        a['href'] = new_href;
+      end
+      return doc_to_migrate.to_s
+    end
+
+    #
+    #
+    #
+    def get_new_blog_reference_url(blog_post_info)
+      new_href = '/';
+      blog_post_info.each do |data|
+        tag = data['name'].downcase.strip;
+        first_date = data['createdDate'].to_s.split('T').first;
+        date = first_date.split('-');
+        year = date[0];
+        month = date[1];
+        day = date[2];
+        title = Contenthelper.purify_title_by_removing_special_characters(data['title'].downcase.strip);
+        title = "#{data['createdDate'].strftime('%H-%M-%S')}-#{title}.html"
+        new_href = "/#{tag}/#{year}/#{month}/#{day}/#{title}";
+        #File.open("blogref.log", 'a+') { |f| f.write(new_href + "\n") }
+      end
+      return new_href;
+    end
+
+    #
     # Public static: logs various src references to a file
     # by reading media content migrated content
     #
@@ -500,5 +543,35 @@ class Contenthelper
       end
       return content;
     end
+
+    #
+    # Function to get the data related to a particular post id
+    #
+    # * this function will get the required post information
+    #
+    # Contenthelper.get_post_info_by_id(33)
+    #
+    def get_post_info_by_id(id)
+      begin
+        # there are too many columns which leads to ambiguity. So, fetch the required columns
+        blog_sql = "SELECT cp.title as title, cpx.createdDate,";
+        blog_sql += "c.name, cpx.postId FROM channelpost as cp";
+        blog_sql += " JOIN channelpostxref as cpx ON cpx.postid = cp.id";
+        blog_sql += " JOIN milacron_migrate_post as mmp ON cp.id = mmp.channelpost_id";
+        blog_sql += " JOIN channel as c ON c.id = cpx.channelid";
+        blog_sql += " WHERE postId = #{id}";
+        blog_sql += " AND migrate = 'yes'";
+        blog_sql += " GROUP BY cp.id";
+
+        blog_post_data = Immutable.dbh.execute(blog_sql);
+        return blog_post_data;
+        rescue DBI::DatabaseError => e
+        Immutable.log.error "Error code: #{e.err}"
+        Immutable.log.error "Error message: #{e.errstr}"
+        Immutable.log.error "Error SQLSTATE: #{e.state}"
+        abort('An error occurred while getting blog post data from DB, Check migration log for more details');
+      end
+    end
+
   end
 end
