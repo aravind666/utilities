@@ -70,7 +70,6 @@ class Crawler
   def log_hrefs_crawled(href_hash)
     log_message = '';
     href_hash.each do |link, href_list|
-      log_message += "\n URL : -  #{link} \n";
       broken_links = '';
       href_list.each do |href|
         href.gsub('http://www.crossroads.net/', '/');
@@ -83,10 +82,11 @@ class Crawler
         elsif href['.php']
           broken_links += "#{href} \n";
         elsif href['mysend/']
-          broken_links += "#{href} \n"; 
+          broken_links += "#{href} \n";
         end
       end
       if  broken_links != ''
+        log_message += "\n URL : -  #{link} \n";
         log_message += "Broken links : - \n #{broken_links}";
         File.open("links_broken.log", 'a+') { |f| f.write(log_message + "\n") }
       end
