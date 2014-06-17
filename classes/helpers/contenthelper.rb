@@ -220,7 +220,7 @@ class Contenthelper
       source = source.gsub('../../', '/')
       source = source.gsub('../', '/')
 
-      if !source['http://']
+      if !source['http://'] || !source['https://']
         replacements = [] 
         #
         # image/uploadedImages folder
@@ -238,6 +238,7 @@ class Contenthelper
         replacements << ["images/uploadedImages/3500 Madison", "content"]
         replacements << ["images/uploadedImages/3500%20Madison", "content"]
         replacements << ["images/uploadedImages", "content"]
+        replacements << ["images/uploadedImages/Reset", "content"]
 
         #
         # img  folder
@@ -248,7 +249,7 @@ class Contenthelper
         #
         # uploadedfiles  folder
         #
-        replacements << ["uploadedfiles/1", "content"]
+        replacements << ["uploadedfiles/1/", "content/"]
         replacements << ["uploadedfiles", "content"]
 
         #
