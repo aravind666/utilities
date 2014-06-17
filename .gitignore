@@ -1,7 +1,7 @@
 *.lock
-*.conf
 *.gem
 *.rbc
+config/global.conf
 /.config
 /coverage/
 /InstalledFiles
