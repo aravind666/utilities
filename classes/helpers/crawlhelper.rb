@@ -93,9 +93,9 @@ class Crawlhelper
 
       response_body = Crawlhelper.remove_unwanted_parts_within_content(response_body);
       if response_body.search('div.container').nil?
-        body_to_parse = response.search('body');
+        body_to_parse = response_body.search('body');
       else
-        body_to_parse = response.search('div.container');
+        body_to_parse = response_body.search('div.container');
       end
       return body_to_parse;
     end
