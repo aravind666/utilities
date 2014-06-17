@@ -1,17 +1,63 @@
-db_user_name = root
-db_password = root
-db_name = crossroadsdotnet
-db_host = localhost
-content_source_path = ../prod_content/
-content_destination_path = /home/aravind/Projects/milacron/milacron_final/crdschurch-dev2/app/_content
-message_destination_path = /home/aravind/Projects/milacron/milacron_final/crdschurch-dev2/app/_messages
-audio_destination_path = /home/costrategix/test/milacron_final/app/_music
-video_destination_path = /home/costrategix/test/milacron_final/app/_media
-blog_destination_path = /home/aravind/Projects/milacron/milacron_final/crdschurch-dev2/app/_posts/migrated
+# Configuration file to store and manage all required configuration parameters
+# with in the migration utilities
+#
+# Author::    Aravind Udayashankara  (mailto:aravind.udayashankara@gmail.com)
+# Copyright:: Copyright (c) 2012 Crossroads
+# License::   MIT
+#
+## LHS : - configuration parameter name
+## RHS : - value of the configuration parameter name
+
+# Database username
+db_user_name = YourDatabaseUserName
+# Database password
+
+db_password = yourSecretDatabasePassword
+
+# Database name
+db_name = YourDatabaseName
+
+# Database host name
+db_host = YourDatabaseHostName
+
+# Source location of the content directory to migrate
+content_source_path = /Volumes/Macintosh HD/var/www/runway-1/crossroads-legacy/includes/documents/
+
+# htdocs folder path of the legacy environment
+legacy_htdocs_path = /Volumes/Macintosh HD/var/www/runway-1/crossroads-legacy/htdocs
+
+# milacron Path to migrate content
+content_destination_path = /Users/CoS/crossroads.net/app/_content
+
+# milacron path to migrate messages
+message_destination_path = /Users/CoS/crossroads.net/app/_messages
+
+# milacron path to migrate messages
+audio_destination_path = /Users/CoS/crossroads.net/app/_music
+
+# milacron path to migrate video posts
+video_destination_path = /Users/CoS/crossroads.net/app/_media
+
+# Legacy Base URL for video thumb nails
 image_thumb_base_url = https://www.crossroads.net/uploadedfiles/
+
+# Legacy Base URL for audio thumb nails
 audio_image_thumb_base_url = http://www.crossroads.net/players/media/mediumHz/
+
+# Destination path to migrate blog posts
+blog_destination_path = /Users/CoS/crossroads.net/app/_posts/migrated
+
+# List of content links to migrate from legacy
 dynamic_links_list = ./data/dynamic_links_to_migrate.list
-crawl_links_list = ./data/crawl_site_maps.list
+
+# Base URL for loading php links
 dynamic_link_base_url = http://www.crossroads.net/index.php?action=viewpage&filepath=pages
+
+# Links to crawl for crawl utility
+crawl_links_list = ./data/crawl_site_maps.list
+
+# Base S3 url for image content
 s3url = http://s3.amazonaws.com/crossroads-media/images/legacy
+
+# Base S3 url for media content such as pdfs and mp3
 s3media = http://s3.amazonaws.com/crossroads-media/media/legacy

@@ -3,6 +3,7 @@
 # Author::    Aravind Udayashankara  (mailto:aravind.udayashankara@gmail.com)
 # Copyright:: Copyright (c) 2012 Crossroads
 # License::   MIT
+#
 # This class works as a bootstrap which sets up the platform
 # For any process based on the user input .
 #
@@ -11,7 +12,10 @@
 class Application
 
   #
-  # Do things when application is instantiated
+  # This methods initialize the application by validating
+  # command line arguments passed and starts processing
+  #
+  # *command_line_argument* - Commandline input arguments
   #
   def initialize(command_line_argument)
     self.validate_arguments(command_line_argument);
@@ -21,58 +25,33 @@ class Application
   #
   # This method validates passed arguments from standard IO
   #
-  # Checks and aborts if command passed is invalid
+  # *command_line_argument* - Commandline input arguments
   #
   def validate_arguments(command_line_argument)
-    # TODO : - Aravind :  Make this as config and validate commands from YAML
-    # This has to be done post integration with Rspec in future .
-    #
-    case command_line_argument
-      when 'copy-media'
-        return;
-      when 'migrate-content'
-        return;
-      when 'migrate-messages'
-        return;
-      when 'migrate-audios'
-        return;
-      when 'migrate-videos'
-        return;
-      when 'migrate-blog'
-        return;
-      when 'migrate-dynamic-content'
-        return;
-      when 'crawl-for-links'
-        return;
-      else
-        puts "you have passed #{command_line_argument} -- I have no idea what to do with that.";
-        puts "I know only to process the commands :  \ncopy-media\nmigrate-content \nmigrate-messages \nmigrate-videos \nmigrate-audios \nmigrate-dynamic-content\nmigrate-blog \ncrawl-for-links\n";
-        Immutable.log.error "Invalid command usage !"
-        exit(false);
+
+    available_utilities = Immutable.routes
+    if available_utilities.has_key?(command_line_argument)
+      return;
+    else
+      available_commands = "\n";
+      available_utilities.each do |key, value|
+        available_commands += "#{key} \n"
+      end
+      puts "You have passed #{command_line_argument} -- I have no idea what to do with that."
+      puts "I know only to process the commands :  #{available_commands}"
+      Immutable.log.error "Invalid command usage !"
+      exit(false);
     end
   end
 
   #
   # This will process the command passed by the enduser
   #
+  # *command_line_argument* - Commandline input arguments
+  #
   def process_commands(command_line_argument)
-    case command_line_argument
-      when 'copy-media'
-        Copy.new;
-      when 'migrate-content'
-        Content.new;
-      when 'migrate-messages'
-        Message.new;
-      when 'migrate-audios'
-        Audio.new;
-      when 'migrate-videos'
-        Video.new;
-      when 'migrate-blog'
-        Blog.new;
-      when 'migrate-dynamic-content'
-        Dynamic.new;
-      when 'crawl-for-links'
-        Crawler.new;
-    end
+    available_utilities = Immutable.routes
+    utility_class = available_utilities[command_line_argument];
+    Object.const_get(utility_class).new;
   end
 end

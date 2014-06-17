@@ -25,6 +25,13 @@ class Immutable
     end
 
     #
+    # Selfie to get routes
+    #
+    def routes
+      RConfig.routes;
+    end
+
+    #
     # Selfie to get logger
     #
     def log

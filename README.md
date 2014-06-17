@@ -20,35 +20,34 @@ bundle install
 Configuration 
 =============
 
-All required configuration has been maintained in config/global.conf file . You just need to update the details as per your environment . 
-Below are the details related to configuration 
+All required configuration has been maintained in config/global.conf file . A sample of the same has been provided inside config directory
+`global.conf.sample`
 
-```
-# Specify DB credentials and host name 
-db_user_name = root
-db_password = root
-db_name = crossroadsdotnet
-db_host = localhost
-
-# Mention the relative paths of source and destination 
-content_source_path = ../cms/production_content/
-content_destination_path = ../cms/content
-```
-
+Please follow the comments carefully and update as per your local environment .
+you can copy the contents and create global.conf file or you can also rename the global.conf.sample
+to global.conf .
 
 Execution 
 =========
 
-To migrate content just run 
-```
-ruby march.rb migrate-content 
-```
+ To know the available utiilites just run
 
-To migrate message just run 
+ $ ruby march.rb
 
-```
-ruby march.rb migrate-messages
-```
+ you will be prompted with the list of arguments that you can pass . Just pass what ever you require.
+
+Utilities and its Uses
+=======================
+
+ crawl-for-links : - Crawls and generate logs of broken links in the specified list
+ copy-media : - Copies required media to appropriate folders
+ migrate_content : - Migrates managed content from legacy
+ migrate_audios : - Migrate audio posts from legacy
+ migrate_videos : - Migrate video posts from legacy
+ migrate-messages : - Migrate message posts from legacy
+ migrate-blog : - Migrate blog posts from legacy
+ migrate-dynamic-content : - Migrate dynamic ( php files serving only content )  posts from legacy
+
 
 Logging 
 =======
