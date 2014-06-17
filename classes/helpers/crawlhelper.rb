@@ -53,7 +53,10 @@ class Crawlhelper
         link = link.gsub("\n", '');
         crawler = Mechanize.new;
         response = Crawlhelper.get_response_from_url(link);
-        response_hash[link] = get_links_within_response_body(response);
+        if response
+          response_hash[link] = get_links_within_response_body(response);
+        end
+
       end
       return response_hash;
     end
