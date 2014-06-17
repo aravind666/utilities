@@ -54,9 +54,9 @@ class Crawlhelper
         crawler = Mechanize.new;
         response = Crawlhelper.get_response_from_url(link);
         if response
-          response_hash[link] = get_links_within_response_body(response);
+          response_body = Crawlhelper.get_response_body_to_crawl(response);
+          response_hash[link] = get_links_within_response_body(response_body);
         end
-
       end
       return response_hash;
     end
@@ -126,7 +126,8 @@ class Crawlhelper
     #
     def get_links_within_response_body(body_to_parse)
       hrefs_list = [];
-      body_to_parse.parser.css('a').each do |a|
+
+      body_to_parse.css('a').each do |a|
         href = a.attribute('href').to_s;
         hrefs_list << href
       end
