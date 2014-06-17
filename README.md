@@ -39,14 +39,14 @@ Execution
 Utilities and its Uses
 =======================
 
- crawl-for-links : - Crawls and generate logs of broken links in the specified list
- copy-media : - Copies required media to appropriate folders
- migrate_content : - Migrates managed content from legacy
- migrate_audios : - Migrate audio posts from legacy
- migrate_videos : - Migrate video posts from legacy
- migrate-messages : - Migrate message posts from legacy
- migrate-blog : - Migrate blog posts from legacy
- migrate-dynamic-content : - Migrate dynamic ( php files serving only content )  posts from legacy
+ * crawl-for-links : - Crawls and generate logs of broken links in the specified list
+ * copy-media : - Copies required media to appropriate folders
+ * migrate_content : - Migrates managed content from legacy
+ * migrate_audios : - Migrate audio posts from legacy
+ * migrate_videos : - Migrate video posts from legacy
+ * migrate-messages : - Migrate message posts from legacy
+ * migrate-blog : - Migrate blog posts from legacy
+ * migrate-dynamic-content : - Migrate dynamic ( php files serving only content )  posts from legacy
 
 
 Logging 
