@@ -50,7 +50,8 @@ class Crawler
         href = "#{Immutable.baseURL}#{href}";
         response = Crawlhelper.get_response_from_url(href);
         if response
-          href_hash[href] = Crawlhelper.get_links_within_response_body(response);
+          response_body = Crawlhelper.get_response_body_to_crawl(response);
+          href_hash[href] = Crawlhelper.get_links_within_response_body(response_body);
         end
       end
     end
