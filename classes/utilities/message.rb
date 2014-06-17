@@ -99,14 +99,19 @@ class Message
   #
   def add_media_content_front_matter(media_content_structure, front_matter, message_id)
     begin
-      isadult = 'N';
+      explicit = ''
       media_content_structure.each do |media|
         lq_file_path = media['LowQFilePath'];
         #
         # A message can have multiple media contents we need to look for
         # all possibilities also each media has its own description and title we need them too
         #
-        isadult = media['isAdult']
+
+        if media['isAdult'] == 'N' || media['isAdult']==''
+          explicit = false
+        else
+          explicit = true
+        end
         case media['ContentTypeID']
           when 5
             # Audio
@@ -165,7 +170,7 @@ class Message
           else
         end
       end
-      front_matter += "\nexplicit: \"#{isadult}\"";
+      front_matter += "\nexplicit: #{explicit}";
       return front_matter;
     end
   end

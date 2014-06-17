@@ -128,6 +128,10 @@ class Contenthelper
       replacements << ['\C-M', ''] # remove unwanted control m chars
       replacements << ['Â', ''] # remove nbsp character
       replacements << ['"', '\\"'] # escape quotes
+      replacements << ['', ''] #escape special chars
+      replacements << ["’", "'"] #escape special chars
+      replacements << ["”", "\''"] #escape special chars
+      replacements << ["“", "\''"] #escape special chars
       replacements.each { |set| string_to_purify = string_to_purify.gsub(set[0], set[1]) }
       string_to_purify
     end
@@ -571,6 +575,17 @@ class Contenthelper
         Immutable.log.error "Error SQLSTATE: #{e.state}"
         abort('An error occurred while getting blog post data from DB, Check migration log for more details');
       end
+    end
+    #
+    # Function to get the data related to blog post
+    # used to get the actual blog content
+    #
+    # *string* - String blog content data
+    #
+    # Returns blog content (concatenation of para1 and para2)
+    #
+    def filter_unwanted_chars(char_string)
+      char_string.gsub(/\s\w\*%\^\$\&\."',#\@\!`~\(\)\}\{\`\\+=-_/,"")
     end
 
   end
