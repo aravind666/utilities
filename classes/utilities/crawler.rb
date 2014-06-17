@@ -84,10 +84,7 @@ class Crawler
           broken_links += "#{href} \n";
         elsif href['mysend/']
           broken_links += "#{href} \n";
-        elsif !href.empty?
-          broken_links += "#{href} \n";
         end
-      end
       if  broken_links != ''
         log_message += "Broken links : - \n #{broken_links}";
         File.open("links_broken.log", 'a+') { |f| f.write(log_message + "\n") }
