@@ -90,12 +90,30 @@ class Crawlhelper
     # crawlhelper.get_response_body_to_crawl('string')
     #
     def get_response_body_to_crawl(response_body)
-      if response_body.search('div#container').nil?
+
+      response_body = Crawlhelper.remove_unwanted_parts_within_content(response_body);
+      if response_body.search('div.container').nil?
         body_to_parse = response.search('body');
       else
-        body_to_parse = response.search('div#container');
+        body_to_parse = response.search('div.container');
       end
       return body_to_parse;
+    end
+
+    #
+    # This method is used to remove unwanted parts with in the
+    # Content where we donot need to crawl
+    #
+    # crawlhelper.remove_unwanted_parts_within_content(nokogiriObjecct)
+    #
+    def remove_unwanted_parts_within_content(response_body)
+
+      response_body.search('ol.breadcrumb').remove();
+      response_body.search('ul.list-group').remove();
+      response_body.search('footer').remove();
+
+      return response_body;
+
     end
 
     #
