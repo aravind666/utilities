@@ -112,6 +112,7 @@ class Blog
         case table
           when 'video'
             image = list['playerUrl'] + list['stillImage'];
+            image = Contenthelper.replace_image_sources_with_new_paths(image)
             front_matter = "\nvideo: \"#{list['hiDownload']}\"";
             front_matter += "\nvideo-width: #{list['hiWidth']}";
             front_matter += "\nvideo-height: #{list['hiHeight']}";
