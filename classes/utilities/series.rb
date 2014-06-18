@@ -54,11 +54,11 @@ class Series
       series_title.gsub!( ':', '-')
 
       if series_image_file1=='' || series_image_file1.nil?
-        series_image = "players/media/series/#{series_image_file}"
+        series_image = "/players/media/series/#{series_image_file}"
       else
-        series_image = "players/media/series/#{series_image_file1}"
+        series_image = "/players/media/series/#{series_image_file1}"
       end
-
+      series_image = Contenthelper.replace_image_sources_with_new_paths(series_image)
       permalink = Contenthelper.purify_title_by_removing_special_characters(series_title.downcase.strip)
       series_description = Contenthelper.purify_by_removing_special_characters(series_description)
       series_description = series_description.strip_control_characters

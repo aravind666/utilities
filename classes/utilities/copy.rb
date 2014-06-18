@@ -373,24 +373,27 @@ class Copy
   #
   def copy_series_media_references(series_data)
       status = false
-      series_data.each do |series|
-        series_image_file = series['ImageFile'].to_s
-        series_image_file1 = series['ImageFile1'].to_s
-        series_image_file.gsub!('../../../', '')
-        series_image_file1.gsub!('../../../', '')
-        if series_image_file1=='' || series_image_file1.nil?
-          series_image = "players/media/series/#{series_image_file}"
-        else
-          series_image = "players/media/series/#{series_image_file1}"
-        end
-        if !series_image.empty?
-          if File.file?("#{Immutable.config.legacy_htdocs_path}/players/media/series/#{series_image}" )
-            status = true;
-            series_image = "players/media/series/#{series_image}"
+      series_image_path = ''
+      if series_data.fetchable? then
+        series_data.each do |series|
+          series_image_file = series['ImageFile'].to_s
+          series_image_file1 = series['ImageFile1'].to_s
+          series_image_file.gsub!('../../../', '')
+          series_image_file1.gsub!('../../../', '')
+          if series_image_file1=='' || series_image_file1.nil?
+            series_image = "/players/media/series/#{series_image_file}"
+          else
+            series_image = "/players/media/series/#{series_image_file1}"
           end
-        end
-        if status
-          self.copy_files_to_appropriate_folders(series_image);
+          if !series_image.empty?
+            if File.file?("#{Immutable.config.legacy_htdocs_path}#{series_image}" )
+              status = true;
+              series_image_path = series_image
+            end
+          end
+          if status
+            self.copy_files_to_appropriate_folders(series_image_path);
+          end
         end
       end
       abort('Successfully migrated series images')
@@ -416,7 +419,7 @@ class Copy
     file = file.gsub('%20', ' ');
 
     file_to_copy = Immutable.config.legacy_htdocs_path + file
-    #puts file_to_copy;
+    puts file_to_copy;
     status = File.file?(file_to_copy);
     case status
       when true
