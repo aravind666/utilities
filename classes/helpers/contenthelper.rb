@@ -378,7 +378,7 @@ class Contenthelper
     #
     # Returns new href src for media
     #
-    def update_html_with_new_href_in_content_posts(data_to_migrate)
+    def update_html_with_milacron_href_in_content_posts(data_to_migrate)
       doc_to_migrate = Nokogiri::HTML(data_to_migrate)
       new_href = '';
       doc_to_migrate.css('a').each do |a|
@@ -393,7 +393,6 @@ class Contenthelper
               message_info = self.get_message_info(message_id);
               new_href = self.get_href_media_replace_url(message_info);
             end
-            File.open("fin.log", 'a+') { |f| f.write(new_href + "\n") }
           end
         elsif href['/blog/view']
             post_id = href.split('/').last
