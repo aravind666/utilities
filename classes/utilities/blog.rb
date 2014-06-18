@@ -121,11 +121,26 @@ class Blog
               front_matter = 'FLV';
             end
           when 'audio'
-            if (list['path'].nil? && list['hosturl'].nil?)
+            path = list['path'];
+            host_url = list['hostUrl'];
+
+            if (path.nil? && host_url.nil?)
               url = '';
+            elsif path['s3.amazonaws']
+              url = path
             else
-              url = list['hostUrl'] + list['path'];
+              url = "#{host_url}#{path}";
             end
+
+            if url['www.crossroads.net']
+              url = url.gsub('http://www.crossroads.net/', '/')
+              url = url.gsub('https://www.crossroads.net/', '/')
+              str_replace_path = path.split('/').last;
+              url = "#{Immutable.config.s3media}/mp3/#{str_replace_path}"
+            else
+              url = path
+            end
+
             front_matter = "\naudio: \"#{url}\"";
           when 'image'
             poster = list['imageUrl'] + list['path'];

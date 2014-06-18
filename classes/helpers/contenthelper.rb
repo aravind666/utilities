@@ -401,7 +401,7 @@ class Contenthelper
         elsif href['/my/media/viewSeries']
           # to do once series url's are ready
         end
-        if !href.empty?
+        if !new_href.empty?
           a['href'] = new_href;
         end
       end
