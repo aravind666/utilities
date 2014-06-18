@@ -68,13 +68,14 @@ class Crawler
   # crawler.log_hrefs_crawled('string link')
   #
   def log_hrefs_crawled(href_hash)
-    log_message = '';
+
     href_hash.each do |link, href_list|
+      log_message = '';
       broken_links = '';
       href_list.each do |href|
         href.gsub('http://www.crossroads.net/', '/');
         if href['http://'] || href['https://'] || href['itpc://'] || href['mailto:'] || href['.jpg']
-          Immutable.log.info " - > #{ href } -- we do not to do any thing with this since its external   ";
+          Immutable.log.info " - > #{ href } -- we do not to do any thing with this since its external";
         elsif href[/^#.+/]
           Immutable.log.info " - > #{ href } -- we do not need this since it is just hash tag";
         elsif href['tags']
@@ -83,6 +84,7 @@ class Crawler
           broken_links += "#{href} \n";
         elsif href['mysend/']
           broken_links += "#{href} \n";
+        elsif href
         end
       end
       if  broken_links != ''
