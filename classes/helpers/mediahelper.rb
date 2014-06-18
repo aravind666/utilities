@@ -23,11 +23,9 @@ class Mediahelper
     #
     def get_all_series
       begin
-        series_sql = 'SELECT SeriesID, Title, REPLACE(Description, "’", "\'") as Description, '
-        series_sql += 'StartDate, EndDate, ImageFile, ImageFile1, ImageFile2 FROM series '
-        series_sql += 'ORDER BY StartDate DESC'
-        series_data = Immutable.dbh.execute(series_sql);
-        return series_data;
+        series_sql  = 'SELECT * FROM series ORDER BY StartDate DESC'
+        series_data = Immutable.dbh.execute(series_sql)
+        return series_data
       rescue DBI::DatabaseError => e
         Immutable.log.error "Error code: #{e.err}"
         Immutable.log.error "Error message: #{e.errstr}"
