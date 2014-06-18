@@ -1,0 +1,26 @@
+class String
+
+  #
+  # Used to strip control chars
+  #
+  def strip_control_characters
+    self.chars.inject("") do |str, char|
+      unless char.ascii_only? and (char.ord < 32 or char.ord == 127)
+        str << char
+      end
+      str
+    end
+  end
+
+  #
+  # Used to strip control and extended chars
+  #
+  def strip_control_and_extended_characters
+    self.chars.inject("") do |str, char|
+      if char.ascii_only? and char.ord.between?(32,126)
+        str << char
+      end
+      str
+    end
+  end
+end

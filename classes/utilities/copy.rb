@@ -33,6 +33,7 @@ class Copy
       self.copy_audio_post_media_references;
       self.copy_video_post_media_references;
       self.copy_blog_post_media_references;
+      self.process_series_media_reference;
     end
   end
 
@@ -353,6 +354,46 @@ class Copy
         self.copy_files_to_appropriate_folders(src)
       end
     end
+  end
+
+  def process_series_media_reference
+    begin
+      series_data = Mediahelper.get_all_series
+      self.copy_series_media_references(series_data)
+    end
+  end
+
+  #
+  # This method is used to copy series image files
+  # required to move to s3
+  #
+  # * copy all image files related to series content
+  #
+  # copy.copy_series_media_references(series_data)
+  #
+  def copy_series_media_references(series_data)
+      status = false
+      series_data.each do |series|
+        series_image_file = series['ImageFile'].to_s
+        series_image_file1 = series['ImageFile1'].to_s
+        series_image_file.gsub!('../../../', '')
+        series_image_file1.gsub!('../../../', '')
+        if series_image_file1=='' || series_image_file1.nil?
+          series_image = "players/media/series/#{series_image_file}"
+        else
+          series_image = "players/media/series/#{series_image_file1}"
+        end
+        if !series_image.empty?
+          if File.file?("#{Immutable.config.legacy_htdocs_path}/players/media/series/#{series_image}" )
+            status = true;
+            series_image = "players/media/series/#{series_image}"
+          end
+        end
+        if status
+          self.copy_files_to_appropriate_folders(series_image);
+        end
+      end
+      abort('Successfully migrated series images')
   end
 
   #
