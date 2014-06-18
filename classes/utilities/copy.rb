@@ -417,9 +417,7 @@ class Copy
     file = file.gsub('../../', '/');
     file = file.gsub('../', '/');
     file = file.gsub('%20', ' ');
-
     file_to_copy = Immutable.config.legacy_htdocs_path + file
-    puts file_to_copy;
     status = File.file?(file_to_copy);
     case status
       when true
