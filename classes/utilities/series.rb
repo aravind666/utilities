@@ -1,5 +1,16 @@
-
+# encoding: ASCII-8BIT
+#
+# series class which defines various attributes and behaviours which are used to migrate
+# Series content as separate collection in Jekyll
+#
+# Author::    Hanumantharaju  (mailto:hanumantharaju.tswamy@costrategix.com)
+# Copyright:: Copyright (c) 2012 Crossroads
+# License::   MIT
+#
+# Initiating this class leads to migration of series content
+#
 class Series
+
 	#
 	# initialize series migration
 	#
@@ -32,23 +43,27 @@ class Series
       front_matter = ''
       series_image = ''
       series_title = ''
+
       series_image_file = series['ImageFile'].to_s
       series_image_file1 = series['ImageFile1'].to_s
       series_title = series['Title'].to_s
+      series_description =  series['Description'].to_s
       series_image_file.gsub!('../../../', '')
       series_image_file1.gsub!('../../../', '')
       series_title.gsub!( /"/, '')
       series_title.gsub!( ':', '-')
+
       if series_image_file1=='' || series_image_file1.nil?
         series_image = "players/media/series/#{series_image_file}"
       else
         series_image = "players/media/series/#{series_image_file1}"
       end
+
       permalink = Contenthelper.purify_title_by_removing_special_characters(series_title.downcase.strip)
-      series_description =  series['Description'].to_s
       series_description = Contenthelper.purify_by_removing_special_characters(series_description)
       series_description = series_description.strip_control_characters
       series_description = series_description.encode('utf-8', 'binary', :invalid => :replace,:undef => :replace, :replace => '')
+
       front_matter = "---\nlayout: series\nseries: \"#{series_title}\"\npermalink: \"\/#{permalink}/\""
       front_matter += "\ntitle: #{series_title}"
       front_matter += "\ndate: #{series['StartDate'].strftime('%Y-%m-%d %H:%M:%S')}"
@@ -56,6 +71,7 @@ class Series
       front_matter += "\ndescription: \"#{series_description}\""
       front_matter += "\nsrc: \"#{series_image}\""
       front_matter += "\n---"
+
       return front_matter
     end
   end
