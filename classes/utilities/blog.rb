@@ -49,8 +49,8 @@ class Blog
           content = Contenthelper.get_blog_content_matter(data);
           content = Contenthelper.update_html_with_new_image_paths(content.to_s);
           content = Contenthelper.update_html_with_new_media_hrefs(content.to_s);
-          content = Contenthelper.update_html_with_new_blog_hrefs(content.to_s);
-          content = Contenthelper.update_html_with_new_media_in_content_post_hrefs(content.to_s);
+          #content = Contenthelper.update_html_with_new_blog_hrefs(content.to_s);
+          content = Contenthelper.update_html_with_new_href_in_content_posts(content.to_s);
           file_write_data = front_matter.force_encoding('UTF-8') + content.force_encoding('UTF-8');
 
           self.migrate_by_adding_jekyll_front_matter(file_write_data, data);

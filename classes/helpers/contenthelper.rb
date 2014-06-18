@@ -230,7 +230,9 @@ class Contenthelper
         #
         replacements << ["images/uploadedImages/Corporate Blogger", "content"]
         replacements << ["images/uploadedImages/Corporate%20Blogger", "content"]
+        replacements << ["images/uploadedImages/Free%20Journey", "content"]
         replacements << ["images/uploadedImages/Journey Materials/Consumed", "content"]
+        replacements << ["images/uploadedImages/GO%20New%20Orleans", "content"]
         replacements << ["images/uploadedImages/kidsmusic", "content"]
         replacements << ["images/uploadedImages/GOMamelodi", "content"]
         replacements << ["images/uploadedImages/boxes/New Folder", "content"]
@@ -376,7 +378,7 @@ class Contenthelper
     #
     # Returns new href src for media
     #
-    def update_html_with_new_media_in_content_post_hrefs(data_to_migrate)
+    def update_html_with_new_href_in_content_posts(data_to_migrate)
       doc_to_migrate = Nokogiri::HTML(data_to_migrate)
       new_href = '';
       doc_to_migrate.css('a').each do |a|
@@ -391,7 +393,12 @@ class Contenthelper
               message_info = self.get_message_info(message_id);
               new_href = self.get_href_media_replace_url(message_info);
             end
+            File.open("fin.log", 'a+') { |f| f.write(new_href + "\n") }
           end
+        elsif href['/blog/view']
+            post_id = href.split('/').last
+            blog_post_info = self.get_post_info_by_id(post_id);
+            new_href = self.get_new_blog_reference_url(blog_post_info);
         elsif href['/my/media/viewSeries']
           # to do once series url's are ready
         end
