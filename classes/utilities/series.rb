@@ -1,10 +1,21 @@
-
+# encoding: ASCII-8BIT
+#
+# series class which defines various attributes and behaviours which are used to migrate
+# Series content as separate collection in Jekyll
+#
+# Author::    Hanumantharaju  (mailto:hanumantharaju.tswamy@costrategix.com)
+# Copyright:: Copyright (c) 2012 Crossroads
+# License::   MIT
+#
+# Initiating this class leads to migration of series content
+#
 class Series
+
 	#
 	# initialize series migration
 	#
 	def initialize
-		series_data = Mediahelper.get_all_series()
+		series_data = Mediahelper.get_all_series
 		self.process_series_data(series_data)
 	end
 	
@@ -32,21 +43,27 @@ class Series
       front_matter = ''
       series_image = ''
       series_title = ''
+
       series_image_file = series['ImageFile'].to_s
       series_image_file1 = series['ImageFile1'].to_s
       series_title = series['Title'].to_s
+      series_description =  series['Description'].to_s
       series_image_file.gsub!('../../../', '')
       series_image_file1.gsub!('../../../', '')
       series_title.gsub!( /"/, '')
       series_title.gsub!( ':', '-')
+
       if series_image_file1=='' || series_image_file1.nil?
-        series_image = "http://www.crossroads.net/players/media/series/#{series_image_file}"
+        series_image = "/players/media/series/#{series_image_file}"
       else
-        series_image = "http://www.crossroads.net/players/media/series/#{series_image_file1}"
+        series_image = "/players/media/series/#{series_image_file1}"
       end
+      series_image = Contenthelper.replace_image_sources_with_new_paths(series_image)
       permalink = Contenthelper.purify_title_by_removing_special_characters(series_title.downcase.strip)
-      series_description = Contenthelper.purify_by_removing_special_characters(series['Description'])
-      series_description = series_description.encode('UTF-8', 'binary', invalid: :replace, undef: :replace, replace: '')
+      series_description = Contenthelper.purify_by_removing_special_characters(series_description)
+      series_description = series_description.strip_control_characters
+      series_description = series_description.encode('utf-8', 'binary', :invalid => :replace,:undef => :replace, :replace => '')
+
       front_matter = "---\nlayout: series\nseries: \"#{series_title}\"\npermalink: \"\/#{permalink}/\""
       front_matter += "\ntitle: #{series_title}"
       front_matter += "\ndate: #{series['StartDate'].strftime('%Y-%m-%d %H:%M:%S')}"
@@ -54,6 +71,7 @@ class Series
       front_matter += "\ndescription: \"#{series_description}\""
       front_matter += "\nsrc: \"#{series_image}\""
       front_matter += "\n---"
+
       return front_matter
     end
   end
@@ -67,7 +85,6 @@ class Series
   #
   def migrate_audio_by_adding_jekyll_front_matter(series_front_matter, series_data)
     begin
-      #puts series_front_matter
       target_file_path = "#{Immutable.config.series_destination_path}/"
       title = Contenthelper.purify_title_by_removing_special_characters(series_data['Title'].downcase.strip)
       target_file_path += "#{series_data['StartDate'].strftime('%Y-%m-%d-%H-%M-%S')}-#{title}.md"

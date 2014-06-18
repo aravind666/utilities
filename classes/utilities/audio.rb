@@ -1,6 +1,6 @@
 # encoding: ASCII-8BIT
 #
-# message class which defines various attributes and behaviours which are used to migrate
+# audio class which defines various attributes and behaviours which are used to migrate
 # Audio content as separate collection in Jekyll
 #
 # Author::    Hanumantharaju  (mailto:hanumantharaju.tswamy@costrategix.com)

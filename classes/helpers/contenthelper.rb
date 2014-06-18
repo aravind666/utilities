@@ -461,6 +461,8 @@ class Contenthelper
           File.open("mp3_missing.log", 'a+') { |f| f.write(old_src + "\n") }
         elsif old_src['.mp4']
           File.open("mp4_missing.log", 'a+') { |f| f.write(old_src + "\n") }
+        elsif old_src['ignup.php']
+          File.open("signuppages.log", 'a+') { |f| f.write(old_src + "\n") }
         elsif old_src['.doc']
           File.open("docs_missing.log", 'a+') { |f| f.write(old_src + "\n") }
         elsif old_src[/^#.+/]
