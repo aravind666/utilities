@@ -38,6 +38,9 @@ audio_destination_path = /Users/CoS/crossroads.net/app/_music
 # milacron path to migrate video posts
 video_destination_path = /Users/CoS/crossroads.net/app/_media
 
+# milacron path to migrate series content
+series_destination_path  =/Users/CoS/crossroads.net/app/_series
+
 # Legacy Base URL for video thumb nails
 image_thumb_base_url = https://www.crossroads.net/uploadedfiles/
 
