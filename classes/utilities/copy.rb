@@ -172,6 +172,9 @@ class Copy
         elsif (File.file?(Immutable.config.legacy_htdocs_path+"/uploadedfiles/" + thumbnail))
           status = true;
           thumbnail_path =  "/uploadedfiles/" + thumbnail;
+        elsif (File.file?(Immutable.config.legacy_htdocs_path+"/uploadedfiles/1/" + thumbnail))
+          status = true;
+          thumbnail_path =  "/uploadedfiles/1/" + thumbnail;
         elsif (File.file?(Immutable.config.legacy_htdocs_path+"/images/uploadedImages/" + thumbnail))
           status = true;
           thumbnail_path =  "/images/uploadedImages/" + thumbnail;
