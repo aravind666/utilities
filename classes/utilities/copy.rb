@@ -385,6 +385,11 @@ class Copy
           else
             series_image = "/players/media/series/#{series_image_file1}"
           end
+
+          if series_image['img/graphics/']
+            series_image = series_image.gsub('/players/media/series/', '')
+          end
+
           if !series_image.empty?
             if File.file?("#{Immutable.config.legacy_htdocs_path}#{series_image}" )
               status = true;
