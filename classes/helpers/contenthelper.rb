@@ -223,8 +223,7 @@ class Contenthelper
       source = source.gsub("http://www.crossroads.net/", '/')
       source = source.gsub('../../', '/')
       source = source.gsub('../', '/')
-
-      if !source['http://'] || !source['https://']
+      if !source['https://'] && !source['http://']
         replacements = [] 
         #
         # image/uploadedImages folder
@@ -241,8 +240,8 @@ class Contenthelper
         replacements << ["images/uploadedImages/banners", "content"]
         replacements << ["images/uploadedImages/3500 Madison", "content"]
         replacements << ["images/uploadedImages/3500%20Madison", "content"]
-        replacements << ["images/uploadedImages", "content"]
         replacements << ["images/uploadedImages/Reset", "content"]
+        replacements << ["images/uploadedImages", "content"]
 
         #
         # img  folder
@@ -331,24 +330,29 @@ class Contenthelper
     #
     def update_html_with_new_blog_hrefs(data_to_migrate)
       doc_to_migrate = Nokogiri::HTML(data_to_migrate)
-      new_href = '/';
+      new_href = '';
       doc_to_migrate.css('a').each do |a|
         href = a.attribute('href').to_s
         if href['/blog/view']
           post_id = href.split('/').last
           blog_post_info = self.get_post_info_by_id(post_id);
           new_href = self.get_new_blog_reference_url(blog_post_info);
+          a['href'] = new_href;
         end
-        a['href'] = new_href;
       end
       return doc_to_migrate.to_s
     end
 
     #
+    # Public static: updates anchor paths
+    # with the migrated path by Parsing the content
     #
+    # *data_to_migrate* - String data gets the new href to be replaced
+    #
+    # Returns new href src for blog reference links
     #
     def get_new_blog_reference_url(blog_post_info)
-      new_href = '/';
+      new_href = '';
       blog_post_info.each do |data|
         tag = data['name'].downcase.strip;
         first_date = data['createdDate'].to_s.split('T').first;
@@ -362,6 +366,77 @@ class Contenthelper
         #File.open("blogref.log", 'a+') { |f| f.write(new_href + "\n") }
       end
       return new_href;
+    end
+
+    #
+    # Public static: updates anchor paths
+    # with the migrated path by Parsing the content
+    #
+    # *data_to_migrate* - String data which needs to updated href media references
+    #
+    # Returns new href src for media
+    #
+    def update_html_with_new_media_in_content_post_hrefs(data_to_migrate)
+      doc_to_migrate = Nokogiri::HTML(data_to_migrate)
+      new_href = '';
+      doc_to_migrate.css('a').each do |a|
+        href = a.attribute('href').to_s
+        if href['/my/media/playMedia'] || href['/my/media/playVideo']
+          clean_hrefs = self.clean_hrefs_or_images_url(href);
+          media_content_id = clean_hrefs.split('=').last
+          if !media_content_id.nil?
+            message_id_array = self.get_message_media_content_by_id(media_content_id);
+            if !message_id_array.nil?
+              message_id = message_id_array['MessageId'];
+              message_info = self.get_message_info(message_id);
+              new_href = self.get_href_media_replace_url(message_info);
+            end
+          end
+        elsif href['/my/media/viewSeries']
+          # to do once series url's are ready
+        end
+        if !href.empty?
+          a['href'] = new_href;
+        end
+      end
+      return doc_to_migrate.to_s
+    end
+
+    #
+    # Function to rewrite new url
+    #
+    # * gets the message related data from DB
+    # * identifies the columns which is required
+    # * generates the url has desired
+    #
+    # contenthelper.get_href_media_replace_url(array)
+    #
+    def get_href_media_replace_url(message_info)
+      new_href = '';
+      message_info.each do |data|
+        title = Contenthelper.purify_title_by_removing_special_characters(data['Title'].downcase.strip);
+        date = data['Date'].strftime('%Y-%m-%d');
+        new_href = "/messages/#{date}-#{title}.html"
+        #File.open("fin.log", 'a+') { |f| f.write(new_href + "\n") }
+      end
+      return new_href;
+    end
+    #
+    # Function to clean up url
+    #
+    # * gets the url
+    # * checks for parent directory clean up
+    # * checks for crossroads.net clean up
+    #
+    # contenthelper.clean_hrefs_or_images_url(url)
+    #
+    def clean_hrefs_or_images_url(href)
+      href = href.strip;
+      href = href.gsub('http://www.crossroads.net/', '/')
+      href = href.gsub('../../', '/')
+      href = href.gsub('../', '/')
+
+      return href;
     end
 
     #
@@ -517,7 +592,7 @@ class Contenthelper
         blog_sql += " HAVING MAX(cpx.createdDate)";
         blog_post_data = Immutable.dbh.execute(blog_sql);
         return blog_post_data;
-      rescue DBI::DatabaseError => e
+        rescue DBI::DatabaseError => e
         Immutable.log.error "Error code: #{e.err}"
         Immutable.log.error "Error message: #{e.errstr}"
         Immutable.log.error "Error SQLSTATE: #{e.state}"
@@ -588,6 +663,51 @@ class Contenthelper
     #
     def filter_unwanted_chars(char_string)
       char_string.gsub(/\s\w\*%\^\$\&\."',#\@\!`~\(\)\}\{\`\\+=-_/,"")
+    end
+
+    #
+    # Function to get the message id from the media content id
+    #
+    # * gets the media content id
+    # * generates message id
+    #
+    # contenthelper.get_message_media_content_by_id(522)
+    #
+    def get_message_media_content_by_id(message_id)
+      begin
+        media_content_sql = "SELECT MessageId FROM messagemediacontent";
+        media_content_sql += " WHERE MessageMediaContentID = #{message_id}";
+
+        media_content_data = Immutable.dbh.select_one(media_content_sql);
+        return media_content_data;
+        rescue DBI::DatabaseError => e
+        Immutable.log.error "Error code: #{e.err}"
+        Immutable.log.error "Error message: #{e.errstr}"
+        Immutable.log.error "Error SQLSTATE: #{e.state}"
+        abort('An error occurred while getting blog post data from DB, Check migration log for more details');
+      end
+    end
+
+    #
+    # Function to get the message info based on message id
+    #
+    # * gets the message id
+    # * generates message information required
+    #
+    # contenthelper.get_message_info(811)
+    #
+    def get_message_info(message_id)
+      begin
+        message_sql = "SELECT * FROM message";
+        message_sql += " WHERE MessageId = #{message_id}";
+        message_sql_data = Immutable.dbh.execute(message_sql);
+        return message_sql_data;
+        rescue DBI::DatabaseError => e
+        Immutable.log.error "Error code: #{e.err}"
+        Immutable.log.error "Error message: #{e.errstr}"
+        Immutable.log.error "Error SQLSTATE: #{e.state}"
+        abort('An error occurred while getting blog post data from DB, Check migration log for more details');
+      end
     end
 
   end
