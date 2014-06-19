@@ -110,6 +110,7 @@ class Crawlhelper
 
       response_body.search('ol.breadcrumb').remove();
       response_body.search('ul.list-group').remove();
+      response_body.search('div#disqus_thread').remove();
       response_body.search('footer').remove();
 
       return response_body;
