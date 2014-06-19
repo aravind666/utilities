@@ -399,9 +399,17 @@ class Contenthelper
             blog_post_info = self.get_post_info_by_id(post_id);
             new_href = self.get_new_blog_reference_url(blog_post_info);
         elsif href['/my/media/viewSeries']
-          # to do once series url's are ready
+          #File.open('series.log', 'a+') { |f| f.write(href + "\n") }
+          clean_hrefs = self.clean_hrefs_or_images_url(href);
+          series_id = clean_hrefs.split('=').last
+          if !series_id.nil?
+            series_result = self.get_series_by_id(series_id);
+            if !series_result.nil?
+              new_href = self.get_href_series_replace_url(series_result);
+            end
+          end
         end
-        if !href.empty?
+        if !new_href.empty?
           a['href'] = new_href;
         end
       end
@@ -427,6 +435,25 @@ class Contenthelper
       end
       return new_href;
     end
+
+    #
+    # Function to rewrite new url
+    #
+    # * gets the series related data from DB
+    # * identifies the columns which is required
+    # * generates the url has desired
+    #
+    # contenthelper.get_href_series_replace_url(array)
+    #
+    def get_href_series_replace_url(series_data)
+      series_title = series_data['Title']
+      series_title.gsub!( ':', '-')
+      series_title = Contenthelper.purify_title_by_removing_special_characters(series_title.downcase.strip);
+      new_href = "/#{series_title}/"
+      #File.open("fin.log", 'a+') { |f| f.write(new_href + "\n") }
+      return new_href
+    end
+
     #
     # Function to clean up url
     #
@@ -690,7 +717,7 @@ class Contenthelper
         Immutable.log.error "Error code: #{e.err}"
         Immutable.log.error "Error message: #{e.errstr}"
         Immutable.log.error "Error SQLSTATE: #{e.state}"
-        abort('An error occurred while getting blog post data from DB, Check migration log for more details');
+        abort('An error occurred while getting message data from DB, Check migration log for more details');
       end
     end
 
@@ -713,6 +740,28 @@ class Contenthelper
         Immutable.log.error "Error message: #{e.errstr}"
         Immutable.log.error "Error SQLSTATE: #{e.state}"
         abort('An error occurred while getting blog post data from DB, Check migration log for more details');
+      end
+    end
+
+    #
+    # Function to get the series info based on series id
+    #
+    # * gets the series data
+    # * generates series information required
+    #
+    # contenthelper.get_series_by_id(series_id)
+    #
+    def get_series_by_id(series_id)
+      begin
+        series_sql = "SELECT Title, StartDate FROM series";
+        series_sql += " WHERE SeriesID = #{series_id}";
+        series_data = Immutable.dbh.select_one(series_sql);
+        return series_data;
+      rescue DBI::DatabaseError => e
+        Immutable.log.error "Error code: #{e.err}"
+        Immutable.log.error "Error message: #{e.errstr}"
+        Immutable.log.error "Error SQLSTATE: #{e.state}"
+        abort('An error occurred while getting series data from DB, Check migration log for more details');
       end
     end
 

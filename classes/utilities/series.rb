@@ -46,23 +46,24 @@ class Series
 
       series_image_file = series['ImageFile'].to_s
       series_image_file1 = series['ImageFile1'].to_s
+      series_image_file2 = series['ImageFile2'].to_s
       series_title = series['Title'].to_s
       series_description =  series['Description'].to_s
       series_image_file.gsub!('../../../', '')
       series_image_file1.gsub!('../../../', '')
       series_title.gsub!( /"/, '')
       series_title.gsub!( ':', '-')
-
-      if series_image_file1 == '' || series_image_file1.nil?
+      if series_image_file2 != ''
+        series_image = series_image_file2
+      elsif series_image_file1 != ''
+        series_image = series_image_file1
+      elsif series_image_file != ''
         series_image = series_image_file
       else
-        series_image = series_image_file1
-      end
-
-      if series_image == ''
         series_image = 'GenericCrnerSign.jpg'
       end
 
+      puts series_image
       if series_image['img/graphics/']
         series_image = series_image.gsub('img/graphics/', '')
       end
