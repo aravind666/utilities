@@ -377,18 +377,23 @@ class Copy
   def copy_series_media_references(series_data)
       status = false
       series_image_path = ''
+      series_image = ''
       if series_data.fetchable? then
         series_data.each do |series|
           series_image_file = series['ImageFile'].to_s
           series_image_file1 = series['ImageFile1'].to_s
+          series_image_file2 = series['ImageFile2'].to_s
           series_image_file.gsub!('../../../', '')
           series_image_file1.gsub!('../../../', '')
-          if series_image_file1=='' || series_image_file1.nil?
-            series_image = "/players/media/series/#{series_image_file}"
-          else
-            series_image = "/players/media/series/#{series_image_file1}"
-          end
 
+          if series_image_file2 != ''
+            series_image = series_image_file2
+          elsif series_image_file1 != ''
+            series_image = series_image_file1
+          elsif series_image_file != ''
+            series_image = series_image_file
+          end
+          series_image = "/players/media/series/#{series_image}"
           if series_image['img/graphics/']
             series_image = series_image.gsub('/players/media/series/', '')
           end
