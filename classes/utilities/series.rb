@@ -3,7 +3,7 @@
 # series class which defines various attributes and behaviours which are used to migrate
 # Series content as separate collection in Jekyll
 #
-# Author::    Hanumantharaju  (mailto:hanumantharaju.tswamy@costrategix.com)
+# Author::    Hanumantharaju T (mailto:hanumantharaju.tswamy@costrategix.com)
 # Copyright:: Copyright (c) 2012 Crossroads
 # License::   MIT
 #
@@ -66,9 +66,9 @@ class Series
         series_image = series_image.gsub('img/graphics/', '')
       end
 
-      series_image = Contenthelper.replace_image_sources_with_new_paths("/players/media/series/#{series_image}")
-      permalink = Contenthelper.purify_title_by_removing_special_characters(series_title.downcase.strip)
-      series_description = Contenthelper.purify_by_removing_special_characters(series_description)
+      series_image = ContentHelper.replace_image_sources_with_new_paths("/players/media/series/#{series_image}")
+      permalink = ContentHelper.purify_title_by_removing_special_characters(series_title.downcase.strip)
+      series_description = ContentHelper.purify_by_removing_special_characters(series_description)
       series_description = series_description.strip_control_characters
       series_description = series_description.encode('utf-8', 'binary', :invalid => :replace,:undef => :replace, :replace => '')
 
@@ -93,7 +93,7 @@ class Series
   def migrate_audio_by_adding_jekyll_front_matter(series_front_matter, series_data)
     begin
       target_file_path = "#{Immutable.config.series_destination_path}/"
-      title = Contenthelper.purify_title_by_removing_special_characters(series_data['Title'].downcase.strip)
+      title = ContentHelper.purify_title_by_removing_special_characters(series_data['Title'].downcase.strip)
       target_file_path += "#{series_data['StartDate'].strftime('%Y-%m-%d-%H-%M-%S')}-#{title}.md"
       migrated_audio_file_handler = File.open(target_file_path, 'w')
       migrated_audio_file_handler.write(series_front_matter)
