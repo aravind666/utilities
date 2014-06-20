@@ -51,8 +51,8 @@ class Blog
           content = Contenthelper.update_html_with_new_media_hrefs(content.to_s);
           #content = Contenthelper.update_html_with_new_blog_hrefs(content.to_s);
           content = Contenthelper.update_html_with_milacron_href_in_content_posts(content.to_s);
+          content = content.encode('utf-8', 'binary', :invalid => :replace,:undef => :replace, :replace => '')
           file_write_data = front_matter.force_encoding('UTF-8') + content.force_encoding('UTF-8');
-
           self.migrate_by_adding_jekyll_front_matter(file_write_data, data);
         else
           self.log_flv_videos(data, media_front_matter);

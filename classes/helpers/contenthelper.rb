@@ -390,6 +390,14 @@ class Contenthelper
               new_href = self.get_href_series_replace_url(series_result);
             end
           end
+        elsif href['/my/media/index.php']
+          new_href = '/media';
+        elsif href['/my/media/messages.php']
+          new_href = '/media/series';
+        elsif href['/my/media/music.php']
+          new_href = '/media/music/';
+        elsif href['/my/media/podcasts.htm']
+          new_href = '/content/Media/podcasts.htm';
         end
         if !new_href.empty?
           a['href'] = new_href;

@@ -62,8 +62,6 @@ class Series
       else
         series_image = 'GenericCrnerSign.jpg'
       end
-
-      puts series_image
       if series_image['img/graphics/']
         series_image = series_image.gsub('img/graphics/', '')
       end
@@ -81,7 +79,6 @@ class Series
       front_matter += "\ndescription: \"#{series_description}\""
       front_matter += "\nsrc: \"#{series_image}\""
       front_matter += "\n---"
-
       return front_matter
     end
   end
