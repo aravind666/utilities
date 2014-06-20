@@ -62,14 +62,14 @@ class Audio
       front_matter = ''
       default_audio_image_thumb = 'DefaultVideoImage.jpg'
       audio_title = audio['Title'].gsub /"/, ''
-      audio_description = Contenthelper.purify_by_removing_special_characters(audio['Description'])
+      audio_description = ContentHelper.purify_by_removing_special_characters(audio['Description'])
       lq_file_path = audio['LowQFilePath']
       if lq_file_path['www.crossroads.net']
         audio_file_path = lq_file_path.gsub('http://www.crossroads.net/', '/')
         audio_file_path = lq_file_path.gsub('https://www.crossroads.net/', '/')
-        audio_file_path = "#{Immutable.config.s3media}/mp3/#{Contenthelper.encode_url_string(audio['HighQFilePath'])}"
+        audio_file_path = "#{Immutable.config.s3media}/mp3/#{ContentHelper.encode_url_string(audio['HighQFilePath'])}"
       else
-        audio_file_path = "#{lq_file_path}#{Contenthelper.encode_url_string(audio['HighQFilePath'])}"
+        audio_file_path = "#{lq_file_path}#{ContentHelper.encode_url_string(audio['HighQFilePath'])}"
       end
       audio_thumb_image = audio['ThumbImagePath'].to_s
       audio_poster = ''
@@ -80,7 +80,7 @@ class Audio
         audio_poster = default_audio_image_thumb
       end
       audio_poster = "/images/uploadedImages/#{audio_poster}"
-      audio_poster = Contenthelper.replace_image_sources_with_new_paths(audio_poster)
+      audio_poster = ContentHelper.replace_image_sources_with_new_paths(audio_poster)
       if audio['duration'] == ':'
         audio['duration'] = '00:00'
       end
@@ -104,7 +104,7 @@ class Audio
   def migrate_audio_by_adding_jekyll_front_matter(audio_front_matter, audio_data)
     begin
       target_file_path = "#{Immutable.config.audio_destination_path}/"
-      title = Contenthelper.purify_title_by_removing_special_characters(audio_data['Title'].downcase.strip)
+      title = ContentHelper.purify_title_by_removing_special_characters(audio_data['Title'].downcase.strip)
       target_file_path += "#{audio_data['UploadDate'].strftime('%Y-%m-%d-%H-%M-%S')}-#{title}.md"
       migrated_audio_file_handler = File.open(target_file_path, 'w')
       migrated_audio_file_handler.write(audio_front_matter)

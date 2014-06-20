@@ -119,9 +119,9 @@ class Message
               if (lq_file_path['www.crossroads.net'])
                 audio_file_path = lq_file_path.gsub('http://www.crossroads.net/', '/');
                 audio_file_path = lq_file_path.gsub('https://www.crossroads.net/', '/');
-                audio_file_path = "#{Immutable.config.s3media}/mp3/#{Contenthelper.encode_url_string(media['HighQFilePath'])}";
+                audio_file_path = "#{Immutable.config.s3media}/mp3/#{ContentHelper.encode_url_string(media['HighQFilePath'])}";
               else
-                audio_file_path = "#{lq_file_path}#{Contenthelper.encode_url_string(media['HighQFilePath'])}"
+                audio_file_path = "#{lq_file_path}#{ContentHelper.encode_url_string(media['HighQFilePath'])}"
               end
               front_matter += "\naudio: \"#{audio_file_path}\"";
               front_matter += "\naudio-duration: \"#{media['duration']}\"";
@@ -129,8 +129,8 @@ class Message
           when 4
             # Video -- only IPOD video
             if (media['iPodVideo'].length > 0)
-              video_description = Contenthelper.purify_by_removing_special_characters(media['Description']);
-              video_title = Contenthelper.purify_by_removing_special_characters(media['Title']);
+              video_description = ContentHelper.purify_by_removing_special_characters(media['Description']);
+              video_title = ContentHelper.purify_by_removing_special_characters(media['Title']);
               video_poster = media['ThumbImagePath'];
               if !media['duration'] || media['duration'] == ':' || media['duration'].to_s.nil?
                 audio_duration = Mediahelper.get_audio_duration(message_id);
@@ -142,17 +142,17 @@ class Message
             end
           when 7
             # Study Notes
-            notes_description = Contenthelper.purify_by_removing_special_characters(media['Description']);
+            notes_description = ContentHelper.purify_by_removing_special_characters(media['Description']);
 
             if (lq_file_path['www.crossroads.net'])
               notes_file_path = lq_file_path.gsub('http://www.crossroads.net/', '/');
               notes_file_path = lq_file_path.gsub('https://www.crossroads.net/', '/');
-              notes_file_path = "#{Immutable.config.s3media}/documents/#{Contenthelper.encode_url_string(media['HighQFilePath'])}"
+              notes_file_path = "#{Immutable.config.s3media}/documents/#{ContentHelper.encode_url_string(media['HighQFilePath'])}"
             else
-              notes_file_path = "#{lq_file_path}#{Contenthelper.encode_url_string(media['HighQFilePath'])}";
+              notes_file_path = "#{lq_file_path}#{ContentHelper.encode_url_string(media['HighQFilePath'])}";
             end
 
-            notes_title = Contenthelper.purify_by_removing_special_characters(media['Title']);
+            notes_title = ContentHelper.purify_by_removing_special_characters(media['Title']);
             front_matter += "\nnotes-description: \"#{notes_description}\"";
             front_matter += "\nnotes: \"#{notes_file_path}\"\nnotes-title: \"#{notes_title}\"";
           when 8
@@ -161,9 +161,9 @@ class Message
             if (lq_file_path['www.crossroads.net'])
               program_file_path = lq_file_path.gsub('http://www.crossroads.net/', '/');
               program_file_path = lq_file_path.gsub('https://www.crossroads.net/', '/');
-              program_file_path = "#{Immutable.config.s3media}/documents/#{Contenthelper.encode_url_string(media['HighQFilePath'])}"
+              program_file_path = "#{Immutable.config.s3media}/documents/#{ContentHelper.encode_url_string(media['HighQFilePath'])}"
             else
-              program_file_path = "#{lq_file_path}#{Contenthelper.encode_url_string(media['HighQFilePath'])}";
+              program_file_path = "#{lq_file_path}#{ContentHelper.encode_url_string(media['HighQFilePath'])}";
             end
 
             front_matter += "\nprogram: \"#{program_file_path}\"";
@@ -185,7 +185,7 @@ class Message
   def migrate_by_adding_jekyll_front_matter(jekyll_front_matter, message_data)
     begin
       target_file_path = "#{Immutable.config.message_destination_path}/";
-      title = Contenthelper.purify_title_by_removing_special_characters(message_data['Title'].downcase.strip);
+      title = ContentHelper.purify_title_by_removing_special_characters(message_data['Title'].downcase.strip);
       target_file_path += "#{message_data['Date'].strftime('%Y-%m-%d')}-#{title}.md";
       migrated_message_file_handler = File.open(target_file_path, 'w');
       migrated_message_file_handler.write(jekyll_front_matter);

@@ -471,8 +471,7 @@ class ContentHelper
     end
 
     #
-    # Function to get the data related to blog post
-    # used to get the actual blog content
+    # To filter unwanted characters
     #
     # *string* - String blog content data
     #

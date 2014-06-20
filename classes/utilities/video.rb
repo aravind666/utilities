@@ -116,11 +116,11 @@ class Video
     front_matter = "";
 
     mainTitle = media['Title'].gsub /"/, '';
-    video_description = Contenthelper.purify_by_removing_special_characters(media['Description']);
+    video_description = ContentHelper.purify_by_removing_special_characters(media['Description']);
     video_poster = media['ThumbImagePath'];
-    #Contenthelper.copy_required_media_images_to_folder(video_poster)
+    #ContentHelper.copy_required_media_images_to_folder(video_poster)
     video_poster = "/uploadedfiles/#{video_poster}"
-    video_poster = Contenthelper.replace_image_sources_with_new_paths(video_poster)
+    video_poster = ContentHelper.replace_image_sources_with_new_paths(video_poster)
 
 
     front_matter = "---\nlayout: media\ncategory: media\ntitle: \"#{mainTitle}\"";
@@ -146,7 +146,7 @@ class Video
   def migrate_by_adding_jekyll_front_matter(jekyll_front_matter, media)
     begin
       target_file_path = "#{Immutable.config.video_destination_path}/";
-      title = Contenthelper.purify_title_by_removing_special_characters(media["Title"].downcase.strip);
+      title = ContentHelper.purify_title_by_removing_special_characters(media["Title"].downcase.strip);
       target_file_path += "#{media["UploadDate"].strftime("%Y-%m-%d-%H-%M-%S")}-#{title}.md"
       migrated_message_file_handler = File.open(target_file_path, 'w')
       migrated_message_file_handler.write(jekyll_front_matter);

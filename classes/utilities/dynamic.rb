@@ -21,7 +21,7 @@ class Dynamic
   # Returns dynamic links array
   #
   def migrate_dynamic_content
-    links_to_migrate = Contenthelper.get_dynamic_links_to_migrate
+    links_to_migrate = ContentHelper.get_dynamic_links_to_migrate
     self.process_links(links_to_migrate)
   end
 
@@ -36,13 +36,13 @@ class Dynamic
   def process_links(links_to_migrate)
     links_to_migrate.each do |link|
       link = link.gsub("\n", '')
-      response_from_content_url = Contenthelper.get_content_from_url(link)
+      response_from_content_url = ContentHelper.get_content_from_url(link)
       if response_from_content_url
         front_matter = self.get_jekyll_front_matter_for_content(link, response_from_content_url)
         content_to_migrate = self.get_content_body_to_migrate(response_from_content_url)
-        Contenthelper.log_various_href_sources(content_to_migrate.to_s)
-        content_to_migrate = Contenthelper.update_html_with_new_media_hrefs(content_to_migrate.to_s)
-        content_to_migrate = Contenthelper.update_html_with_milacron_href_in_content_posts(content_to_migrate.to_s);
+        ContentHelper.log_various_href_sources(content_to_migrate.to_s)
+        content_to_migrate = ContentHelper.update_html_with_new_media_hrefs(content_to_migrate.to_s)
+        content_to_migrate = ContentHelper.update_html_with_milacron_href_in_content_posts(content_to_migrate.to_s);
         target_file_location = self.setup_target_file_location(link)
         self.migrate_by_adding_jekyll_front_matter(target_file_location, front_matter, content_to_migrate)
       end
@@ -59,7 +59,7 @@ class Dynamic
   def get_content_body_to_migrate(response)
     response.parser.css('img').each do |img|
       old_src = img.attribute('src').to_s
-      new_src = Contenthelper.replace_image_sources_with_new_paths(old_src)
+      new_src = ContentHelper.replace_image_sources_with_new_paths(old_src)
       img['src'] = new_src;
     end
     if response.search('div#mainContent').nil?
