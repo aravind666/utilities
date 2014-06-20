@@ -138,7 +138,7 @@ class Content
     data_to_migrate = ContentHelper.update_html_with_new_image_paths(data_to_migrate);
     ContentHelper.log_various_href_sources(data_to_migrate);
     data_to_migrate = ContentHelper.update_html_with_new_media_hrefs(data_to_migrate);
-    data_to_migrate = ContentHelper.update_html_with_milacron_href_in_content_posts(data_to_migrate.to_s);
+    data_to_migrate = BlogHelper.update_html_with_milacron_href_in_content_posts(data_to_migrate.to_s);
     migrated_content_file_handler.write(data_to_migrate);
   end
 
