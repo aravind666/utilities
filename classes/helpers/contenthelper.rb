@@ -470,16 +470,5 @@ class ContentHelper
       end
     end
 
-    #
-    # To filter unwanted characters
-    #
-    # *string* - String blog content data
-    #
-    # Returns blog content (concatenation of para1 and para2)
-    #
-    def filter_unwanted_chars(char_string)
-      char_string.gsub(/\s\w\*%\^\$\&\."',#\@\!`~\(\)\}\{\`\\+=-_/, "")
-    end
-
   end
 end
