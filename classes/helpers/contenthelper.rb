@@ -224,7 +224,7 @@ class Contenthelper
       source = source.gsub('../../', '/')
       source = source.gsub('../', '/')
       if !source['https://'] && !source['http://']
-        replacements = [] 
+        replacements = []
         #
         # image/uploadedImages folder
         #
@@ -294,7 +294,7 @@ class Contenthelper
       doc_to_migrate.css('img').each do |img|
         old_src = img.attribute('src').to_s
         old_file_name = File.basename(old_src);
-        s3_file_name = old_file_name.gsub(' ','+');
+        s3_file_name = old_file_name.gsub(' ', '+');
         new_src = Contenthelper.replace_image_sources_with_new_paths(old_src)
         img['src'] = new_src
       end
@@ -314,8 +314,8 @@ class Contenthelper
       doc_to_migrate.css('a').each do |a|
         href = a.attribute('href').to_s
         old_file_name = File.basename(href);
-        s3_file_name = old_file_name.gsub(' ','+');
-        href = href.gsub(old_file_name,s3_file_name);
+        s3_file_name = old_file_name.gsub(' ', '+');
+        href = href.gsub(old_file_name, s3_file_name);
         new_href = Contenthelper.update_href(href)
         a['href'] = new_href
       end
@@ -323,52 +323,26 @@ class Contenthelper
     end
 
     #
-    # Public static: updates anchor paths
-    # with the migrated path by Parsing the content
+    # Public static: checks whether the blog post exists or not
+    # with in the migrated folder in the milacron app folder
     #
-    # *data_to_migrate* - String data which needs to updated href references
-    #
-    # Returns new href src for blog links
-    #
-    def update_html_with_new_blog_hrefs(data_to_migrate)
-      doc_to_migrate = Nokogiri::HTML(data_to_migrate)
-      new_href = '';
-      doc_to_migrate.css('a').each do |a|
-        href = a.attribute('href').to_s
-        if href['/blog/view']
-          post_id = href.split('/').last
-          blog_post_info = self.get_post_info_by_id(post_id);
-          new_href = self.get_new_blog_reference_url(blog_post_info);
-          a['href'] = new_href;
-        end
-      end
-      return doc_to_migrate.to_s
-    end
-
-    #
-    # Public static: updates anchor paths
-    # with the migrated path by Parsing the content
-    #
-    # *data_to_migrate* - String data gets the new href to be replaced
+    # *file_name* - file name to check for
+    # *blog_post_info* - Blog information which we are searching for
     #
     # Returns new href src for blog reference links
     #
-    def get_new_blog_reference_url(blog_post_info)
-      new_href = '';
-      blog_post_info.each do |data|
-        tag = data['name'].downcase.strip;
-        first_date = data['createdDate'].to_s.split('T').first;
-        date = first_date.split('-');
-        year = date[0];
-        month = date[1];
-        day = date[2];
-        title = Contenthelper.purify_title_by_removing_special_characters(data['title'].downcase.strip);
-        title = "#{data['createdDate'].strftime('%H-%M-%S')}-#{title}.html"
-        new_href = "/#{tag}/#{year}/#{month}/#{day}/#{title}";
-        #File.open("blogref.log", 'a+') { |f| f.write(new_href + "\n") }
+    def check_for_blog_post_existance(file_name,blog_post_info)
+      destination_to_check = Immutable.config.blog_destination_path
+      file_path = "#{destination_to_check}/#{file_name}"
+      if File.file?(file_path)
+        return true;
+      else
+        log_message = "post Id  #{blog_post_info['postId']} on channel Id #{blog_post_info['channelId']} has not been migrated "
+        File.open("blog_posts_missing.log", 'a+') { |f| f.write(log_message + "\n") }
+        return false
       end
-      return new_href;
     end
+
 
     #
     # Public static: updates anchor paths
@@ -395,9 +369,17 @@ class Contenthelper
             end
           end
         elsif href['/blog/view']
-            post_id = href.split('/').last
-            blog_post_info = self.get_post_info_by_id(post_id);
+          href_parts = href.split('/')
+          post_id = href_parts[href_parts.length - 1]
+          channel_id = href_parts[href_parts.length - 2]
+          blog_post_info = self.get_post_info_by_id(channel_id,post_id);
+          if !blog_post_info.nil?
             new_href = self.get_new_blog_reference_url(blog_post_info);
+          else
+            log_message = "post Id  #{post_id} on channel Id #{channel_id} does not exists in DB "
+            File.open("blog_posts_does_not_exists.log", 'a+') { |f| f.write(log_message + "\n") }
+          end
+
         elsif href['/my/media/viewSeries']
           #File.open('series.log', 'a+') { |f| f.write(href + "\n") }
           clean_hrefs = self.clean_hrefs_or_images_url(href);
@@ -415,6 +397,33 @@ class Contenthelper
       end
       return doc_to_migrate.to_s
     end
+
+
+    #
+    # Public static: updates anchor paths
+    # with the migrated path by Parsing the content
+    #
+    # *data_to_migrate* - String data gets the new href to be replaced
+    #
+    # Returns new href src for blog reference links
+    #
+    def get_new_blog_reference_url(blog_post_info)
+      title = Contenthelper.purify_title_by_removing_special_characters(blog_post_info['title'].downcase.strip);
+      file_name = "#{blog_post_info['createdDate'].strftime('%Y-%m-%d-%H-%M-%S')}-#{title}.html"
+      file_name_in_href = "#{blog_post_info['createdDate'].strftime('%H-%M-%S').to_s}-#{title}.html"
+      tag = blog_post_info['name'].downcase.strip;
+      file_parts = file_name.split('-');
+      new_href = "/#{tag}/#{file_parts[0]}/#{file_parts[1]}/#{file_parts[2]}/#{file_name_in_href}";
+      status = Contenthelper.check_for_blog_post_existance(file_name,blog_post_info)
+      if status
+        return new_href
+      else
+        return ''
+      end
+    end
+
+
+
 
     #
     # Function to rewrite new url
@@ -447,7 +456,7 @@ class Contenthelper
     #
     def get_href_series_replace_url(series_data)
       series_title = series_data['Title']
-      series_title.gsub!( ':', '-')
+      series_title.gsub!(':', '-')
       series_title = Contenthelper.purify_title_by_removing_special_characters(series_title.downcase.strip);
       new_href = "/#{series_title}/"
       #File.open("fin.log", 'a+') { |f| f.write(new_href + "\n") }
@@ -613,6 +622,7 @@ class Contenthelper
     def get_all_blog_posts
       begin
         # there are too many columns which leads to ambiguity. So, fetch the required columns
+
         blog_sql = "SELECT cp.title as title, cp.subtitle, cp.paragraph1, cp.paragraph2, cpx.createdDate,";
         blog_sql += "c.name, p.FirstName, cpx.postId FROM channelpost as cp";
         blog_sql += " JOIN channelpostxref as cpx ON cpx.postid = cp.id";
@@ -625,7 +635,7 @@ class Contenthelper
         blog_sql += " HAVING MAX(cpx.createdDate)";
         blog_post_data = Immutable.dbh.execute(blog_sql);
         return blog_post_data;
-        rescue DBI::DatabaseError => e
+      rescue DBI::DatabaseError => e
         Immutable.log.error "Error code: #{e.err}"
         Immutable.log.error "Error message: #{e.errstr}"
         Immutable.log.error "Error SQLSTATE: #{e.state}"
@@ -665,27 +675,26 @@ class Contenthelper
     #
     # Contenthelper.get_post_info_by_id(33)
     #
-    def get_post_info_by_id(id)
+    def get_post_info_by_id(channel_id, post_id)
       begin
         # there are too many columns which leads to ambiguity. So, fetch the required columns
-        blog_sql = "SELECT cp.title as title, cpx.createdDate,";
-        blog_sql += "c.name, cpx.postId FROM channelpost as cp";
-        blog_sql += " JOIN channelpostxref as cpx ON cpx.postid = cp.id";
-        blog_sql += " JOIN milacron_migrate_post as mmp ON cp.id = mmp.channelpost_id";
-        blog_sql += " JOIN channel as c ON c.id = cpx.channelid";
-        blog_sql += " WHERE postId = #{id}";
-        blog_sql += " AND migrate = 'yes'";
-        blog_sql += " GROUP BY cp.id";
 
-        blog_post_data = Immutable.dbh.execute(blog_sql);
+        blog_sql = "SELECT cpx.postId, cpx.createdDate, cpx.channelId, ch.name ,cp.title "
+        blog_sql += " from channelpostxref as cpx"
+        blog_sql += " JOIN channel as ch ON cpx.channelId = ch.id"
+        blog_sql += " JOIN channelpost as cp ON cpx.postId = cp.id"
+        blog_sql += " where cpx.channelId = #{channel_id} and cpx.postId = #{post_id}"
+
+        blog_post_data = Immutable.dbh.select_one(blog_sql);
         return blog_post_data;
-        rescue DBI::DatabaseError => e
+      rescue DBI::DatabaseError => e
         Immutable.log.error "Error code: #{e.err}"
         Immutable.log.error "Error message: #{e.errstr}"
         Immutable.log.error "Error SQLSTATE: #{e.state}"
         abort('An error occurred while getting blog post data from DB, Check migration log for more details');
       end
     end
+
     #
     # Function to get the data related to blog post
     # used to get the actual blog content
@@ -695,7 +704,7 @@ class Contenthelper
     # Returns blog content (concatenation of para1 and para2)
     #
     def filter_unwanted_chars(char_string)
-      char_string.gsub(/\s\w\*%\^\$\&\."',#\@\!`~\(\)\}\{\`\\+=-_/,"")
+      char_string.gsub(/\s\w\*%\^\$\&\."',#\@\!`~\(\)\}\{\`\\+=-_/, "")
     end
 
     #
@@ -713,7 +722,7 @@ class Contenthelper
 
         media_content_data = Immutable.dbh.select_one(media_content_sql);
         return media_content_data;
-        rescue DBI::DatabaseError => e
+      rescue DBI::DatabaseError => e
         Immutable.log.error "Error code: #{e.err}"
         Immutable.log.error "Error message: #{e.errstr}"
         Immutable.log.error "Error SQLSTATE: #{e.state}"
@@ -735,7 +744,7 @@ class Contenthelper
         message_sql += " WHERE MessageId = #{message_id}";
         message_sql_data = Immutable.dbh.execute(message_sql);
         return message_sql_data;
-        rescue DBI::DatabaseError => e
+      rescue DBI::DatabaseError => e
         Immutable.log.error "Error code: #{e.err}"
         Immutable.log.error "Error message: #{e.errstr}"
         Immutable.log.error "Error SQLSTATE: #{e.state}"

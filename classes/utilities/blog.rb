@@ -58,6 +58,7 @@ class Blog
           self.log_flv_videos(data, media_front_matter);
         end
       end
+
     else
       Immutable.log.info "No blog post available";
     end
@@ -197,6 +198,7 @@ class Blog
     begin
       target_file_path = "#{Immutable.config.blog_destination_path}/";
       title = Contenthelper.purify_title_by_removing_special_characters(blog_data['title'].downcase.strip);
+
       target_file_path += "#{blog_data['createdDate'].strftime('%Y-%m-%d-%H-%M-%S')}-#{title}.html"
       migrated_blog_file_handler = File.open(target_file_path, 'w');
       migrated_blog_file_handler.write(html_data);
