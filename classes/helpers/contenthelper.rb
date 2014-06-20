@@ -9,7 +9,7 @@
 #
 # All behaviours exhibited here are selfies you do not need an object to call them
 #
-class Contenthelper
+class ContentHelper
 
   class << self
 
@@ -295,7 +295,7 @@ class Contenthelper
         old_src = img.attribute('src').to_s
         old_file_name = File.basename(old_src);
         s3_file_name = old_file_name.gsub(' ', '+');
-        new_src = Contenthelper.replace_image_sources_with_new_paths(old_src)
+        new_src = ContentHelper.replace_image_sources_with_new_paths(old_src)
         img['src'] = new_src
       end
       doc_to_migrate.to_s
@@ -316,7 +316,7 @@ class Contenthelper
         old_file_name = File.basename(href);
         s3_file_name = old_file_name.gsub(' ', '+');
         href = href.gsub(old_file_name, s3_file_name);
-        new_href = Contenthelper.update_href(href)
+        new_href = ContentHelper.update_href(href)
         a['href'] = new_href
       end
       return doc_to_migrate.to_s
@@ -416,13 +416,13 @@ class Contenthelper
     # Returns new href src for blog reference links
     #
     def get_new_blog_reference_url(blog_post_info)
-      title = Contenthelper.purify_title_by_removing_special_characters(blog_post_info['title'].downcase.strip);
+      title = ContentHelper.purify_title_by_removing_special_characters(blog_post_info['title'].downcase.strip);
       file_name = "#{blog_post_info['createdDate'].strftime('%Y-%m-%d-%H-%M-%S')}-#{title}.html"
       file_name_in_href = "#{blog_post_info['createdDate'].strftime('%H-%M-%S').to_s}-#{title}.html"
       tag = blog_post_info['name'].downcase.strip;
       file_parts = file_name.split('-');
       new_href = "/#{tag}/#{file_parts[0]}/#{file_parts[1]}/#{file_parts[2]}/#{file_name_in_href}";
-      status = Contenthelper.check_for_blog_post_existance(file_name,blog_post_info)
+      status = ContentHelper.check_for_blog_post_existance(file_name,blog_post_info)
       if status
         return new_href
       else
@@ -445,7 +445,7 @@ class Contenthelper
     def get_href_media_replace_url(message_info)
       new_href = '';
       message_info.each do |data|
-        title = Contenthelper.purify_title_by_removing_special_characters(data['Title'].downcase.strip);
+        title = ContentHelper.purify_title_by_removing_special_characters(data['Title'].downcase.strip);
         date = data['Date'].strftime('%Y-%m-%d');
         new_href = "/messages/#{date}-#{title}.html"
         #File.open("fin.log", 'a+') { |f| f.write(new_href + "\n") }
@@ -465,7 +465,7 @@ class Contenthelper
     def get_href_series_replace_url(series_data)
       series_title = series_data['Title']
       series_title.gsub!(':', '-')
-      series_title = Contenthelper.purify_title_by_removing_special_characters(series_title.downcase.strip);
+      series_title = ContentHelper.purify_title_by_removing_special_characters(series_title.downcase.strip);
       new_href = "/#{series_title}/"
       #File.open("fin.log", 'a+') { |f| f.write(new_href + "\n") }
       return new_href
@@ -625,7 +625,7 @@ class Contenthelper
     # * this function will get all the blog posts
     # * for channels id's in 1,2,3,4,5,6,7,8,9 and the migrate flag need to be yes
     #
-    # Contenthelper.get_all_blog_posts
+    # ContentHelper.get_all_blog_posts
     #
     def get_all_blog_posts
       begin
@@ -681,7 +681,7 @@ class Contenthelper
     #
     # * this function will get the required post information
     #
-    # Contenthelper.get_post_info_by_id(33)
+    # ContentHelper.get_post_info_by_id(33)
     #
     def get_post_info_by_id(channel_id, post_id)
       begin

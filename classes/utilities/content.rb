@@ -36,7 +36,7 @@ class Content
       File.delete('everythingelse.log') if File.exist?('everythingelse.log');
       File.delete('php_links_in_milacron.log') if File.exist?('php_links_in_milacron.log');
       File.delete('mysend_links_in_milacron.log') if File.exist?('mysend_links_in_milacron.log');
-      Contenthelper.validate_content_destination_path;
+      ContentHelper.validate_content_destination_path;
       FileUtils.rm_rf(Dir.glob(Immutable.config.content_destination_path))
     rescue Errno::ENOENT => e
       Immutable.log.error "Folder does not exists, Its first run #{e}"
@@ -50,7 +50,7 @@ class Content
   # * sends for processing
   #
   def migrate_content
-    content_data = Contenthelper.get_content_from_database();
+    content_data = ContentHelper.get_content_from_database();
     self.process_content(content_data);
   end
 
@@ -106,7 +106,7 @@ class Content
   # content.build_content_based_on_status(array)
   #
   def build_content_based_on_status(content)
-    db_file_path = Contenthelper.purify_file_path(content[1]);
+    db_file_path = ContentHelper.purify_file_path(content[1]);
     destination_file_name = content[2];
     complete_source_path = Immutable.config.content_source_path + db_file_path + destination_file_name;
     category_name = content[3].gsub(/\s/, '-');
@@ -135,10 +135,10 @@ class Content
     migrated_file_path = "#{Immutable.config.content_destination_path}/#{category_name}/#{file_name}";
     migrated_content_file_handler = File.open(migrated_file_path, 'w');
     migrated_content_file_handler.write(front_matter);
-    data_to_migrate = Contenthelper.update_html_with_new_image_paths(data_to_migrate);
-    Contenthelper.log_various_href_sources(data_to_migrate);
-    data_to_migrate = Contenthelper.update_html_with_new_media_hrefs(data_to_migrate);
-    data_to_migrate = Contenthelper.update_html_with_milacron_href_in_content_posts(data_to_migrate.to_s);
+    data_to_migrate = ContentHelper.update_html_with_new_image_paths(data_to_migrate);
+    ContentHelper.log_various_href_sources(data_to_migrate);
+    data_to_migrate = ContentHelper.update_html_with_new_media_hrefs(data_to_migrate);
+    data_to_migrate = ContentHelper.update_html_with_milacron_href_in_content_posts(data_to_migrate.to_s);
     migrated_content_file_handler.write(data_to_migrate);
   end
 

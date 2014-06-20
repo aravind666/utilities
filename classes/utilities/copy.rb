@@ -58,7 +58,7 @@ class Copy
   end
 
   def copy_blog_post_media_references
-    blog_data = Contenthelper.get_all_blog_posts();
+    blog_data = ContentHelper.get_all_blog_posts();
     self.process_blog_data_for_media(blog_data);
 
     puts "Completed copying blog post media elements";
@@ -115,7 +115,7 @@ class Copy
   # copy.copy_dynamic_content_media_references
   #
   def copy_dynamic_content_media_references
-    links_to_migrate = Contenthelper.get_dynamic_links_to_migrate();
+    links_to_migrate = ContentHelper.get_dynamic_links_to_migrate();
     self.process_parse_dynamic_content(links_to_migrate);
     puts "Completed copying dynamic content media elements";
   end
@@ -130,7 +130,7 @@ class Copy
   # copy.copy_content_media_references
   #
   def copy_content_media_references
-    content_data = Contenthelper.get_content_from_database();
+    content_data = ContentHelper.get_content_from_database();
     self.parse_content(content_data);
     puts "Completed copying content media";
   end
@@ -215,7 +215,7 @@ class Copy
             end
           end
         end
-        content_to_migrate = Contenthelper.get_blog_content_matter(data);
+        content_to_migrate = ContentHelper.get_blog_content_matter(data);
         self.parse_hrefs_media(content_to_migrate);
         self.parse_content_for_images(content_to_migrate);
       end
@@ -272,7 +272,7 @@ class Copy
   def process_parse_dynamic_content(links_to_migrate)
     links_to_migrate.each do |link|
       link = link.gsub("\n", '');
-      response_from_content_url = Contenthelper.get_content_from_url(link);
+      response_from_content_url = ContentHelper.get_content_from_url(link);
       if (response_from_content_url)
         if response_from_content_url.search('div#mainContent').nil?
           content_to_migrate = response_from_content_url.search('body');
@@ -298,7 +298,7 @@ class Copy
   def parse_content(content)
     begin
       while row = content.fetch do
-        db_file_path = Contenthelper.purify_file_path(row[1]);
+        db_file_path = ContentHelper.purify_file_path(row[1]);
         destination_file_name = row[2];
         complete_source_path = Immutable.config.content_source_path + db_file_path + destination_file_name;
         status = File.file?(complete_source_path);

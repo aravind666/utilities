@@ -27,7 +27,7 @@ class Blog
   # to generate blog content jekyll front matter
   #
   def migrate_blog
-    blog_data = Contenthelper.get_all_blog_posts();
+    blog_data = ContentHelper.get_all_blog_posts();
     self.process_blog_data(blog_data);
   end
 
@@ -46,11 +46,11 @@ class Blog
         media_front_matter = self.process_blog_media_list(data['postId'], blog_media_list);
         if media_front_matter != 'FLV'
           front_matter = self.get_jekyll_front_matter_blog_post(data, media_front_matter);
-          content = Contenthelper.get_blog_content_matter(data);
-          content = Contenthelper.update_html_with_new_image_paths(content.to_s);
-          content = Contenthelper.update_html_with_new_media_hrefs(content.to_s);
-          #content = Contenthelper.update_html_with_new_blog_hrefs(content.to_s);
-          content = Contenthelper.update_html_with_milacron_href_in_content_posts(content.to_s);
+          content = ContentHelper.get_blog_content_matter(data);
+          content = ContentHelper.update_html_with_new_image_paths(content.to_s);
+          content = ContentHelper.update_html_with_new_media_hrefs(content.to_s);
+          #content = ContentHelper.update_html_with_new_blog_hrefs(content.to_s);
+          content = ContentHelper.update_html_with_milacron_href_in_content_posts(content.to_s);
           content = content.encode('utf-8', 'binary', :invalid => :replace,:undef => :replace, :replace => '')
           file_write_data = front_matter.force_encoding('UTF-8') + content.force_encoding('UTF-8');
           self.migrate_by_adding_jekyll_front_matter(file_write_data, data);
@@ -113,7 +113,7 @@ class Blog
         case table
           when 'video'
             image = list['playerUrl'] + list['stillImage'];
-            image = Contenthelper.replace_image_sources_with_new_paths(image)
+            image = ContentHelper.replace_image_sources_with_new_paths(image)
             front_matter = "\nvideo: \"#{list['hiDownload']}\"";
             front_matter += "\nvideo-width: #{list['hiWidth']}";
             front_matter += "\nvideo-height: #{list['hiHeight']}";
@@ -145,7 +145,7 @@ class Blog
             front_matter = "\naudio: \"#{url}\"";
           when 'image'
             poster = list['imageUrl'] + list['path'];
-            poster = Contenthelper.replace_image_sources_with_new_paths(poster);
+            poster = ContentHelper.replace_image_sources_with_new_paths(poster);
             front_matter = "\nimage: \"#{poster}\"";
             if (list['width'] == 0)
               list['width'] = '';
@@ -170,7 +170,7 @@ class Blog
   #
   def get_jekyll_front_matter_blog_post(data, mediaElements)
     mainTitle = data['title'].gsub /"/, '';
-    tagCategory = Contenthelper.purify_title_by_removing_special_characters(data['name'].downcase.strip);
+    tagCategory = ContentHelper.purify_title_by_removing_special_characters(data['name'].downcase.strip);
     front_matter = "---\nlayout: post\ntitle: \"#{mainTitle}\"";
     front_matter += "\nsubtitle: \"#{data['subtitle']}\"";
     front_matter += "\ndate: #{data['createdDate'].strftime('%Y-%m-%d %H:%M:%S')}";
@@ -197,7 +197,7 @@ class Blog
   def migrate_by_adding_jekyll_front_matter(html_data, blog_data)
     begin
       target_file_path = "#{Immutable.config.blog_destination_path}/";
-      title = Contenthelper.purify_title_by_removing_special_characters(blog_data['title'].downcase.strip);
+      title = ContentHelper.purify_title_by_removing_special_characters(blog_data['title'].downcase.strip);
 
       target_file_path += "#{blog_data['createdDate'].strftime('%Y-%m-%d-%H-%M-%S')}-#{title}.html"
       migrated_blog_file_handler = File.open(target_file_path, 'w');
