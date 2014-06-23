@@ -104,6 +104,17 @@ class BlogHelper
       return doc_to_migrate.to_s
     end
 
+    #
+    # This method based on the href's received
+    # gets the message info by media content id by splitting with
+    # the mentioned id
+    #
+    # * Split from the URL
+    # * Get message id from media content id
+    # * Get message info from message table
+    #
+    # bloghelper.get_play_media_and_video_url(url)
+    #
     def get_play_media_and_video_url(href)
       new_href = false
       clean_hrefs = ContentHelper.clean_hrefs_or_images_url(href);
@@ -119,6 +130,14 @@ class BlogHelper
       return new_href
     end
 
+    #
+    # Get the blog information from the post id and channel id
+    #
+    # * Split from the URL
+    # * Get blog post info from channel id and post id
+    #
+    # bloghelper.get_blog_view_url(url)
+    #
     def get_blog_view_url(href)
       new_href = false
       href_parts = href.split('/')
@@ -134,6 +153,16 @@ class BlogHelper
       return new_href
     end
 
+    #
+    # This method based on the href's received
+    # gets the series info with
+    # the mentioned id
+    #
+    # * Split from the URL
+    # * Get series info from series id
+    #
+    # bloghelper.get_series_view_url(url)
+    #
     def get_series_view_url(href)
       new_href = false
       clean_hrefs = ContentHelper.clean_hrefs_or_images_url(href);
