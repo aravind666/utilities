@@ -53,6 +53,7 @@ class Series
       series_image_file1.gsub!('../../../', '')
       series_title.gsub!( /"/, '')
       series_title.gsub!( ':', '-')
+      series_title.gsub!( '#', '')
       if series_image_file2 != ''
         series_image = series_image_file2
       elsif series_image_file1 != ''
@@ -73,7 +74,7 @@ class Series
       series_description = series_description.encode('utf-8', 'binary', :invalid => :replace,:undef => :replace, :replace => '')
 
       front_matter = "---\nlayout: series\nseries: \"#{series_title}\"\npermalink: \"\/#{permalink}/\""
-      front_matter += "\ntitle: #{series_title}"
+      front_matter += "\ntitle: \"#{series_title}\""
       front_matter += "\ndate: #{series['StartDate'].strftime('%Y-%m-%d %H:%M:%S')}"
       front_matter += "\nendDate: #{series['EndDate'].strftime('%Y-%m-%d %H:%M:%S')}"
       front_matter += "\ndescription: \"#{series_description}\""
