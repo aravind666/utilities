@@ -388,6 +388,7 @@ class ContentHelper
     def update_href(href)
       href = href.strip;
       href = href.gsub('http://www.crossroads.net/', '/')
+      href = href.gsub('https://www.crossroads.net/', '/')
       href = href.gsub('../../', '/')
       href = href.gsub('../', '/')
 
