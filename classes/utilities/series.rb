@@ -51,9 +51,8 @@ class Series
       series_description =  series['Description'].to_s
       series_image_file.gsub!('../../../', '')
       series_image_file1.gsub!('../../../', '')
-      series_title.gsub!( /"/, '')
-      series_title.gsub!( ':', '-')
-      series_title.gsub!( '#', '')
+      #series_title.gsub!( /"/, '')
+      #series_title.gsub!( ':', '-')
       if series_image_file2 != ''
         series_image = series_image_file2
       elsif series_image_file1 != ''
