@@ -58,7 +58,7 @@ class Copy
   end
 
   def copy_blog_post_media_references
-    blog_data = ContentHelper.get_all_blog_posts();
+    blog_data = BlogHelper.get_all_blog_posts();
     self.process_blog_data_for_media(blog_data);
 
     puts "Completed copying blog post media elements";
@@ -215,7 +215,7 @@ class Copy
             end
           end
         end
-        content_to_migrate = ContentHelper.get_blog_content_matter(data);
+        content_to_migrate = BlogHelper.get_blog_content_matter(data);
         self.parse_hrefs_media(content_to_migrate);
         self.parse_content_for_images(content_to_migrate);
       end
