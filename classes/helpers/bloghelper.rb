@@ -88,6 +88,8 @@ class BlogHelper
           new_href = self.get_blog_view_url(href)
         elsif href['/my/media/viewSeries']
           new_href = self.get_series_view_url(href)
+        elsif href['/mysend/']
+          new_href = self.get_email_by_mail_id(href)
         elsif href['/my/media/index.php']
           new_href = '/media';
         elsif href['/my/media/messages.php']
@@ -346,6 +348,57 @@ class BlogHelper
         log_message = "post Id  #{blog_post_info['postId']} on channel Id #{blog_post_info['channelId']} has not been migrated "
         File.open("blog_posts_missing.log", 'a+') { |f| f.write(log_message + "\n") }
         return false
+      end
+    end
+
+    #
+    # Function to rewrite new url
+    #
+    # * gets the href url
+    # * identifies the web mail id
+    # * get the mail info from the id
+    # * if present adds or logs the web id which isn't available
+    #
+    # BlogHelper.get_email_by_id(url)
+    #
+    def get_email_by_mail_id(href)
+      new_href = false
+      clean_hrefs = ContentHelper.clean_hrefs_or_images_url(href);
+      web_mail_id = clean_hrefs.split('/').last
+      if !web_mail_id.nil? && web_mail_id == Integer
+        email_id_array = self.get_email_address_by_web_mail_id(web_mail_id);
+        if email_id_array.nil?
+          new_href = '/'
+          message = "Email address if missing for the web mail id - #{web_mail_id}\n";
+          File.open("missing_email_address.log", 'a+') { |f| f.write(message + "\n") }
+        else
+          email = email_id_array['EmailAddress'];
+          if !email.nil?
+            new_href = "mailto:#{email}"
+          end
+        end
+      end
+      return new_href
+    end
+
+    #
+    # Function to get the mail address from the web mail id
+    #
+    # * gets the email from DB using the web mail id
+    #
+    # BlogHelper.get_email_address_by_web_mail_id(123)
+    #
+    def get_email_address_by_web_mail_id(web_mail_id)
+      begin
+        web_mail_sql = "SELECT EmailAddress FROM web_mail";
+        web_mail_sql += " WHERE WebMailID = #{web_mail_id}";
+        web_mail_data = Immutable.dbh.select_one(web_mail_sql);
+        return web_mail_data;
+        rescue DBI::DatabaseError => e
+        Immutable.log.error "Error code: #{e.err}"
+        Immutable.log.error "Error message: #{e.errstr}"
+        Immutable.log.error "Error SQLSTATE: #{e.state}"
+        abort('An error occurred while getting email address from DB, Check migration log for more details');
       end
     end
 
