@@ -15,6 +15,9 @@ class Blog
   # Initialize the blog content migration process
   #
   def initialize
+    File.delete('missing_email_address.log') if File.exist?('missing_email_address.log');
+    File.delete('blog_posts_does_not_exists.log') if File.exist?('blog_posts_does_not_exists.log');
+    File.delete('blog_posts_missing.log') if File.exist?('blog_posts_missing.log');
     self.migrate_blog();
   end
 
