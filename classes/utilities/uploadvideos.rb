@@ -15,8 +15,8 @@ class UploadVideos
   # Initialize the video uploading process
   #
   def initialize
-    #self.process_upload_video
-    self.upload_video
+    self.process_upload_video
+    #self.upload_video
   end
 
   #
@@ -45,8 +45,8 @@ class UploadVideos
   # Function used to upload videos to youtube
   #
   #
-  #def upload_video(opts, body)
-  def upload_video
+  def upload_video(opts, body)
+  #def upload_video
     opts = Trollop::options do
       opt :file, 'Video file to upload',
           :default => system('curl -s https://s3.amazonaws.com/crossroadsvideomessages/go-forth-01.mp4 -o go-forth-01.mp4'),
