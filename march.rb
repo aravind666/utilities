@@ -10,6 +10,9 @@
 #
 
 
+# required to intract with Amazon S3 object and its buckets
+require 'aws-sdk'
+
 # rconfig is used to read configuration from files
 require 'rconfig';
 
@@ -31,8 +34,9 @@ require 'mechanize';
 # required for HTML parsing
 require 'nokogiri';
 
-# requireed to escape and un-escape a value to be included in a URL
+# required to escape and un-escape a value to be included in a URL
 require 'uri'
+
 
 # Delete the log file during a fresh run
 # FileUtils.rm('migration.log');
