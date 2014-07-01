@@ -90,6 +90,8 @@ class BlogHelper
           new_href = self.get_series_view_url(href)
         elsif href['/mysend/']
           new_href = self.get_email_by_mail_id(href)
+        elsif href['/index.php?action=viewpage&filepath=']
+          new_href = self.get_links_by_file_path(href)
         elsif href['/my/media/index.php']
           new_href = '/media';
         elsif href['/my/media/messages.php']
@@ -399,6 +401,145 @@ class BlogHelper
         Immutable.log.error "Error message: #{e.errstr}"
         Immutable.log.error "Error SQLSTATE: #{e.state}"
         abort('An error occurred while getting email address from DB, Check migration log for more details');
+      end
+    end
+
+    #
+    # Function to get the links references by the url
+    #
+    # * Get the href link from the content/direct url
+    #
+    # BlogHelper.get_links_by_file_path(url)
+    #
+    def get_links_by_file_path(href)
+      new_href = false
+      href = ContentHelper.purify_file_path(href)
+      file_parts = self.get_file_parts(href)
+      file_path = "#{file_parts[0]}/"
+      file_name = file_parts.last
+      web_page_data = self.get_category_by_file_name_and_path(file_path, file_name)
+      if !web_page_data.nil?
+        complete_source_path = Immutable.config.content_source_path + file_path + file_name
+        category_name = web_page_data['category_name'].gsub(/\s/, '-')
+        status = File.file?(complete_source_path);
+        case status
+          when true
+            new_href = self.get_cms_links_references(web_page_data, file_name, category_name)
+          when false
+            message = "File doesn't exist in the source location for id - #{web_page_data['web_page_id']}\n"
+            File.open("missing_web_pages_from_source.log", 'a+') { |f| f.write(message) }
+        end
+        if file_path['shortlinks']
+          new_href = self.get_short_links_reference(web_page_data, file_name)
+        end
+      else
+        File.open("web_page_not_exists_in_db.log", 'a+') { |f| f.write("#{href}\n") }
+      end
+      return new_href
+    end
+
+    #
+    # Function to get parts of the file which splits into two
+    #
+    # * Get from the href provided
+    #
+    # BlogHelper.get_file_parts(url)
+    #
+    def get_file_parts(href)
+      file = href.split('filepath=').last
+      file_parts = file.rpartition('/')
+      return file_parts
+    end
+
+    #
+    # Function which gets the references for the cms urls
+    #
+    # * Gets the web page data
+    # * checks if it is migrated or not
+    # * if migrated get the new link
+    # * if not log them
+    #
+    # BlogHelper.get_cms_links_references(array, abc, category)
+    #
+    def get_cms_links_references(web_page_data, file_name, category_name)
+      new_href = false
+      migrated_status = self.check_if_web_page_is_migrated(web_page_data['web_page_id'])
+      if !migrated_status.nil?
+        new_href = "/content/#{category_name}/#{file_name}"
+      else
+        message = "File is not migrated for id - #{web_page_data['web_page_id']}\n";
+        File.open("unmigrated_web_pages.log", 'a+') { |f| f.write(message) }
+      end
+      return new_href
+    end
+
+    #
+    # Function which gets the references for the short links
+    #
+    # * Gets the web page data
+    # * checks if it is migrated or not
+    # * if migrated get the new link with the file name
+    # * if not log them
+    #
+    # BlogHelper.get_short_links_reference(array, abc)
+    #
+    def get_short_links_reference(web_page_data, file_name)
+      new_href = false
+      migrated_status = self.check_if_web_page_is_migrated(web_page_data['web_page_id'])
+      if !migrated_status.nil?
+        file_name = file_name.split('.').first
+        new_href = "/#{file_name}/";
+      else
+        message = "Short link File is not migrated for id - #{web_page_data['web_page_id']}\n"
+        File.open("unmigrated_shortlink_web_pages.log", 'a+') { |f| f.write(message) }
+      end
+      return new_href
+    end
+
+    #
+    # Function which gets the category which belongs to
+    #
+    # * Gets the file path
+    # * Gets the file name
+    # * return the web page data based on the inputs
+    #
+    # BlogHelper.get_category_by_file_name_and_path(page/about, abc)
+    #
+    def get_category_by_file_name_and_path(file_path, file_name)
+      begin
+        web_page_sql = "SELECT page_title, file_path, file_name, pc.category_name, wp.web_page_id"
+        web_page_sql += " FROM web_page AS wp"
+        web_page_sql += " JOIN page_category AS pc ON (wp.page_category_id = pc.page_category_id)"
+        web_page_sql += " where wp.file_path = '#{file_path}' AND wp.file_name  = '#{file_name}'"
+        web_page_data = Immutable.dbh.select_one(web_page_sql)
+        return web_page_data;
+        rescue DBI::DatabaseError => e
+        Immutable.log.error "Error code: #{e.err}"
+        Immutable.log.error "Error message: #{e.errstr}"
+        Immutable.log.error "Error SQLSTATE: #{e.state}"
+        abort('An error occurred while getting web page details by file, Check migration log for more details')
+      end
+    end
+
+    #
+    # Function to check the web page id being migrated or not
+    #
+    # * Gets the web_page_id
+    #
+    # BlogHelper.check_if_web_page_is_migrated(724)
+    #
+    def check_if_web_page_is_migrated(web_page_id)
+      begin
+        migrate_page_sql = "SELECT migrate"
+        migrate_page_sql += " FROM milacron_migrate_pages"
+        migrate_page_sql += " where web_page_id = #{web_page_id}"
+        migrate_page_data = Immutable.dbh.select_one(migrate_page_sql)
+        return migrate_page_data
+        rescue DBI::DatabaseError => e
+        Immutable.log.error "Error code: #{e.err}"
+        Immutable.log.error "Error message: #{e.errstr}"
+        Immutable.log.error "Error SQLSTATE: #{e.state}"
+        abort('An error occurred while getting milacron migrate details by id, Check migration log for more details')
       end
     end
 
