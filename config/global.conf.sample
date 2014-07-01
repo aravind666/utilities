@@ -64,3 +64,10 @@ s3url = http://s3.amazonaws.com/crossroads-media/images/legacy
 
 # Base S3 url for media content such as pdfs and mp3
 s3media = http://s3.amazonaws.com/crossroads-media/media/legacy
+
+# youtube client secrete info
+user_oauth_json = './data/milacron'
+
+youtube_client_secrete_json = './data/client_secrets.json'
+
+user_new_oauth_json = './data/user_new_oauth.json'
