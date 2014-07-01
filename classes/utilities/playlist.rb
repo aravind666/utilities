@@ -9,6 +9,8 @@
 #
 class PlayList
 
+  include YouTubeModule
+
   #
   # Initialize the playlist create process
   #
@@ -23,7 +25,7 @@ class PlayList
     opts = Trollop::options do
       opt :message, 'Upload video to milacron playlist',
           :default => 'Upload video to milacron playlist', :type => String
-      opt :title, 'Video title', :default => 'Milacron Test video upload', :type => String
+      opt :title, 'Video title', :default => 'Messages', :type => String
       opt :description, 'Video description',
           :default => 'Test Description', :type => String
       opt :keywords, 'Video keywords, comma-separated',

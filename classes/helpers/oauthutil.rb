@@ -13,8 +13,16 @@ require 'google/api_client/client_secrets'
 require 'json'
 require 'launchy'
 require 'thin'
+require_relative 'youtubemodule'
 
 FILE_POSTFIX = '-oauth2.json'
+# This OAuth 2.0 access scope allows for read-only access to the authenticated
+# user's account, but not other types of account access.
+#YOUTUBE_READONLY_SCOPE = 'https://www.googleapis.com/auth/youtube.readonly'
+#YOUTUBE_API_SERVICE_NAME = 'youtube'
+#YOUTUBE_API_VERSION = 'v3'
+#USER_ACCESS_TOKEN_INFO = Immutable.config.user_oauth_json
+#YOUTUBE_CLIENT_SECRETE = Immutable.config.youtube_client_secrete_json
 
 class CommandLineOAuthHelper
 

@@ -52,6 +52,10 @@ class Application
   def process_commands(command_line_argument)
     available_utilities = Immutable.routes
     utility_class = available_utilities[command_line_argument];
-    Object.const_get(utility_class).new;
+    if ARGV[1]!= ''
+      Object.const_get(utility_class).new(ARGV[1])
+    else
+      Object.const_get(utility_class).new
+    end
   end
 end

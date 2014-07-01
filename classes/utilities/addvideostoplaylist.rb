@@ -9,17 +9,12 @@
 #
 class AddVideosToPlayList
 
-  YOUTUBE_READONLY_SCOPE = 'https://www.googleapis.com/auth/youtube.readonly'
-  YOUTUBE_API_SERVICE_NAME = 'youtube'
-  YOUTUBE_API_VERSION = 'v3'
-  USER_ACCESS_TOKEN_INFO = Immutable.config.user_oauth_json
-  YOUTUBE_CLIENT_SECRETE = Immutable.config.youtube_client_secrete_json
-
+  include YouTubeModule
   #
   # Initialize the audio content migration process
   #
   def initialize
-    self.add_video_to_playlist('PL4k-hIu-yqFLjBInZlowgVFYe7jZvWg8g', 'cTGbCscs35c', 1)
+    self.add_video_to_playlist('PL4k-hIu-yqFLjBInZlowgVFYe7jZvWg8g', 'R1I2Xygmnao', 1)
   end
 
   def add_video_to_playlist(playlist_id, video_id, position)
