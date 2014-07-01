@@ -36,9 +36,13 @@ class Content
       File.delete('everythingelse.log') if File.exist?('everythingelse.log');
       File.delete('php_links_in_milacron.log') if File.exist?('php_links_in_milacron.log');
       File.delete('mysend_links_in_milacron.log') if File.exist?('mysend_links_in_milacron.log');
+      File.delete('missing_web_pages_from_source.log') if File.exist?('missing_web_pages_from_source.log');
+      File.delete('unmigrated_web_pages.log') if File.exist?('unmigrated_web_pages.log');
+      File.delete('unmigrated_shortlink_web_pages.log') if File.exist?('unmigrated_shortlink_web_pages.log');
+      File.delete('web_page_not_exists_in_db.log') if File.exist?('web_page_not_exists_in_db.log');
       ContentHelper.validate_content_destination_path;
       FileUtils.rm_rf(Dir.glob(Immutable.config.content_destination_path))
-    rescue Errno::ENOENT => e
+      rescue Errno::ENOENT => e
       Immutable.log.error "Folder does not exists, Its first run #{e}"
     end
   end
