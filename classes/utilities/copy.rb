@@ -29,11 +29,15 @@ class Copy
       self.setup_folders_required;
       self.copy_content_media_references;
       self.copy_dynamic_content_media_references;
+      self.upload_content_media_reference_to_s3
+      self.setup_folders_required;
+
       self.copy_message_media_references;
-      self.copy_audio_post_media_references;
-      self.copy_video_post_media_references;
-      self.copy_blog_post_media_references;
+      self.upload_message_media_reference_to_s3;
+      self.setup_folders_required;
+
       self.process_series_media_reference;
+      self.upload_AV_media_reference_to_s3;
     end
   end
 
@@ -60,7 +64,6 @@ class Copy
   def copy_blog_post_media_references
     blog_data = BlogHelper.get_all_blog_posts();
     self.process_blog_data_for_media(blog_data);
-
     puts "Completed copying blog post media elements";
   end
 
@@ -133,6 +136,131 @@ class Copy
     content_data = ContentHelper.get_content_from_database();
     self.parse_content(content_data);
     puts "Completed copying content media";
+  end
+
+  #
+  # This method organizes s3
+  #
+  # * organize s3 bucket path as mentioned in MIL-257
+  #
+  #
+  def organize_existing_s3_files
+     self.organize_s3_existing_audio_messages;
+     self.organize_s3_existing_video_messages;
+  end
+
+
+  #
+  # This method organizes s3
+  #
+  # * upload content media references to s3
+  #
+  #
+  def upload_content_media_reference_to_s3
+    cmd_jpg  =  "aws s3 cp jpg/ s3://crossroads-media/images/ --recursive --acl public-read"
+    cmd_jepg =  "aws s3 cp jpeg/ s3://crossroads-media/images/ --recursive --acl public-read"
+    cmd_png  =  "aws s3 cp jpeg/ s3://crossroads-media/images/ --recursive --acl public-read"
+    cmd_gif   =  "aws s3 cp jpeg/ s3://crossroads-media/images/ --recursive --acl public-read"
+    cmd_docs =  "aws s3 cp docs/ s3://crossroads-media/documents/ --recursive --acl public-read"
+    cmd_pdf  =  "aws s3 cp pdf/ s3://crossroads-media/documents/ --recursive --acl public-read"
+    cmd_mp3  =  "aws s3 cp mp3/ s3://crossroads-media/other-media/audio/ --recursive --acl public-read"
+    cmd_mp4  =  "aws s3 cp mp4/ s3://crossroads-media/other-media/video/ --recursive --acl public-read"
+    system(cmd_jpg);
+    system(cmd_jepg);
+    system(cmd_png);
+    system(cmd_gif);
+    system(cmd_docs);
+    system(cmd_pdf);
+    system(cmd_mp3);
+    system(cmd_mp4);
+  end
+
+  #
+  # This method organizes s3
+  #
+  # * upload content media references to s3
+  #
+  #
+  def upload_message_media_reference_to_s3
+    cmd_jpg  =  "aws s3 cp jpg/ s3://crossroads-media/images/ --recursive --acl public-read"
+    cmd_jepg =  "aws s3 cp jpeg/ s3://crossroads-media/images/ --recursive --acl public-read"
+    cmd_png  =  "aws s3 cp jpeg/ s3://crossroads-media/images/ --recursive --acl public-read"
+    md_gif   =  "aws s3 cp jpeg/ s3://crossroads-media/images/ --recursive --acl public-read"
+    cmd_docs =  "aws s3 cp docs/ s3://crossroads-media/documents/ --recursive --acl public-read"
+    cmd_pdf  =  "aws s3 cp pdf/ s3://crossroads-media/documents/ --recursive --acl public-read"
+    cmd_mp3  =  "aws s3 cp mp3/ s3://crossroads-media/messages/audio/ --recursive --acl public-read"
+    cmd_mp4  =  "aws s3 cp mp4/ s3://crossroads-media/messages/video/ --recursive --acl public-read"
+    system(cmd_jpg);
+    system(cmd_jepg);
+    system(cmd_png);
+    system(cmd_gif);
+    system(cmd_docs);
+    system(cmd_pdf);
+    system(cmd_mp3);
+    system(cmd_mp4);
+  end
+
+
+  #
+  # This method organizes s3
+  #
+  # * upload audio media references to s3
+  #
+  #
+  def upload_AV_media_reference_to_s3
+    cmd_jpg  =  "aws s3 cp jpg/ s3://crossroads-media/images/ --recursive --acl public-read"
+    cmd_jepg =  "aws s3 cp jpeg/ s3://crossroads-media/images/ --recursive --acl public-read"
+    cmd_png  =  "aws s3 cp jpeg/ s3://crossroads-media/images/ --recursive --acl public-read"
+    md_gif   =  "aws s3 cp jpeg/ s3://crossroads-media/images/ --recursive --acl public-read"
+    cmd_docs =  "aws s3 cp docs/ s3://crossroads-media/documents/ --recursive --acl public-read"
+    cmd_pdf  =  "aws s3 cp pdf/ s3://crossroads-media/documents/ --recursive --acl public-read"
+    cmd_mp3  =  "aws s3 cp mp3/ s3://crossroads-media/music/audio/ --recursive --acl public-read"
+    cmd_mp4  =  "aws s3 cp mp4/ s3://crossroads-media/other-media/video/ --recursive --acl public-read"
+    system(cmd_jpg);
+    system(cmd_jepg);
+    system(cmd_png);
+    system(cmd_gif);
+    system(cmd_docs);
+    system(cmd_pdf);
+    system(cmd_mp3);
+    system(cmd_mp4);
+  end
+
+
+  #
+  # This method organizes s3 audio message path
+  #
+  # * organize s3 bucket path for message audios as mentioned in MIL-257
+  #
+  #
+  def organize_s3_audio_messages
+    s3 = AWS::S3.new
+    message_audio_file_list  = s3.buckets['crossroadsaudiomessages'].objects.collect(&:key);
+    destination_bucket = s3.buckets['crossroads-media'].objects;
+    message_audio_file_list.each do |audio|
+      source_file = s3.buckets['crossroadsaudiomessages'].objects[audio];
+      new_audio_message_bucket_path = "messages/audio/#{audio}"
+      destination = destination_bucket[new_audio_message_bucket_path]
+      source_file.copy_to(destination, {:acl => :public_read})
+    end
+  end
+
+  #
+  # This method organizes s3 video message path
+  #
+  # * organize s3 bucket path for message videos as mentioned in MIL-257
+  #
+  #
+  def organize_s3_video_messages
+    s3 = AWS::S3.new
+    message_video_file_list  = s3.buckets['crossroadsvideomessages'].objects.collect(&:key);
+    destination_bucket = s3.buckets['crossroads-media'].objects;
+    message_video_file_list.each do |video|
+      source_file = s3.buckets['crossroadsvideomessages'].objects[video];
+      new_video_message_bucket_path = "messages/video/#{audio}"
+      destination = destination_bucket[new_video_message_bucket_path]
+      source_file.copy_to(destination, {:acl => :public_read})
+    end
   end
 
 
