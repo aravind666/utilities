@@ -465,7 +465,7 @@ class BlogHelper
       new_href = false
       migrated_status = self.check_if_web_page_is_migrated(web_page_data['web_page_id'])
       if !migrated_status.nil?
-        new_href = "/content/#{category_name}/#{file_name}"
+        new_href = "/content/#{category_name}/#{file_name.downcase}"
       else
         message = "File is not migrated for id - #{web_page_data['web_page_id']}\n";
         File.open("unmigrated_web_pages.log", 'a+') { |f| f.write(message) }

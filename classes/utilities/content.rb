@@ -136,7 +136,7 @@ class Content
   def migrate_by_adding_jekyll_front_matter(complete_source_path, file_name, category_name, front_matter)
     source_file_handler = File.open(complete_source_path)
     data_to_migrate = source_file_handler.read();
-    migrated_file_path = "#{Immutable.config.content_destination_path}/#{category_name}/#{file_name}";
+    migrated_file_path = "#{Immutable.config.content_destination_path}/#{category_name}/#{file_name.downcase}";
     migrated_content_file_handler = File.open(migrated_file_path, 'w');
     migrated_content_file_handler.write(front_matter);
     data_to_migrate = ContentHelper.update_html_with_new_image_paths(data_to_migrate);
