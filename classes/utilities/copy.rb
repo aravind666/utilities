@@ -32,10 +32,6 @@ class Copy
       self.upload_content_media_reference_to_s3
       self.setup_folders_required;
 
-      self.copy_message_media_references;
-      self.upload_message_media_reference_to_s3;
-      self.setup_folders_required;
-
       self.process_series_media_reference;
       self.upload_content_media_reference_to_s3;
       self.setup_folders_required;
@@ -47,6 +43,10 @@ class Copy
 
       self.copy_blog_post_media_references;
       self.upload_content_media_reference_to_s3;
+      self.setup_folders_required;
+
+      self.copy_message_media_references;
+      self.upload_message_media_reference_to_s3;
       self.setup_folders_required;
 
       self.organize_existing_s3_files;
