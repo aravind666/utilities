@@ -30,17 +30,17 @@ class Copy
       self.copy_content_media_references;
       self.copy_dynamic_content_media_references;
       self.upload_content_media_reference_to_s3
-      self.setup_folders_required;
 
+      self.setup_folders_required;
       self.process_series_media_reference;
       self.upload_content_media_reference_to_s3;
-      self.setup_folders_required;
 
+      self.setup_folders_required;
       self.copy_audio_post_media_references;
       self.copy_video_post_media_references;
       self.upload_AV_media_reference_to_s3;
-      self.setup_folders_required;
 
+      self.setup_folders_required;
       self.copy_blog_post_media_references;
       self.upload_content_media_reference_to_s3;
       self.setup_folders_required;
@@ -185,9 +185,11 @@ class Copy
   def organize_other_AV_references_with_in_s3
     video_list_in_s3 = Mediahelper.get_media_content();
     video_list_in_s3.each do |video|
-      uri = URI.parse(uri = URI.parse(ContentHelper.encode_url_string(video['iPodVideo'])))
-      video_filename = File.basename(uri.path)
-      self.organize_s3_video_posts(video_filename);
+      if(video['iPodVideo'].to_s.length > 0)
+        uri = URI.parse(ContentHelper.encode_url_string(video['iPodVideo']))
+        video_filename = File.basename(uri.path)
+        self.organize_s3_video_posts(URI.unescape(video_filename));
+      end
     end
     audio_list_in_s3 = Mediahelper.get_audio_content();
     audio_list_in_s3.each do |audio|
@@ -207,9 +209,11 @@ class Copy
       # Audio
       self.organize_s3_audio_message(media['HighQFilePath']);
     elsif media['ContentTypeID'] = 4
-      uri = URI.parse(ContentHelper.encode_url_string(media['iPodVideo']))
-      video_filename = File.basename(uri.path)
-      self.organize_s3_video_message(video_filename);
+      if(media['iPodVideo'].to_s.length > 0)
+        uri = URI.parse(ContentHelper.encode_url_string(media['iPodVideo']))
+        video_filename = File.basename(uri.path)
+        self.organize_s3_video_message(URI.unescape(video_filename));
+      end
     end
   end
 
@@ -398,9 +402,8 @@ class Copy
             still_image_path = media['playerUrl'] + media['stillImage'];
             still_image_path = still_image_path.to_s;
             self.copy_files_to_appropriate_folders(still_image_path);
-            if (media['hiDownload'].nil?)
-              puts media['hiDownload']
-            else
+            video_url = media['hiDownload'];
+            if (video_url['s3.amazonaws.com'])
               uri = URI.parse(media['hiDownload'])
               video_filename = File.basename(uri.path)
               self.organize_s3_video_posts(video_filename);
