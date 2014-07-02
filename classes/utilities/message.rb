@@ -116,13 +116,9 @@ class Message
           when 5
             # Audio
             if (media['HighQFilePath'].length > 0)
-              if (lq_file_path['www.crossroads.net'])
-                audio_file_path = lq_file_path.gsub('http://www.crossroads.net/', '/');
-                audio_file_path = lq_file_path.gsub('https://www.crossroads.net/', '/');
-                audio_file_path = "#{Immutable.config.s3media}/mp3/#{ContentHelper.encode_url_string(media['HighQFilePath'])}";
-              else
-                audio_file_path = "#{lq_file_path}#{ContentHelper.encode_url_string(media['HighQFilePath'])}"
-              end
+
+              audio_file_path = "#{Immutable.config.s3url}/message/audio/#{ContentHelper.encode_url_string(media['HighQFilePath'])}";
+
               front_matter += "\naudio: \"#{audio_file_path}\"";
               front_matter += "\naudio-duration: \"#{media['duration']}\"";
             end
@@ -137,8 +133,11 @@ class Message
                 media['duration'] = audio_duration['duration'];
               end
               front_matter += "\ndescription: \"#{video_description}\"";
-              front_matter += "\nvideo: \"#{media['iPodVideo']}\"\nvideo-duration: \"#{media['duration']}\"";
-              front_matter += "\nvideo-image: \"#{Immutable.config.s3url}/content/#{video_poster}\"";
+              uri = URI.parse(media['iPodVideo'])
+              video_filename =  File.basename(uri.path)
+              video_file_path = "#{Immutable.config.s3url}/message/video/#{ContentHelper.encode_url_string(video_filename)}";
+              front_matter += "\nvideo: \"#{video_file_path}\"\nvideo-duration: \"#{media['duration']}\"";
+              front_matter += "\nvideo-image: \"#{Immutable.config.s3url}/images/#{video_poster}\"";
             end
           when 7
             # Study Notes
@@ -147,7 +146,7 @@ class Message
             if (lq_file_path['www.crossroads.net'])
               notes_file_path = lq_file_path.gsub('http://www.crossroads.net/', '/');
               notes_file_path = lq_file_path.gsub('https://www.crossroads.net/', '/');
-              notes_file_path = "#{Immutable.config.s3media}/documents/#{ContentHelper.encode_url_string(media['HighQFilePath'])}"
+              notes_file_path = "#{Immutable.config.s3url}/documents/#{ContentHelper.encode_url_string(media['HighQFilePath'])}"
             else
               notes_file_path = "#{lq_file_path}#{ContentHelper.encode_url_string(media['HighQFilePath'])}";
             end
@@ -161,7 +160,7 @@ class Message
             if (lq_file_path['www.crossroads.net'])
               program_file_path = lq_file_path.gsub('http://www.crossroads.net/', '/');
               program_file_path = lq_file_path.gsub('https://www.crossroads.net/', '/');
-              program_file_path = "#{Immutable.config.s3media}/documents/#{ContentHelper.encode_url_string(media['HighQFilePath'])}"
+              program_file_path = "#{Immutable.config.s3url}/documents/#{ContentHelper.encode_url_string(media['HighQFilePath'])}"
             else
               program_file_path = "#{lq_file_path}#{ContentHelper.encode_url_string(media['HighQFilePath'])}";
             end
