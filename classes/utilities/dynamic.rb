@@ -63,7 +63,7 @@ class Dynamic
       img['src'] = new_src;
     end
 
-    response = ContentHelper.remove_no_space_paragraphs(response.to_s);
+    response = BlogHelper.remove_unwanted_paragraph(response.to_s);
 
     if response.search('div#mainContent').nil?
       post_body = response.search('body')

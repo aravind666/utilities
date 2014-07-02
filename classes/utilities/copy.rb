@@ -403,6 +403,7 @@ class Copy
             still_image_path = still_image_path.to_s;
             self.copy_files_to_appropriate_folders(still_image_path);
             video_url = media['hiDownload'];
+            video_url = video_url.to_s;
             if (video_url['s3.amazonaws.com'])
               uri = URI.parse(media['hiDownload'])
               video_filename = File.basename(uri.path)
