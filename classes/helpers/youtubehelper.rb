@@ -37,7 +37,7 @@ class YouTubeHelper
           )
           client.refresh_access_token!
         else
-          puts 'client auth info file rquired'
+          puts 'client auth info file required'
           abort
         end
         client
@@ -263,14 +263,12 @@ class YouTubeHelper
         sql_query += " VALUES ('null', '#{insert_data['youtube_video_id']}', "
         sql_query += " #{insert_data['message_id']}, #{insert_data['media_content_id']}, "
         sql_query += " #{insert_data['content_type_id']}, #{date_time}, #{date_time}) "
-        p sql_query
-        abort
         return sql_query
       end
     end
 
     #
-    # Function used to get response as array
+    # Function used to get youtube response data
     #
     def normalize_response_data(response)
       begin
