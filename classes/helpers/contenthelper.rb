@@ -448,22 +448,5 @@ class ContentHelper
       href
     end
 
-
-
-    #
-    # Public static: removes unwanted paragraphs with class 'nospace'
-    #
-    # *old_src* - String DOM to parse and remove
-    #
-    # Returns updated DOM
-    #
-    def remove_no_space_paragraphs(data_to_migrate)
-      doc_to_migrate = Nokogiri::HTML(data_to_migrate)
-      data_to_migrate.search('p.noPspace').remove();
-      return data_to_migrate.to_s;
-    end
-
-
-
   end
 end
