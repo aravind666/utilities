@@ -8,3 +8,7 @@ gem 'mechanize'
 gem 'nokogiri'
 gem 'aws-sdk'
 gem 'google-api-client', '~> 0.7'
+gem  'thin'
+gem 'trollop'
+gem 'openssl-extensions'
+
