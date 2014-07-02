@@ -62,6 +62,9 @@ class Dynamic
       new_src = ContentHelper.replace_image_sources_with_new_paths(old_src)
       img['src'] = new_src;
     end
+
+    response = ContentHelper.remove_no_space_paragraphs(response.to_s);
+
     if response.search('div#mainContent').nil?
       post_body = response.search('body')
     else

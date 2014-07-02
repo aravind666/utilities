@@ -99,7 +99,7 @@ class BlogHelper
         elsif href['/my/media/music.php']
           new_href = '/media/music/';
         elsif href['/my/media/podcasts.htm']
-          new_href = '/content/Media/podcasts.htm';
+          new_href = '/content/media/podcasts.htm';
         end
         if new_href
           a['href'] = new_href;
@@ -420,7 +420,7 @@ class BlogHelper
       web_page_data = self.get_category_by_file_name_and_path(file_path, file_name)
       if !web_page_data.nil?
         complete_source_path = Immutable.config.content_source_path + file_path + file_name
-        category_name = web_page_data['category_name'].gsub(/\s/, '-')
+        category_name = web_page_data['category_name'].downcase.gsub(/\s/, '-')
         status = File.file?(complete_source_path);
         case status
           when true
@@ -465,7 +465,7 @@ class BlogHelper
       new_href = false
       migrated_status = self.check_if_web_page_is_migrated(web_page_data['web_page_id'])
       if !migrated_status.nil?
-        new_href = "/content/#{category_name}/#{file_name}"
+        new_href = "/content/#{category_name}/#{file_name.downcase}"
       else
         message = "File is not migrated for id - #{web_page_data['web_page_id']}\n";
         File.open("unmigrated_web_pages.log", 'a+') { |f| f.write(message) }

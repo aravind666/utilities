@@ -64,13 +64,7 @@ class Audio
       audio_title = audio['Title'].gsub /"/, ''
       audio_description = ContentHelper.purify_by_removing_special_characters(audio['Description'])
       lq_file_path = audio['LowQFilePath']
-      if lq_file_path['www.crossroads.net']
-        audio_file_path = lq_file_path.gsub('http://www.crossroads.net/', '/')
-        audio_file_path = lq_file_path.gsub('https://www.crossroads.net/', '/')
-        audio_file_path = "#{Immutable.config.s3media}/mp3/#{ContentHelper.encode_url_string(audio['HighQFilePath'])}"
-      else
-        audio_file_path = "#{lq_file_path}#{ContentHelper.encode_url_string(audio['HighQFilePath'])}"
-      end
+      audio_file_path = "#{Immutable.config.s3url}/music/audio/#{ContentHelper.encode_url_string(media['HighQFilePath'])}";
       audio_thumb_image = audio['ThumbImagePath'].to_s
       audio_poster = ''
       if audio_thumb_image && !audio_thumb_image.nil? && !audio_thumb_image.empty?

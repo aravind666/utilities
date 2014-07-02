@@ -32,21 +32,21 @@ class Copy
       self.upload_content_media_reference_to_s3
       self.setup_folders_required;
 
-      self.copy_message_media_references;
-      self.upload_message_media_reference_to_s3;
-      self.setup_folders_required;
-
       self.process_series_media_reference;
-      self.upload_AV_media_reference_to_s3;
+      self.upload_content_media_reference_to_s3;
       self.setup_folders_required;
 
       self.copy_audio_post_media_references;
       self.copy_video_post_media_references;
-      self.upload_content_media_reference_to_s3
+      self.upload_AV_media_reference_to_s3;
       self.setup_folders_required;
 
       self.copy_blog_post_media_references;
       self.upload_content_media_reference_to_s3;
+      self.setup_folders_required;
+
+      self.copy_message_media_references;
+      self.upload_message_media_reference_to_s3;
       self.setup_folders_required;
 
       self.organize_existing_s3_files;
@@ -172,13 +172,8 @@ class Copy
 
     message_media_data = Mediahelper.get_all_media_from_all_messages();
     message_media_data.each do |media|
-      lqpath = media['LowQFilePath'];
-      if lqpath['s3.amazonaws.com']
-        # copy that file with in S3
-        self.organize_message_media_within_s3(media['HighQFilePath']);
-      end
+      self.organize_message_media_within_s3(media);
     end
-
   end
 
   #
@@ -190,7 +185,9 @@ class Copy
   def organize_other_AV_references_with_in_s3
     video_list_in_s3 = Mediahelper.get_media_content();
     video_list_in_s3.each do |video|
-        self.organize_s3_video_posts(video['HighQFilePath']);
+      uri = URI.parse(video['iPodVideo'])
+      video_filename = File.basename(uri.path)
+      self.organize_s3_video_posts(video_filename);
     end
     audio_list_in_s3 = Mediahelper.get_audio_content();
     audio_list_in_s3.each do |audio|
@@ -199,19 +196,20 @@ class Copy
   end
 
 
-
-
   #
   # This method organizes existing messages with in S3
   #
   # * organize files in S3 based on file type
   #
   #
-  def organize_message_media_within_s3(file)
-    if file['.mp3']
-      self.organize_s3_audio_message(file)
-    elsif file['.mp4']
-      self.organize_s3_video_message(file)
+  def organize_message_media_within_s3(media)
+    if media['ContentTypeID'] = 5
+      # Audio
+      self.organize_s3_audio_message(media['HighQFilePath']);
+    elsif media['ContentTypeID'] = 4
+      uri = URI.parse(media['iPodVideo'])
+      video_filename = File.basename(uri.path)
+      self.organize_s3_video_message(video_filename);
     end
   end
 
@@ -223,11 +221,14 @@ class Copy
   #
   def organize_s3_audio_message(file)
     s3 = Immutable.getS3;
-      destination_bucket = s3.buckets['crossroads-media'].objects;
-      audio_file_to_organize = s3.buckets['crossroadsaudiomessages'].objects[file];
+    destination_bucket = s3.buckets['crossroads-media'].objects;
+    audio_file_to_organize = s3.buckets['crossroadsaudiomessages'].objects[file];
+    if(s3.buckets['crossroadsaudiomessages'].objects[file].exists?)
       new_audio_message_bucket_path = "messages/audio/#{file}"
       destination = destination_bucket[new_audio_message_bucket_path]
       audio_file_to_organize.copy_to(destination, { :acl => :public_read })
+    end
+
   end
 
 
@@ -241,9 +242,11 @@ class Copy
     s3 = Immutable.getS3;
     destination_bucket = s3.buckets['crossroads-media'].objects;
     video_file_to_organize = s3.buckets['crossroadsvideomessages'].objects[file];
-    new_video_message_bucket_path = "messages/video/#{file}"
-    destination = destination_bucket[new_video_message_bucket_path]
-    video_file_to_organize.copy_to(destination, { :acl => :public_read })
+    if(s3.buckets['crossroadsvideomessages'].objects[file].exists?)
+      new_video_message_bucket_path = "messages/video/#{file}"
+      destination = destination_bucket[new_video_message_bucket_path]
+      video_file_to_organize.copy_to(destination, { :acl => :public_read })
+    end
   end
 
   #
@@ -256,9 +259,11 @@ class Copy
     s3 = Immutable.getS3;
     destination_bucket = s3.buckets['crossroads-media'].objects;
     video_file_to_organize = s3.buckets['crossroadsvideomessages'].objects[file];
-    new_video_message_bucket_path = "other-media/video/#{file}"
-    destination = destination_bucket[new_video_message_bucket_path]
-    video_file_to_organize.copy_to(destination, { :acl => :public_read })
+    if(s3.buckets['crossroadsvideomessages'].objects[file].exists?)
+      new_video_message_bucket_path = "other-media/video/#{file}"
+      destination = destination_bucket[new_video_message_bucket_path]
+      video_file_to_organize.copy_to(destination, { :acl => :public_read })
+    end
   end
 
   #
@@ -271,9 +276,11 @@ class Copy
     s3 = Immutable.getS3;
     destination_bucket = s3.buckets['crossroads-media'].objects;
     audio_file_to_organize = s3.buckets['crossroadsaudiomessages'].objects[file];
-    new_audio_message_bucket_path = "other-media/video/#{file}"
-    destination = destination_bucket[new_audio_message_bucket_path]
-    audio_file_to_organize.copy_to(destination, { :acl => :public_read })
+    if(s3.buckets['crossroadsaudiomessages'].objects[file].exists?)
+      new_audio_message_bucket_path = "other-media/video/#{file}"
+      destination = destination_bucket[new_audio_message_bucket_path]
+      audio_file_to_organize.copy_to(destination, { :acl => :public_read })
+    end
   end
 
 
@@ -345,6 +352,10 @@ class Copy
         if blog_media_list.fetchable? then
           blog_media_list.each do |media|
             case media[10] # checking for content type
+              when 1, 4, 9 # type video
+                table = 'video';
+                video_list = Mediahelper.get_all_media_for_blog(data['postId'], table);
+                self.process_media_for_blog_post(video_list, table)
               when 5, 11 # type audio
                 table = 'audio';
                 audio_list = Mediahelper.get_all_media_for_blog(data['postId'], table);
@@ -383,6 +394,13 @@ class Copy
             still_image_path = media['playerUrl'] + media['stillImage'];
             still_image_path = still_image_path.to_s;
             self.copy_files_to_appropriate_folders(still_image_path);
+            if(list['hiDownload'].nil?)
+              puts list['hiDownload']
+            else
+              uri = URI.parse(list['hiDownload'])
+              video_filename = File.basename(uri.path)
+              self.organize_s3_video_posts(video_filename);
+            end
           when 'audio'
             if (media['path'].nil? && media['hosturl'].nil?)
               url = '';
@@ -391,6 +409,7 @@ class Copy
             end
             media_path = url.to_s;
             self.copy_files_to_appropriate_folders(media_path);
+
           when 'image'
             poster_path = media['imageUrl'] + media['path'];
             poster_path = poster_path.to_s;
@@ -550,7 +569,7 @@ class Copy
         end
       end
     end
-    abort('Successfully migrated series images')
+    puts('Successfully migrated series images')
   end
 
   #
@@ -611,9 +630,9 @@ class Copy
   def upload_content_media_reference_to_s3
     cmd_jpg = "aws s3 cp jpg/ s3://crossroads-media/images/ --recursive --acl public-read"
     cmd_jepg = "aws s3 cp jpeg/ s3://crossroads-media/images/ --recursive --acl public-read"
-    cmd_png = "aws s3 cp jpeg/ s3://crossroads-media/images/ --recursive --acl public-read"
-    cmd_gif = "aws s3 cp jpeg/ s3://crossroads-media/images/ --recursive --acl public-read"
-    cmd_docs = "aws s3 cp docs/ s3://crossroads-media/documents/ --recursive --acl public-read"
+    cmd_png = "aws s3 cp png/ s3://crossroads-media/images/ --recursive --acl public-read"
+    cmd_gif = "aws s3 cp gif/ s3://crossroads-media/images/ --recursive --acl public-read"
+    cmd_docs = "aws s3 cp doc/ s3://crossroads-media/documents/ --recursive --acl public-read"
     cmd_pdf = "aws s3 cp pdf/ s3://crossroads-media/documents/ --recursive --acl public-read"
     cmd_mp3 = "aws s3 cp mp3/ s3://crossroads-media/other-media/audio/ --recursive --acl public-read"
     cmd_mp4 = "aws s3 cp mp4/ s3://crossroads-media/other-media/video/ --recursive --acl public-read"
@@ -625,6 +644,7 @@ class Copy
     system(cmd_pdf);
     system(cmd_mp3);
     system(cmd_mp4);
+    puts " Completed uploading media references to S3 "
   end
 
   #
@@ -636,9 +656,9 @@ class Copy
   def upload_message_media_reference_to_s3
     cmd_jpg = "aws s3 cp jpg/ s3://crossroads-media/images/ --recursive --acl public-read"
     cmd_jepg = "aws s3 cp jpeg/ s3://crossroads-media/images/ --recursive --acl public-read"
-    cmd_png = "aws s3 cp jpeg/ s3://crossroads-media/images/ --recursive --acl public-read"
-    md_gif = "aws s3 cp jpeg/ s3://crossroads-media/images/ --recursive --acl public-read"
-    cmd_docs = "aws s3 cp docs/ s3://crossroads-media/documents/ --recursive --acl public-read"
+    cmd_png = "aws s3 cp png/ s3://crossroads-media/images/ --recursive --acl public-read"
+    cmd_gif = "aws s3 cp gif/ s3://crossroads-media/images/ --recursive --acl public-read"
+    cmd_docs = "aws s3 cp doc/ s3://crossroads-media/documents/ --recursive --acl public-read"
     cmd_pdf = "aws s3 cp pdf/ s3://crossroads-media/documents/ --recursive --acl public-read"
     cmd_mp3 = "aws s3 cp mp3/ s3://crossroads-media/messages/audio/ --recursive --acl public-read"
     cmd_mp4 = "aws s3 cp mp4/ s3://crossroads-media/messages/video/ --recursive --acl public-read"
@@ -650,6 +670,7 @@ class Copy
     system(cmd_pdf);
     system(cmd_mp3);
     system(cmd_mp4);
+    puts " Completed uploading message references to S3 "
   end
 
 
@@ -662,9 +683,9 @@ class Copy
   def upload_AV_media_reference_to_s3
     cmd_jpg = "aws s3 cp jpg/ s3://crossroads-media/images/ --recursive --acl public-read"
     cmd_jepg = "aws s3 cp jpeg/ s3://crossroads-media/images/ --recursive --acl public-read"
-    cmd_png = "aws s3 cp jpeg/ s3://crossroads-media/images/ --recursive --acl public-read"
-    md_gif = "aws s3 cp jpeg/ s3://crossroads-media/images/ --recursive --acl public-read"
-    cmd_docs = "aws s3 cp docs/ s3://crossroads-media/documents/ --recursive --acl public-read"
+    cmd_png = "aws s3 cp png/ s3://crossroads-media/images/ --recursive --acl public-read"
+    cmd_gif = "aws s3 cp gif/ s3://crossroads-media/images/ --recursive --acl public-read"
+    cmd_docs = "aws s3 cp doc/ s3://crossroads-media/documents/ --recursive --acl public-read"
     cmd_pdf = "aws s3 cp pdf/ s3://crossroads-media/documents/ --recursive --acl public-read"
     cmd_mp3 = "aws s3 cp mp3/ s3://crossroads-media/music/audio/ --recursive --acl public-read"
     cmd_mp4 = "aws s3 cp mp4/ s3://crossroads-media/other-media/video/ --recursive --acl public-read"
@@ -676,6 +697,7 @@ class Copy
     system(cmd_pdf);
     system(cmd_mp3);
     system(cmd_mp4);
+    puts " Completed uploading AV references to S3 "
   end
 
 end

@@ -79,7 +79,7 @@ class Immutable
     def getS3
       AWS.config(
           :region => 'us-east-1',
-          :access_key_id     => self.config.s3_access_key_id
+          :access_key_id     => self.config.s3_access_key_id,
           :secret_access_key => self.config.s3_secret_access_key
       )
 
