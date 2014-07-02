@@ -663,7 +663,7 @@ class Copy
     cmd_jpg = "aws s3 cp jpg/ s3://crossroads-media/images/ --recursive --acl public-read"
     cmd_jepg = "aws s3 cp jpeg/ s3://crossroads-media/images/ --recursive --acl public-read"
     cmd_png = "aws s3 cp jpeg/ s3://crossroads-media/images/ --recursive --acl public-read"
-    md_gif = "aws s3 cp jpeg/ s3://crossroads-media/images/ --recursive --acl public-read"
+    cmd_gif = "aws s3 cp jpeg/ s3://crossroads-media/images/ --recursive --acl public-read"
     cmd_docs = "aws s3 cp docs/ s3://crossroads-media/documents/ --recursive --acl public-read"
     cmd_pdf = "aws s3 cp pdf/ s3://crossroads-media/documents/ --recursive --acl public-read"
     cmd_mp3 = "aws s3 cp mp3/ s3://crossroads-media/music/audio/ --recursive --acl public-read"
