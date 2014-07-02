@@ -116,15 +116,16 @@ class Blog
           when 'video'
             image = list['playerUrl'] + list['stillImage'];
             image = ContentHelper.replace_image_sources_with_new_paths(image)
-            uri = URI.parse(list['hiDownload'])
-            video_filename = File.basename(uri.path)
-            video_file_path = "#{Immutable.config.s3url}/other-media/video/#{video_filename}"
-            front_matter = "\nvideo: \"#{video_file_path}\"";
-            front_matter += "\nvideo-width: #{list['hiWidth']}";
-            front_matter += "\nvideo-height: #{list['hiHeight']}";
-            front_matter += "\nvideo-image: #{image}";
             if (list['hiDownload'].nil?)
               front_matter = 'FLV';
+            else
+              uri = URI.parse(list['hiDownload'])
+              video_filename = File.basename(uri.path)
+              video_file_path = "#{Immutable.config.s3url}/other-media/video/#{video_filename}"
+              front_matter = "\nvideo: \"#{video_file_path}\"";
+              front_matter += "\nvideo-width: #{list['hiWidth']}";
+              front_matter += "\nvideo-height: #{list['hiHeight']}";
+              front_matter += "\nvideo-image: #{image}";
             end
           when 'audio'
             path = list['path'];
