@@ -72,6 +72,20 @@ class Immutable
       self.logger.error "Error message: #{e.errstr}";
     end
 
+    #
+    # This method returns the s3 connection handler
+    # TODO : - Research on Persistance
+    #
+    def getS3
+      AWS.config(
+          :region => 'us-east-1',
+          :access_key_id     => self.config.s3_access_key_id
+          :secret_access_key => self.config.s3_secret_access_key
+      )
+
+      s3 = AWS::S3.new
+      return s3;
+    end
   end
 
 end
