@@ -42,7 +42,7 @@ class Copy
 
       self.copy_audio_post_media_references;
       self.copy_video_post_media_references;
-      self.upload_content_media_reference_to_s3
+      self.upload_content_media_reference_to_s3;
       self.setup_folders_required;
 
       self.copy_blog_post_media_references;
@@ -550,7 +550,7 @@ class Copy
         end
       end
     end
-    abort('Successfully migrated series images')
+    puts('Successfully migrated series images')
   end
 
   #

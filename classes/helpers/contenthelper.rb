@@ -406,20 +406,20 @@ class ContentHelper
         replacements << ["uploadedfiles", "documents"]
 
       elsif href['.mp3']
-        replacements << ["images/uploadedImages/Corporate Blogger", "mp3"]
-        replacements << ["images/uploadedImages/Journey%20Materials/Consumed", "mp3"]
-        replacements << ["images/uploadedimages/gomamelodi/podcasts", "mp3"]
-        replacements << ["images/uploadedImages/audio", "mp3"]
-        replacements << ["images/uploadedImages/banners", "mp3"]
-        replacements << ["images/uploadedImages/Reset", "mp3"]
-        replacements << ["images/uploadedImages", "mp3"]
-        replacements << ["players/media/hq/320", "mp3"]
-        replacements << ["players/media/hq", "mp3"]
-        replacements << ["teams/audio/Media", "mp3"]
-        replacements << ["audio/Media", "mp3"]
-        replacements << ["audio", "mp3"]
-        replacements << ["webmedia/JourneyMedia/Reset", "mp3"]
-        replacements << ["uploadedfiles", "mp3"]
+        replacements << ["images/uploadedImages/Corporate Blogger", "other-media/audio"]
+        replacements << ["images/uploadedImages/Journey%20Materials/Consumed", "other-media/audio"]
+        replacements << ["images/uploadedimages/gomamelodi/podcasts", "other-media/audio"]
+        replacements << ["images/uploadedImages/audio", "other-media/audio"]
+        replacements << ["images/uploadedImages/banners", "other-media/audio"]
+        replacements << ["images/uploadedImages/Reset", "other-media/audio"]
+        replacements << ["images/uploadedImages", "other-media/audio"]
+        replacements << ["players/media/hq/320", "other-media/audio"]
+        replacements << ["players/media/hq", "other-media/audio"]
+        replacements << ["teams/audio/Media", "other-media/audio"]
+        replacements << ["audio/Media", "other-media/audio"]
+        replacements << ["audio", "other-media/audio"]
+        replacements << ["webmedia/JourneyMedia/Reset", "other-media/audio"]
+        replacements << ["uploadedfiles", "other-media/audio"]
       elsif href['.doc']
 
         replacements << ["images/uploadedImages/Corporate Blogger", "documents"]
@@ -432,18 +432,18 @@ class ContentHelper
         replacements << ["uploadedfiles", "documents"]
 
       elsif href['.jpg']
-        replacements << ["images/uploadedImages/Corporate Blogger", "content"]
-        replacements << ["images/uploadedImages/Journey%20Materials/Consumed", "content"]
-        replacements << ["images/uploadedimages/gomamelodi/podcasts", "content"]
-        replacements << ["images/uploadedImages/audio", "content"]
-        replacements << ["images/uploadedImages/banners", "content"]
-        replacements << ["images/uploadedImages/Reset", "content"]
-        replacements << ["images/uploadedImages", "content"]
-        replacements << ["uploadedfiles", "content"]
+        replacements << ["images/uploadedImages/Corporate Blogger", "images"]
+        replacements << ["images/uploadedImages/Journey%20Materials/Consumed", "images"]
+        replacements << ["images/uploadedimages/gomamelodi/podcasts", "images"]
+        replacements << ["images/uploadedImages/audio", "images"]
+        replacements << ["images/uploadedImages/banners", "images"]
+        replacements << ["images/uploadedImages/Reset", "images"]
+        replacements << ["images/uploadedImages", "images"]
+        replacements << ["uploadedfiles", "images"]
       end
       replacements.each { |set| href = href.gsub(set[0], set[1]) }
       if !replacements.empty?
-        href = Immutable.config.s3media + href
+        href = Immutable.config.s3url + href
       end
       href
     end
