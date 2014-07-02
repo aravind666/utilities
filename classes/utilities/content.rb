@@ -113,7 +113,7 @@ class Content
     db_file_path = ContentHelper.purify_file_path(content[1]);
     destination_file_name = content[2];
     complete_source_path = Immutable.config.content_source_path + db_file_path + destination_file_name;
-    category_name = content[3].gsub(/\s/, '-');
+    category_name = content[3].downcase.gsub(/\s/, '-');
     status = File.file?(complete_source_path);
     case status
       when true
