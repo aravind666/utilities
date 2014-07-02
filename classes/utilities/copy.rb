@@ -37,12 +37,12 @@ class Copy
       self.setup_folders_required;
 
       self.process_series_media_reference;
-      self.upload_AV_media_reference_to_s3;
+      self.upload_content_media_reference_to_s3;
       self.setup_folders_required;
 
       self.copy_audio_post_media_references;
       self.copy_video_post_media_references;
-      self.upload_content_media_reference_to_s3;
+      self.upload_AV_media_reference_to_s3;
       self.setup_folders_required;
 
       self.copy_blog_post_media_references;
@@ -172,13 +172,8 @@ class Copy
 
     message_media_data = Mediahelper.get_all_media_from_all_messages();
     message_media_data.each do |media|
-      lqpath = media['LowQFilePath'];
-      if lqpath['s3.amazonaws.com']
-        # copy that file with in S3
-        self.organize_message_media_within_s3(media['HighQFilePath']);
-      end
+      self.organize_message_media_within_s3(media);
     end
-
   end
 
   #
@@ -190,7 +185,9 @@ class Copy
   def organize_other_AV_references_with_in_s3
     video_list_in_s3 = Mediahelper.get_media_content();
     video_list_in_s3.each do |video|
-        self.organize_s3_video_posts(video['HighQFilePath']);
+      uri = URI.parse(video['iPodVideo'])
+      video_filename = File.basename(uri.path)
+      self.organize_s3_video_posts(video_filename);
     end
     audio_list_in_s3 = Mediahelper.get_audio_content();
     audio_list_in_s3.each do |audio|
@@ -199,19 +196,20 @@ class Copy
   end
 
 
-
-
   #
   # This method organizes existing messages with in S3
   #
   # * organize files in S3 based on file type
   #
   #
-  def organize_message_media_within_s3(file)
-    if file['.mp3']
-      self.organize_s3_audio_message(file)
-    elsif file['.mp4']
-      self.organize_s3_video_message(file)
+  def organize_message_media_within_s3(media)
+    if media['ContentTypeID'] = 5
+      # Audio
+      self.organize_s3_audio_message(media['HighQFilePath']);
+    elsif media['ContentTypeID'] = 4
+      uri = URI.parse(media['iPodVideo'])
+      video_filename = File.basename(uri.path)
+      self.organize_s3_video_message(video_filename);
     end
   end
 
@@ -223,11 +221,11 @@ class Copy
   #
   def organize_s3_audio_message(file)
     s3 = Immutable.getS3;
-      destination_bucket = s3.buckets['crossroads-media'].objects;
-      audio_file_to_organize = s3.buckets['crossroadsaudiomessages'].objects[file];
-      new_audio_message_bucket_path = "messages/audio/#{file}"
-      destination = destination_bucket[new_audio_message_bucket_path]
-      audio_file_to_organize.copy_to(destination, { :acl => :public_read })
+    destination_bucket = s3.buckets['crossroads-media'].objects;
+    audio_file_to_organize = s3.buckets['crossroadsaudiomessages'].objects[file];
+    new_audio_message_bucket_path = "messages/audio/#{file}"
+    destination = destination_bucket[new_audio_message_bucket_path]
+    audio_file_to_organize.copy_to(destination, { :acl => :public_read })
   end
 
 

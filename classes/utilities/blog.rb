@@ -116,7 +116,10 @@ class Blog
           when 'video'
             image = list['playerUrl'] + list['stillImage'];
             image = ContentHelper.replace_image_sources_with_new_paths(image)
-            front_matter = "\nvideo: \"#{list['hiDownload']}\"";
+            uri = URI.parse(list['hiDownload'])
+            video_filename = File.basename(uri.path)
+            video_file_path = "#{Immutable.config.s3url}/other-media/video/#{video_filename}"
+            front_matter = "\nvideo: \"#{video_file_path}\"";
             front_matter += "\nvideo-width: #{list['hiWidth']}";
             front_matter += "\nvideo-height: #{list['hiHeight']}";
             front_matter += "\nvideo-image: #{image}";
@@ -126,7 +129,6 @@ class Blog
           when 'audio'
             path = list['path'];
             host_url = list['hostUrl'];
-
             if (path.nil? && host_url.nil?)
               url = '';
             elsif path['s3.amazonaws']
@@ -134,17 +136,10 @@ class Blog
             else
               url = "#{host_url}#{path}";
             end
-
-            if url['www.crossroads.net']
-              url = url.gsub('http://www.crossroads.net/', '/')
-              url = url.gsub('https://www.crossroads.net/', '/')
-              str_replace_path = path.split('/').last;
-              url = "#{Immutable.config.s3media}/mp3/#{str_replace_path}"
-            else
-              url = path
-            end
-
-            front_matter = "\naudio: \"#{url}\"";
+            uri = URI.parse(url)
+            audio_filename = File.basename(uri.path)
+            audio_file_path = "#{Immutable.config.s3url}/other-media/audio/#{audio_filename}"
+            front_matter = "\naudio: \"#{audio_file_path}\"";
           when 'image'
             poster = list['imageUrl'] + list['path'];
             poster = ContentHelper.replace_image_sources_with_new_paths(poster);
