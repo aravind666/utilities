@@ -1,3 +1,4 @@
+require_relative('immutable')
 module YouTubeModule
   YOUTUBE_READONLY_SCOPE = 'https://www.googleapis.com/auth/youtube.readonly'
   YOUTUBE_API_SERVICE_NAME = 'youtube'
