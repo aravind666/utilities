@@ -343,6 +343,10 @@ class Copy
         if blog_media_list.fetchable? then
           blog_media_list.each do |media|
             case media[10] # checking for content type
+              when 1, 4, 9 # type video
+                table = 'video';
+                video_list = Mediahelper.get_all_media_for_blog(data['postId'], table);
+                self.process_media_for_blog_post(video_list, table)
               when 5, 11 # type audio
                 table = 'audio';
                 audio_list = Mediahelper.get_all_media_for_blog(data['postId'], table);
@@ -381,7 +385,9 @@ class Copy
             still_image_path = media['playerUrl'] + media['stillImage'];
             still_image_path = still_image_path.to_s;
             self.copy_files_to_appropriate_folders(still_image_path);
-            if(!list['hiDownload'].nil?)
+            if(list['hiDownload'].nil?)
+              puts list['hiDownload']
+            else
               uri = URI.parse(list['hiDownload'])
               video_filename = File.basename(uri.path)
               self.organize_s3_video_posts(video_filename);
