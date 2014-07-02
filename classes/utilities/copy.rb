@@ -623,6 +623,7 @@ class Copy
     system(cmd_pdf);
     system(cmd_mp3);
     system(cmd_mp4);
+    puts " Completed uploading media references to S3 "
   end
 
   #
@@ -648,6 +649,7 @@ class Copy
     system(cmd_pdf);
     system(cmd_mp3);
     system(cmd_mp4);
+    puts " Completed uploading message references to S3 "
   end
 
 
@@ -674,6 +676,7 @@ class Copy
     system(cmd_pdf);
     system(cmd_mp3);
     system(cmd_mp4);
+    puts " Completed uploading AV references to S3 "
   end
 
 end
