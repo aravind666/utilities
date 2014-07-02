@@ -9,66 +9,18 @@
 #
 class AddVideosToPlayList
 
-  include YouTubeModule
   #
   # Initialize the audio content migration process
   #
   def initialize
-    self.add_video_to_playlist('PL4k-hIu-yqFLjBInZlowgVFYe7jZvWg8g', 'R1I2Xygmnao', 1)
+    self.add_video_to_playlist('PL4k-hIu-yqFLQ0lZ_jJkFm7atqmMlWn3z', 'xFE3o0ASf94', 1)
   end
 
-  def add_video_to_playlist(playlist_id, video_id, position)
+  def add_video_to_playlist(playlist_id, video_id, position=1)
     begin
-      client, youtube = YouTubeHelper.get_authenticated_service
-      body = {
-        #:kind=> 'youtube#playlistItem',
-        :id=> playlist_id,
-        :snippet=> {
-            #:publishedAt=> 'datetime',
-            #:channelId=> 'string',
-            #:title=> 'string',
-            #:description=> 'string',
-          :channelTitle=> 'Test chanel',
-          :playlistId=> playlist_id,
-          #:position=> position,
-          :resourceId=> {
-              :kind=> 'youtube#video',
-              :videoId=> video_id,
-          }
-        },
-        :contentDetails=> {
-          :videoId=> video_id,
-        #:startAt=> 'string',
-        #:endAt=> 'string',
-        #:note=> 'string'
-        },
-        :status=> {
-          :privacyStatus=> 'public'
-        }
-      }
-      playlist_items_response = client.execute!(
-          :api_method => youtube.playlist_items.insert,
-          :parameters => {
-              :part => body.keys.join(',')
-          },
-          :body_object => body
-      )
-      puts "Video add to playlist successfully #{playlist_items_response.data.id}"
+      YouTubeHelper.add_video_to_playlist(playlist_id, video_id, position)
+      puts "Video:'#{video_id}' add to playlist successfully"
     end
-    rescue Google::APIClient::TransmissionError => e
-      response_hash = JSON.parse(e.result.body)
-      result_hash = Hash.new
-      response_hash = response_hash['error']['errors'].to_enum
-      response_hash.each { |val| result_hash = val }
-      #p result_hash
-      #puts "val:#{result_hash['reason']}"
-      #abort
-      #p result_hash
-      if result_hash['reason'] == 'authError'
-        puts 'Get new access token using refresh token'
-        CommandLineOAuthHelper.refresh_access_token(USER_ACCESS_TOKEN_INFO, YOUTUBE_CLIENT_SECRETE, AddVideosToPlayList)
-      else
-        puts e.result.body
-      end
   end
+
 end

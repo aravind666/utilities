@@ -9,23 +9,23 @@
 #
 # Initiating this class leads to uploading videos to youtube
 #
-class UploadVideos
+class UploadMessageVideos
 
   #
   # Initialize the video uploading videos process
   #
   def initialize
-    self.upload_video
+    self.upload_message_video
   end
 
   #
-  # Function used to upload videos to youtube
+  # Function used to upload message videos to youtube
   #
-  def upload_video
+  def upload_message_video
     begin
       youtube_response = Hash.new
       youtube_response['youtube_video_id'] = 0
-      get_all_video_data = YouTubeHelper.get_only_video_data
+      get_all_video_data = YouTubeHelper.get_message_video_data
       get_all_video_data.each do |video_data|
         youtube_response = YouTubeHelper.upload_video_to_youtube(video_data)
         puts "Video file '#{video_data[:file]}' uploaded successfully"
