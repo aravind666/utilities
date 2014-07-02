@@ -223,9 +223,12 @@ class Copy
     s3 = Immutable.getS3;
     destination_bucket = s3.buckets['crossroads-media'].objects;
     audio_file_to_organize = s3.buckets['crossroadsaudiomessages'].objects[file];
-    new_audio_message_bucket_path = "messages/audio/#{file}"
-    destination = destination_bucket[new_audio_message_bucket_path]
-    audio_file_to_organize.copy_to(destination, { :acl => :public_read })
+    if(s3.buckets['crossroadsaudiomessages'].objects[file].exists?)
+      new_audio_message_bucket_path = "messages/audio/#{file}"
+      destination = destination_bucket[new_audio_message_bucket_path]
+      audio_file_to_organize.copy_to(destination, { :acl => :public_read })
+    end
+
   end
 
 
@@ -239,9 +242,11 @@ class Copy
     s3 = Immutable.getS3;
     destination_bucket = s3.buckets['crossroads-media'].objects;
     video_file_to_organize = s3.buckets['crossroadsvideomessages'].objects[file];
-    new_video_message_bucket_path = "messages/video/#{file}"
-    destination = destination_bucket[new_video_message_bucket_path]
-    video_file_to_organize.copy_to(destination, { :acl => :public_read })
+    if(s3.buckets['crossroadsvideomessages'].objects[file].exists?)
+      new_video_message_bucket_path = "messages/video/#{file}"
+      destination = destination_bucket[new_video_message_bucket_path]
+      video_file_to_organize.copy_to(destination, { :acl => :public_read })
+    end
   end
 
   #
@@ -254,9 +259,11 @@ class Copy
     s3 = Immutable.getS3;
     destination_bucket = s3.buckets['crossroads-media'].objects;
     video_file_to_organize = s3.buckets['crossroadsvideomessages'].objects[file];
-    new_video_message_bucket_path = "other-media/video/#{file}"
-    destination = destination_bucket[new_video_message_bucket_path]
-    video_file_to_organize.copy_to(destination, { :acl => :public_read })
+    if(s3.buckets['crossroadsvideomessages'].objects[file].exists?)
+      new_video_message_bucket_path = "other-media/video/#{file}"
+      destination = destination_bucket[new_video_message_bucket_path]
+      video_file_to_organize.copy_to(destination, { :acl => :public_read })
+    end
   end
 
   #
@@ -269,9 +276,11 @@ class Copy
     s3 = Immutable.getS3;
     destination_bucket = s3.buckets['crossroads-media'].objects;
     audio_file_to_organize = s3.buckets['crossroadsaudiomessages'].objects[file];
-    new_audio_message_bucket_path = "other-media/video/#{file}"
-    destination = destination_bucket[new_audio_message_bucket_path]
-    audio_file_to_organize.copy_to(destination, { :acl => :public_read })
+    if(s3.buckets['crossroadsaudiomessages'].objects[file].exists?)
+      new_audio_message_bucket_path = "other-media/video/#{file}"
+      destination = destination_bucket[new_audio_message_bucket_path]
+      audio_file_to_organize.copy_to(destination, { :acl => :public_read })
+    end
   end
 
 
