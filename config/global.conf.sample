@@ -71,3 +71,8 @@ user_oauth_json = './data/milacron'
 youtube_client_secrete_json = './data/client_secrets.json'
 
 user_new_oauth_json = './data/user_new_oauth.json'
+
+#S3 credentials
+s3_access_key_id = '******put_your_access_key_id***********'
+s3_secret_access_key = '**********put_your_secret_access_key*********'
+
