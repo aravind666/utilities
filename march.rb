@@ -37,6 +37,9 @@ require 'nokogiri';
 # required to escape and un-escape a value to be included in a URL
 require 'uri'
 
+# Following libraries are required to communicate with gooogle youtube data api
+require 'youtube_it'
+require 'trollop'
 
 # Delete the log file during a fresh run
 # FileUtils.rm('migration.log');
