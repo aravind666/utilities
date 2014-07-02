@@ -381,6 +381,11 @@ class Copy
             still_image_path = media['playerUrl'] + media['stillImage'];
             still_image_path = still_image_path.to_s;
             self.copy_files_to_appropriate_folders(still_image_path);
+
+            uri = URI.parse(list['hiDownload'])
+            video_filename = File.basename(uri.path)
+            self.organize_s3_video_posts(video_filename);
+            
           when 'audio'
             if (media['path'].nil? && media['hosturl'].nil?)
               url = '';
@@ -389,6 +394,7 @@ class Copy
             end
             media_path = url.to_s;
             self.copy_files_to_appropriate_folders(media_path);
+
           when 'image'
             poster_path = media['imageUrl'] + media['path'];
             poster_path = poster_path.to_s;

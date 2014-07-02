@@ -448,28 +448,22 @@ class ContentHelper
       href
     end
 
+
+
     #
-    # Public static: copies required images for blog to respective folder
+    # Public static: removes unwanted paragraphs with class 'nospace'
     #
-    # *old_src* - String file path to copy
+    # *old_src* - String DOM to parse and remove
     #
-    # Returns nothing
+    # Returns updated DOM
     #
-    def copy_required_blog_images_to_folder(old_src)
-      old_src.gsub('http://www.crossroads.net/', '/')
-      if old_src['http://']
-        Immutable.log.info " - > #{ old_src } we do not need this file"
-      else
-        file_to_copy = Immutable.config.legacy_htdocs_path + old_src
-        status = File.file?(file_to_copy);
-        case status
-          when true
-            FileUtils.cp(file_to_copy, 'blogimages/')
-          when false
-            Immutable.log.info " - > #{ file_to_copy } does not exists"
-        end
-      end
+    def remove_no_space_paragraphs(data_to_migrate)
+      doc_to_migrate = Nokogiri::HTML(data_to_migrate)
+      data_to_migrate.search('p.noPspace').remove();
+      return data_to_migrate.to_s;
     end
+
+
 
   end
 end
