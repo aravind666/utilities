@@ -116,9 +116,7 @@ class Message
           when 5
             # Audio
             if (media['HighQFilePath'].length > 0)
-
-              audio_file_path = "#{Immutable.config.s3url}/message/audio/#{ContentHelper.encode_url_string(media['HighQFilePath'])}";
-
+              audio_file_path = "#{Immutable.config.s3url}/messages/audio/#{ContentHelper.encode_url_string(media['HighQFilePath'])}";
               front_matter += "\naudio: \"#{audio_file_path}\"";
               front_matter += "\naudio-duration: \"#{media['duration']}\"";
             end
@@ -135,7 +133,7 @@ class Message
               front_matter += "\ndescription: \"#{video_description}\"";
               uri = URI.parse(ContentHelper.encode_url_string(media['iPodVideo']))
               video_filename =  File.basename(uri.path)
-              video_file_path = "#{Immutable.config.s3url}/message/video/#{ContentHelper.encode_url_string(video_filename)}";
+              video_file_path = "#{Immutable.config.s3url}/messages/video/#{ContentHelper.encode_url_string(video_filename)}";
               front_matter += "\nvideo: \"#{video_file_path}\"\nvideo-duration: \"#{media['duration']}\"";
               front_matter += "\nvideo-image: \"#{Immutable.config.s3url}/images/#{video_poster}\"";
             end
