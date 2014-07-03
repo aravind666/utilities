@@ -420,7 +420,8 @@ class BlogHelper
       web_page_data = self.get_category_by_file_name_and_path(file_path, file_name)
       if !web_page_data.nil?
         complete_source_path = Immutable.config.content_source_path + file_path + file_name
-        category_name = web_page_data['category_name'].downcase.gsub(/\s/, '-')
+        category_name = web_page_data['category_name'].gsub(/\s/, '-')
+        category_name = category_name.downcase
         status = File.file?(complete_source_path);
         case status
           when true
