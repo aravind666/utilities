@@ -53,7 +53,7 @@ class Blog
           content = ContentHelper.update_html_with_new_image_paths(content.to_s);
           content = ContentHelper.update_html_with_new_media_hrefs(content.to_s);
           content = BlogHelper.update_html_with_milacron_href_in_content_posts(content.to_s);
-          content = BlogHelper.remove_unwanted_paragraph(content.to_s)
+          content = ContentHelper.remove_unwanted_paragraph(content.to_s)
           content = content.encode('utf-8', 'binary', :invalid => :replace,:undef => :replace, :replace => '')
           file_write_data = front_matter.force_encoding('UTF-8') + content.force_encoding('UTF-8');
           self.migrate_by_adding_jekyll_front_matter(file_write_data, data);
