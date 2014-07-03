@@ -367,7 +367,7 @@ class BlogHelper
       new_href = false
       clean_hrefs = ContentHelper.clean_hrefs_or_images_url(href);
       web_mail_id = clean_hrefs.split('/').last
-      if !web_mail_id.nil? && web_mail_id == Integer
+      if !web_mail_id.nil? && /^\d+$/ === web_mail_id
         email_id_array = self.get_email_address_by_web_mail_id(web_mail_id);
         if email_id_array.nil?
           new_href = '/'
@@ -420,7 +420,8 @@ class BlogHelper
       web_page_data = self.get_category_by_file_name_and_path(file_path, file_name)
       if !web_page_data.nil?
         complete_source_path = Immutable.config.content_source_path + file_path + file_name
-        category_name = web_page_data['category_name'].downcase.gsub(/\s/, '-')
+        category_name = web_page_data['category_name'].gsub(/\s/, '-')
+        category_name = category_name.downcase
         status = File.file?(complete_source_path);
         case status
           when true
@@ -541,24 +542,6 @@ class BlogHelper
         Immutable.log.error "Error SQLSTATE: #{e.state}"
         abort('An error occurred while getting milacron migrate details by id, Check migration log for more details')
       end
-    end
-
-    #
-    # Function to check the content with noSpace class
-    #
-    # * removes the content with the specified condition
-    #
-    # BlogHelper.remove_unwanted_paragraph(data)
-    #
-    def remove_unwanted_paragraph(data_to_remove)
-      doc_to_remove = Nokogiri::HTML(data_to_remove)
-      doc_to_remove.css('p').each do |p|
-        para = p.to_s
-        if para['<p class="noPspace">&nbsp;</p>']
-          p.remove
-        end
-      end
-      return doc_to_remove.to_s
     end
 
   end

@@ -126,7 +126,7 @@ class Video
     front_matter = "---\nlayout: media\ncategory: media\ntitle: \"#{mainTitle}\"";
     front_matter += "\ndate: #{media["UploadDate"].strftime("%Y-%m-%d")}";
     front_matter += "\ndescription: \"#{video_description}\""
-    uri = URI.parse(media['iPodVideo'])
+    uri = URI.parse(ContentHelper.encode_url_string(media['iPodVideo']))
     video_filename = File.basename(uri.path)
     video_file_path = "#{Immutable.config.s3url}/other-media/video/#{video_filename}"
     front_matter += "\nvideo: \"#{video_file_path}\"";

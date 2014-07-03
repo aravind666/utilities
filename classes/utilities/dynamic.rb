@@ -63,8 +63,8 @@ class Dynamic
       img['src'] = new_src;
     end
 
-    response = BlogHelper.remove_unwanted_paragraph(response.to_s);
-
+    response = ContentHelper.remove_unwanted_paragraph(response.to_s)
+    response = Nokogiri::HTML(response);
     if response.search('div#mainContent').nil?
       post_body = response.search('body')
     else
@@ -83,7 +83,7 @@ class Dynamic
     directory_path = self.get_complete_directory_path_to_migrate(link)
     file_name_to_migrate = get_complete_file_name_to_migrate(link)
     directory_to_migrate = self.setup_file_path_to_migrate(directory_path)
-    target_file = directory_to_migrate + '/' + file_name_to_migrate
+    target_file = directory_to_migrate.downcase + '/' + file_name_to_migrate.downcase
     if File.file?(target_file)
       Immutable.log.info "File already exists : #{link}"
       target_file['.htm'] = '-2.htm'
@@ -100,7 +100,7 @@ class Dynamic
   # Returns absolute file path
   #
   def get_exact_filepath_from_url(file_path)
-    file_path.sub(/[a-zA-Z]/) { |s| s.upcase }
+    file_path.sub(/[a-zA-Z]/) { |s| s.downcase }
   end
 
   # Public: used to get file name
@@ -112,7 +112,7 @@ class Dynamic
   def get_complete_file_name_to_migrate(content_url)
     file_name_to_migrate = File.basename(content_url)
     file_name_to_migrate['.php'] = '.htm'
-    file_name_to_migrate
+    file_name_to_migrate.downcase;
   end
 
   # Public: used to get directory path
@@ -124,7 +124,8 @@ class Dynamic
   #
   def get_complete_directory_path_to_migrate(content_url)
     file_path = self.get_exact_filepath_from_url(content_url)
-    File.dirname(file_path)
+    directory = File.dirname(file_path)
+    return directory.downcase
   end
 
   #
@@ -183,7 +184,9 @@ class Dynamic
     # it is the standard followed in migrating managed content
     category = self.get_complete_directory_path_to_migrate(content_url)
     category_parts = category.split('/')
-    "---\nlayout: right_column \ntitle: \"#{title}\" \ncategory: \"#{category_parts[0]}\"\n---\n"
+    category_name = category_parts[0];
+
+    "---\nlayout: right_column \ntitle: \"#{title}\" \ncategory: \"#{category_name.downcase}\"\n---\n"
   end
 
 end

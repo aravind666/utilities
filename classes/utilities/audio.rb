@@ -64,7 +64,7 @@ class Audio
       audio_title = audio['Title'].gsub /"/, ''
       audio_description = ContentHelper.purify_by_removing_special_characters(audio['Description'])
       lq_file_path = audio['LowQFilePath']
-      audio_file_path = "#{Immutable.config.s3url}/music/audio/#{ContentHelper.encode_url_string(media['HighQFilePath'])}";
+      audio_file_path = "#{Immutable.config.s3url}/music/audio/#{ContentHelper.encode_url_string(audio['HighQFilePath'])}";
       audio_thumb_image = audio['ThumbImagePath'].to_s
       audio_poster = ''
       if audio_thumb_image && !audio_thumb_image.nil? && !audio_thumb_image.empty?
