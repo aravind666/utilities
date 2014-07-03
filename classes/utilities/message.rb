@@ -133,7 +133,7 @@ class Message
                 media['duration'] = audio_duration['duration'];
               end
               front_matter += "\ndescription: \"#{video_description}\"";
-              uri = URI.parse(ContentHelper.encode_url_string(media['iPodVideo'])
+              uri = URI.parse(ContentHelper.encode_url_string(media['iPodVideo']))
               video_filename =  File.basename(uri.path)
               video_file_path = "#{Immutable.config.s3url}/message/video/#{ContentHelper.encode_url_string(video_filename)}";
               front_matter += "\nvideo: \"#{video_file_path}\"\nvideo-duration: \"#{media['duration']}\"";

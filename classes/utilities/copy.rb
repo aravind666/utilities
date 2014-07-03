@@ -25,6 +25,7 @@ class Copy
   #
   #
   def copy_media
+
     begin
       self.setup_folders_required;
       self.copy_content_media_references;
@@ -48,9 +49,7 @@ class Copy
       self.copy_message_media_references;
       self.upload_message_media_reference_to_s3;
       self.setup_folders_required;
-
       self.organize_existing_s3_files;
-
     end
   end
 
@@ -169,7 +168,6 @@ class Copy
   #
   #
   def organize_message_media_references_in_s3
-
     message_media_data = Mediahelper.get_all_media_from_all_messages();
     message_media_data.each do |media|
       self.organize_message_media_within_s3(media);
@@ -185,9 +183,10 @@ class Copy
   def organize_other_AV_references_with_in_s3
     video_list_in_s3 = Mediahelper.get_media_content();
     video_list_in_s3.each do |video|
-      if(video['iPodVideo'].to_s.length > 0)
-        uri = URI.parse(ContentHelper.encode_url_string(video['iPodVideo']))
-        video_filename = File.basename(uri.path)
+      if(video['iPodVideo'].length > 0)
+        url = video['iPodVideo'];
+        url = url.gsub('https://s3.amazonaws.com/crossroadsvideomessages/','');
+        video_filename = url.gsub('http://s3.amazonaws.com/crossroadsvideomessages/','');
         self.organize_s3_video_posts(URI.unescape(video_filename));
       end
     end
@@ -195,6 +194,7 @@ class Copy
     audio_list_in_s3.each do |audio|
       self.organize_s3_audio_posts(audio['HighQFilePath']);
     end
+    puts " Completed Organizing other Videos and Audios "
   end
 
 
@@ -205,15 +205,13 @@ class Copy
   #
   #
   def organize_message_media_within_s3(media)
-    if media['ContentTypeID'] = 5
-      # Audio
+    if media['ContentTypeID'] == 5
       self.organize_s3_audio_message(media['HighQFilePath']);
-    elsif media['ContentTypeID'] = 4
-      if(media['iPodVideo'].to_s.length > 0)
-        uri = URI.parse(ContentHelper.encode_url_string(media['iPodVideo']))
-        video_filename = File.basename(uri.path)
+    elsif ( media['ContentTypeID'] == 4 )
+        url = media['iPodVideo'];
+        url = url.gsub('https://s3.amazonaws.com/crossroadsvideomessages/','');
+        video_filename = url.gsub('http://s3.amazonaws.com/crossroadsvideomessages/','');
         self.organize_s3_video_message(URI.unescape(video_filename));
-      end
     end
   end
 
@@ -233,7 +231,6 @@ class Copy
       destination = destination_bucket[new_audio_message_bucket_path]
       audio_file_to_organize.copy_to(destination, { :acl => :public_read })
     end
-
   end
 
 
