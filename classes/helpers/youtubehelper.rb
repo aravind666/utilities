@@ -47,7 +47,6 @@ class YouTubeHelper
     def upload_video_to_youtube(video_data)
       begin
         client = self.get_authenticated_service
-        video_data[:file] = '/var/www/test1234.mp4'
         video_file = video_data[:file].gsub('https','http')
         response = client.video_upload(
             "#{video_file}",
@@ -93,7 +92,10 @@ class YouTubeHelper
                   message_media_data = Mediahelper.get_video_media_content_for_message(message[0])
                   if message_media_data.fetchable?
                     message_media_data.each do |media|
-                      video_data_array << self.create_video_data(media, series[0], message[0])
+                      video_exist_flag = self.check_video_exist_in_youtube(media)
+                      if video_exist_flag == 0
+                        video_data_array << self.create_video_data(media, series[0], message[0])
+                      end
                     end
                     Immutable.log.info "There are no video content available for media:#{message[0]}"
                   end
@@ -102,7 +104,7 @@ class YouTubeHelper
             end
           end
         end
-        video_data_array
+        p video_data_array
       end
     end
 
@@ -116,7 +118,10 @@ class YouTubeHelper
         if ipod_video_data.fetchable?
           ipod_video_data.each do |video_data|
             if video_data['iPodVideo'].length > 0
-              video_data_array << create_video_data(video_data, 0, 0)
+              video_exist_flag = self.check_video_exist_in_youtube(video_data)
+              if video_exist_flag == 0
+                video_data_array << create_video_data(video_data, 0, 0)
+              end
             end
           end
         else
@@ -229,18 +234,14 @@ class YouTubeHelper
     def create_entry_in_db(youtube_video_id, video_data)
       begin
         sql_query = self.prepare_db_query(youtube_video_id, video_data)
-        dbh = Immutable.dbh.execute(sql_query)
+        Immutable.dbh.execute(sql_query)
         puts "DB insert query : #{sql_query}"
         puts 'Record has been created'
-        dbh.commit
       rescue DBI::DatabaseError => e
         Immutable.log.error "Error code: #{e.err}"
         Immutable.log.error "Error message: #{e.errstr}"
         Immutable.log.error "Error SQLSTATE: #{e.state}"
         abort('An error occurred while DB insertion, Check migration log for more details')
-      ensure
-        #disconnect from server
-        dbh.disconnect if dbh
       end
     end
 
@@ -259,10 +260,11 @@ class YouTubeHelper
         insert_data['content_type_id'] =  video_data[:media_content_type_id] ? video_data[:media_content_type_id] : 0
         sql_query =  " INSERT INTO milacron_youtube_references "
         sql_query += " (id, youtube_video_id, message_id, media_content_id, "
-        sql_query += " content_type_id, create_dt, update_dt) "
+        sql_query += " content_type_id, create_dt_tm, update_dt_tm) "
         sql_query += " VALUES ('null', '#{insert_data['youtube_video_id']}', "
         sql_query += " #{insert_data['message_id']}, #{insert_data['media_content_id']}, "
-        sql_query += " #{insert_data['content_type_id']}, #{date_time}, #{date_time}) "
+        sql_query += " #{insert_data['content_type_id']}, '#{date_time}', '#{date_time}') "
+        puts sql_query
         return sql_query
       end
     end
@@ -275,6 +277,37 @@ class YouTubeHelper
         video_id = response.unique_id
         puts 'Video was successfully uploaded'
         video_id
+      end
+    end
+
+    #
+    # Function used to check the video file exist or not
+    #
+    def check_video_exist_in_youtube(video_data)
+      begin
+        flag = 0
+        sql_query = "SELECT * FROM milacron_youtube_references WHERE  "
+        sql_query += "media_content_id=#{video_data['MediaContentID']} AND "
+        sql_query += "content_type_id=#{video_data['ContentTypeID']}"
+        row = Immutable.dbh.select_one(sql_query)
+        if !row.nil?
+          if row[:id]
+            flag = 1
+          end
+        end
+        flag
+      end
+    end
+
+    #
+    # Function used to get video ids from db which
+    # are need to add youtube playlist
+    #
+    def get_video_ids
+      begin
+        sql_query = 'SELECT * FROM milacron_youtube_references'
+        results = Immutable.dbh.execute(sql_query)
+        return results
       end
     end
 
