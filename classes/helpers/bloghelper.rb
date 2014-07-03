@@ -367,7 +367,7 @@ class BlogHelper
       new_href = false
       clean_hrefs = ContentHelper.clean_hrefs_or_images_url(href);
       web_mail_id = clean_hrefs.split('/').last
-      if !web_mail_id.nil? && web_mail_id == Integer
+      if !web_mail_id.nil? && /^\d+$/ === web_mail_id
         email_id_array = self.get_email_address_by_web_mail_id(web_mail_id);
         if email_id_array.nil?
           new_href = '/'
@@ -420,7 +420,8 @@ class BlogHelper
       web_page_data = self.get_category_by_file_name_and_path(file_path, file_name)
       if !web_page_data.nil?
         complete_source_path = Immutable.config.content_source_path + file_path + file_name
-        category_name = web_page_data['category_name'].downcase.gsub(/\s/, '-')
+        category_name = web_page_data['category_name'].gsub(/\s/, '-')
+        category_name = category_name.downcase
         status = File.file?(complete_source_path);
         case status
           when true
