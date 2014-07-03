@@ -40,6 +40,7 @@ class Content
       File.delete('unmigrated_web_pages.log') if File.exist?('unmigrated_web_pages.log');
       File.delete('unmigrated_shortlink_web_pages.log') if File.exist?('unmigrated_shortlink_web_pages.log');
       File.delete('web_page_not_exists_in_db.log') if File.exist?('web_page_not_exists_in_db.log');
+      File.delete('remaining_manual_pages.csv') if File.exist?('remaining_manual_pages.csv');
       ContentHelper.validate_content_destination_path;
       FileUtils.rm_rf(Dir.glob(Immutable.config.content_destination_path))
       rescue Errno::ENOENT => e

@@ -93,13 +93,15 @@ class BlogHelper
         elsif href['/index.php?action=viewpage&filepath=']
           new_href = self.get_links_by_file_path(href)
         elsif href['/my/media/index.php']
-          new_href = '/media';
+          new_href = '/media'
         elsif href['/my/media/messages.php']
-          new_href = '/media/series';
+          new_href = '/media/series'
         elsif href['/my/media/music.php']
-          new_href = '/media/music/';
+          new_href = '/media/music/'
         elsif href['/my/media/podcasts.htm']
-          new_href = '/content/media/podcasts.htm';
+          new_href = '/content/media/podcasts.htm'
+        elsif !href['https://'] && !href['http://'] && !href['mailto:']
+          new_href = self.replace_other_references(href)
         end
         if new_href
           a['href'] = new_href;
@@ -541,6 +543,49 @@ class BlogHelper
         Immutable.log.error "Error message: #{e.errstr}"
         Immutable.log.error "Error SQLSTATE: #{e.state}"
         abort('An error occurred while getting milacron migrate details by id, Check migration log for more details')
+      end
+    end
+
+    #
+    # Function to replace other references which are created manually
+    #
+    # * Gets the href
+    #
+    # BlogHelper.replace_other_references(url)
+    #
+    def replace_other_references(href)
+      href = ContentHelper.clean_hrefs_or_images_url(href);
+      href = ContentHelper.purify_file_path(href)
+      new_href = false
+      new_page_data = self.get_new_pages_info(href)
+      if !new_page_data.nil?
+        new_href = new_page_data['milacron_path']
+      else
+        File.open("remaining_manual_pages.csv", 'a+') { |f| f.write("#{href}\n") }
+      end
+      return new_href
+    end
+
+    #
+    # Function to get the new page information from the legacy path
+    #
+    # * Gets the legacy path
+    # * returns the milacron path
+    #
+    # BlogHelper.get_new_pages_info(url)
+    #
+    def get_new_pages_info(href)
+      begin
+        migrate_new_page_sql = "SELECT milacron_path"
+        migrate_new_page_sql += " FROM milacron_migrate_new_pages"
+        migrate_new_page_sql += " where legacy_path = '#{href}'"
+        migrate_new_page_data = Immutable.dbh.select_one(migrate_new_page_sql)
+        return migrate_new_page_data
+        rescue DBI::DatabaseError => e
+        Immutable.log.error "Error code: #{e.err}"
+        Immutable.log.error "Error message: #{e.errstr}"
+        Immutable.log.error "Error SQLSTATE: #{e.state}"
+        abort('An error occurred while getting milacron migrate new pages by legacy path, Check migration log for more details')
       end
     end
 
