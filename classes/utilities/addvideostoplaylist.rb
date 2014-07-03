@@ -42,7 +42,7 @@ class AddVideosToPlayList
       if video_id_result.fetchable?
         video_id_result.each do |video_data|
           if video_data['id'] > 0
-            video_id_array << video_data['youtube_video_id']
+            video_id_array << video_data['video_id']
           end
         end
       end

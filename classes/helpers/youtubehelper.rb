@@ -104,7 +104,7 @@ class YouTubeHelper
             end
           end
         end
-        p video_data_array
+        video_data_array
       end
     end
 
@@ -236,7 +236,7 @@ class YouTubeHelper
         sql_query = self.prepare_db_query(youtube_video_id, video_data)
         Immutable.dbh.execute(sql_query)
         puts "DB insert query : #{sql_query}"
-        puts 'Record has been created'
+        puts 'Record has been created in DB'
       rescue DBI::DatabaseError => e
         Immutable.log.error "Error code: #{e.err}"
         Immutable.log.error "Error message: #{e.errstr}"
@@ -253,18 +253,18 @@ class YouTubeHelper
         insert_data = Hash.new
         sql_query= ''
         date_time = Time.now.strftime('%Y-%m-%d %H:%M:%S')
-        insert_data['youtube_video_id'] = youtube_video_id
+        embed_url = 'https://www.youtube.com/embed/'
+        insert_data['video_id'] = youtube_video_id
         insert_data['series_id'] = video_data[:series_id] ? video_data[:series_id] : 0
         insert_data['message_id'] = video_data[:message_id] ? video_data[:message_id] : 0
         insert_data['media_content_id'] = video_data[:media_content_id] ? video_data[:media_content_id] : 0
         insert_data['content_type_id'] =  video_data[:media_content_type_id] ? video_data[:media_content_type_id] : 0
         sql_query =  " INSERT INTO milacron_youtube_references "
-        sql_query += " (id, youtube_video_id, message_id, media_content_id, "
+        sql_query += " (id, video_id, embed_url, message_id, media_content_id, "
         sql_query += " content_type_id, create_dt_tm, update_dt_tm) "
-        sql_query += " VALUES ('null', '#{insert_data['youtube_video_id']}', "
+        sql_query += " VALUES ('null', '#{insert_data['video_id']}', '#{embed_url}', "
         sql_query += " #{insert_data['message_id']}, #{insert_data['media_content_id']}, "
         sql_query += " #{insert_data['content_type_id']}, '#{date_time}', '#{date_time}') "
-        puts sql_query
         return sql_query
       end
     end
@@ -275,7 +275,7 @@ class YouTubeHelper
     def normalize_response_data(response)
       begin
         video_id = response.unique_id
-        puts 'Video was successfully uploaded'
+        puts 'Video has been successfully uploaded'
         video_id
       end
     end
@@ -286,7 +286,7 @@ class YouTubeHelper
     def check_video_exist_in_youtube(video_data)
       begin
         flag = 0
-        sql_query = "SELECT * FROM milacron_youtube_references WHERE  "
+        sql_query = "SELECT id FROM milacron_youtube_references WHERE  "
         sql_query += "media_content_id=#{video_data['MediaContentID']} AND "
         sql_query += "content_type_id=#{video_data['ContentTypeID']}"
         row = Immutable.dbh.select_one(sql_query)
@@ -311,5 +311,46 @@ class YouTubeHelper
       end
     end
 
+    #
+    # Function used to get messages youtube video id and embed url
+    #
+    #
+    def get_message_video_yt_data(message_id, media_content_id, content_type_id)
+      begin
+        response_hash = Hash.new
+        sql_query = "SELECT * FROM milacron_youtube_references "
+        sql_query += "WHERE message_id=#{message_id} AND media_content_id=#{media_content_id} "
+        sql_query += "AND content_type_id=#{content_type_id} "
+        results = Immutable.dbh.execute(sql_query)
+        if results.fetchable?
+          results.each { |message_data|
+            response_hash['video_id'] = message_data['video_id']
+            response_hash['embed_url'] = message_data['embed_url']
+          }
+        end
+        return response_hash
+      end
+    end
+
+    #
+    # Function used to get messages youtube video id and embed url
+    #
+    #
+    def get_video_content_yt_data(media_content_id, content_type_id)
+      begin
+        response_hash = Hash.new
+        sql_query = "SELECT * FROM milacron_youtube_references "
+        sql_query += "WHERE media_content_id=#{media_content_id} "
+        sql_query += "AND content_type_id=#{content_type_id} "
+        results = Immutable.dbh.execute(sql_query)
+        if results.fetchable?
+          results.each { |video_data|
+            response_hash['video_id'] = video_data['video_id']
+            response_hash['embed_url'] = video_data['embed_url']
+          }
+        end
+        return response_hash
+      end
+    end
   end
 end

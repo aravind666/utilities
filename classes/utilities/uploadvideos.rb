@@ -31,7 +31,6 @@ class UploadVideos
         puts "Video file '#{video_data[:file]}' uploaded successfully"
         video_id = YouTubeHelper.normalize_response_data(youtube_response)
         YouTubeHelper.create_entry_in_db(video_id, video_data)
-        abort
       end
     end
   end
