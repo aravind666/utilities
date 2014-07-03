@@ -114,10 +114,11 @@ class Content
     destination_file_name = content[2];
     complete_source_path = Immutable.config.content_source_path + db_file_path + destination_file_name;
     category_name = content[3].gsub(/\s/, '-');
+    category_name = category_name.downcase;
     status = File.file?(complete_source_path);
     case status
       when true
-        self.setup_file_path(category_name.downcase);
+        self.setup_file_path(category_name);
         front_matter = get_jekyll_front_matter_for_content(content);
         self.migrate_by_adding_jekyll_front_matter(complete_source_path, destination_file_name, category_name, front_matter);
       when false
