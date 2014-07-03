@@ -83,7 +83,7 @@ class Dynamic
     directory_path = self.get_complete_directory_path_to_migrate(link)
     file_name_to_migrate = get_complete_file_name_to_migrate(link)
     directory_to_migrate = self.setup_file_path_to_migrate(directory_path)
-    target_file = directory_to_migrate + '/' + file_name_to_migrate
+    target_file = directory_to_migrate.downcase + '/' + file_name_to_migrate.downcase
     if File.file?(target_file)
       Immutable.log.info "File already exists : #{link}"
       target_file['.htm'] = '-2.htm'
@@ -183,7 +183,9 @@ class Dynamic
     # it is the standard followed in migrating managed content
     category = self.get_complete_directory_path_to_migrate(content_url)
     category_parts = category.split('/')
-    "---\nlayout: right_column \ntitle: \"#{title}\" \ncategory: \"#{category_parts[0]}\"\n---\n"
+    category_name = category_parts[0];
+
+    "---\nlayout: right_column \ntitle: \"#{title}\" \ncategory: \"#{category_name.downcase}\"\n---\n"
   end
 
 end
