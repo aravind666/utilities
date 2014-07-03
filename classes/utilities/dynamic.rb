@@ -100,7 +100,7 @@ class Dynamic
   # Returns absolute file path
   #
   def get_exact_filepath_from_url(file_path)
-    file_path.sub(/[a-zA-Z]/) { |s| s.upcase }
+    file_path.sub(/[a-zA-Z]/) { |s| s.downcase }
   end
 
   # Public: used to get file name
@@ -112,7 +112,7 @@ class Dynamic
   def get_complete_file_name_to_migrate(content_url)
     file_name_to_migrate = File.basename(content_url)
     file_name_to_migrate['.php'] = '.htm'
-    file_name_to_migrate
+    file_name_to_migrate.downcase;
   end
 
   # Public: used to get directory path
@@ -124,7 +124,8 @@ class Dynamic
   #
   def get_complete_directory_path_to_migrate(content_url)
     file_path = self.get_exact_filepath_from_url(content_url)
-    File.dirname(file_path)
+    directory = File.dirname(file_path)
+    return directory.downcase
   end
 
   #
