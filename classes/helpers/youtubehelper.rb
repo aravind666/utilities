@@ -37,7 +37,7 @@ class YouTubeHelper
           )
           client.refresh_access_token!
         else
-          puts 'client auth info file rquired'
+          puts 'client auth info file required'
           abort
         end
         client
@@ -215,6 +215,9 @@ class YouTubeHelper
           opt :media_content_id, 'video media_content_id',
               :default => video_data['MediaContentID'],
               :type => :int
+          opt :media_content_type_id, 'video media_content_id',
+              :default => video_data['ContentTypeID'],
+              :type => :int
         end
         return opts
       end
@@ -231,12 +234,12 @@ class YouTubeHelper
         puts 'Record has been created'
         dbh.commit
       rescue DBI::DatabaseError => e
-        puts 'An error occurred'
-        puts "Error code:    #{e.err}"
-        puts "Error message: #{e.errstr}"
-        dbh.rollback
+        Immutable.log.error "Error code: #{e.err}"
+        Immutable.log.error "Error message: #{e.errstr}"
+        Immutable.log.error "Error SQLSTATE: #{e.state}"
+        abort('An error occurred while DB insertion, Check migration log for more details')
       ensure
-        disconnect from server
+        #disconnect from server
         dbh.disconnect if dbh
       end
     end
@@ -247,15 +250,13 @@ class YouTubeHelper
     def prepare_db_query(youtube_video_id, video_data)
       begin
         insert_data = Hash.new
-        insert_data['media_content_id'] = 0
-        insert_data['content_type_id'] = 0
         sql_query= ''
         date_time = Time.now.strftime('%Y-%m-%d %H:%M:%S')
         insert_data['youtube_video_id'] = youtube_video_id
-        insert_data['series_id'] = video_data['message_id']
-        insert_data['message_id'] = video_data['message_id']
-        insert_data['media_content_id'] = video_data['MediaContentID']
-        insert_data['content_type_id'] = video_data['ContentTypeID']
+        insert_data['series_id'] = video_data[:series_id] ? video_data[:series_id] : 0
+        insert_data['message_id'] = video_data[:message_id] ? video_data[:message_id] : 0
+        insert_data['media_content_id'] = video_data[:media_content_id] ? video_data[:media_content_id] : 0
+        insert_data['content_type_id'] =  video_data[:media_content_type_id] ? video_data[:media_content_type_id] : 0
         sql_query =  " INSERT INTO milacron_youtube_references "
         sql_query += " (id, youtube_video_id, message_id, media_content_id, "
         sql_query += " content_type_id, create_dt, update_dt) "
@@ -267,7 +268,7 @@ class YouTubeHelper
     end
 
     #
-    # Function used to get response as array
+    # Function used to get youtube response data
     #
     def normalize_response_data(response)
       begin

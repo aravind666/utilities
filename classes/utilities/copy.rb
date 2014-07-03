@@ -25,22 +25,23 @@ class Copy
   #
   #
   def copy_media
+
     begin
       self.setup_folders_required;
       self.copy_content_media_references;
       self.copy_dynamic_content_media_references;
       self.upload_content_media_reference_to_s3
-      self.setup_folders_required;
 
+      self.setup_folders_required;
       self.process_series_media_reference;
       self.upload_content_media_reference_to_s3;
-      self.setup_folders_required;
 
+      self.setup_folders_required;
       self.copy_audio_post_media_references;
       self.copy_video_post_media_references;
       self.upload_AV_media_reference_to_s3;
-      self.setup_folders_required;
 
+      self.setup_folders_required;
       self.copy_blog_post_media_references;
       self.upload_content_media_reference_to_s3;
       self.setup_folders_required;
@@ -48,9 +49,7 @@ class Copy
       self.copy_message_media_references;
       self.upload_message_media_reference_to_s3;
       self.setup_folders_required;
-
       self.organize_existing_s3_files;
-
     end
   end
 
@@ -169,7 +168,6 @@ class Copy
   #
   #
   def organize_message_media_references_in_s3
-
     message_media_data = Mediahelper.get_all_media_from_all_messages();
     message_media_data.each do |media|
       self.organize_message_media_within_s3(media);
@@ -185,14 +183,18 @@ class Copy
   def organize_other_AV_references_with_in_s3
     video_list_in_s3 = Mediahelper.get_media_content();
     video_list_in_s3.each do |video|
-      uri = URI.parse(video['iPodVideo'])
-      video_filename = File.basename(uri.path)
-      self.organize_s3_video_posts(video_filename);
+      if(video['iPodVideo'].length > 0)
+        url = video['iPodVideo'];
+        url = url.gsub('https://s3.amazonaws.com/crossroadsvideomessages/','');
+        video_filename = url.gsub('http://s3.amazonaws.com/crossroadsvideomessages/','');
+        self.organize_s3_video_posts(URI.unescape(video_filename));
+      end
     end
     audio_list_in_s3 = Mediahelper.get_audio_content();
     audio_list_in_s3.each do |audio|
       self.organize_s3_audio_posts(audio['HighQFilePath']);
     end
+    puts " Completed Organizing other Videos and Audios "
   end
 
 
@@ -203,13 +205,13 @@ class Copy
   #
   #
   def organize_message_media_within_s3(media)
-    if media['ContentTypeID'] = 5
-      # Audio
+    if media['ContentTypeID'] == 5
       self.organize_s3_audio_message(media['HighQFilePath']);
-    elsif media['ContentTypeID'] = 4
-      uri = URI.parse(media['iPodVideo'])
-      video_filename = File.basename(uri.path)
-      self.organize_s3_video_message(video_filename);
+    elsif ( media['ContentTypeID'] == 4 )
+        url = media['iPodVideo'];
+        url = url.gsub('https://s3.amazonaws.com/crossroadsvideomessages/','');
+        video_filename = url.gsub('http://s3.amazonaws.com/crossroadsvideomessages/','');
+        self.organize_s3_video_message(URI.unescape(video_filename));
     end
   end
 
@@ -223,13 +225,12 @@ class Copy
     s3 = Immutable.getS3;
     destination_bucket = s3.buckets['crossroads-media'].objects;
     audio_file_to_organize = s3.buckets['crossroadsaudiomessages'].objects[file];
-    if(s3.buckets['crossroadsaudiomessages'].objects[file].exists?)
-      puts " Copying the #{file} in to messages/audio/" ;
+    if (s3.buckets['crossroadsaudiomessages'].objects[file].exists?)
+      puts " Copying the #{file} in to messages/audio/";
       new_audio_message_bucket_path = "messages/audio/#{file}"
       destination = destination_bucket[new_audio_message_bucket_path]
       audio_file_to_organize.copy_to(destination, { :acl => :public_read })
     end
-
   end
 
 
@@ -243,8 +244,8 @@ class Copy
     s3 = Immutable.getS3;
     destination_bucket = s3.buckets['crossroads-media'].objects;
     video_file_to_organize = s3.buckets['crossroadsvideomessages'].objects[file];
-    if(s3.buckets['crossroadsvideomessages'].objects[file].exists?)
-      puts " Copying the #{file} in to messages/video/" ;
+    if (s3.buckets['crossroadsvideomessages'].objects[file].exists?)
+      puts " Copying the #{file} in to messages/video/";
       new_video_message_bucket_path = "messages/video/#{file}"
       destination = destination_bucket[new_video_message_bucket_path]
       video_file_to_organize.copy_to(destination, { :acl => :public_read })
@@ -261,8 +262,8 @@ class Copy
     s3 = Immutable.getS3;
     destination_bucket = s3.buckets['crossroads-media'].objects;
     video_file_to_organize = s3.buckets['crossroadsvideomessages'].objects[file];
-    if(s3.buckets['crossroadsvideomessages'].objects[file].exists?)
-      puts " Copying the #{file} in to other-media/video/" ;
+    if (s3.buckets['crossroadsvideomessages'].objects[file].exists?)
+      puts " Copying the #{file} in to other-media/video/";
       new_video_message_bucket_path = "other-media/video/#{file}"
       destination = destination_bucket[new_video_message_bucket_path]
       video_file_to_organize.copy_to(destination, { :acl => :public_read })
@@ -279,8 +280,8 @@ class Copy
     s3 = Immutable.getS3;
     destination_bucket = s3.buckets['crossroads-media'].objects;
     audio_file_to_organize = s3.buckets['crossroadsaudiomessages'].objects[file];
-    if(s3.buckets['crossroadsaudiomessages'].objects[file].exists?)
-      puts " Copying the #{file} in to other-media/audio/" ;
+    if (s3.buckets['crossroadsaudiomessages'].objects[file].exists?)
+      puts " Copying the #{file} in to other-media/audio/";
       new_audio_message_bucket_path = "other-media/audio/#{file}"
       destination = destination_bucket[new_audio_message_bucket_path]
       audio_file_to_organize.copy_to(destination, { :acl => :public_read })
@@ -398,9 +399,9 @@ class Copy
             still_image_path = media['playerUrl'] + media['stillImage'];
             still_image_path = still_image_path.to_s;
             self.copy_files_to_appropriate_folders(still_image_path);
-            if(media['hiDownload'].nil?)
-              puts media['hiDownload']
-            else
+            video_url = media['hiDownload'];
+            video_url = video_url.to_s;
+            if (video_url['s3.amazonaws.com'])
               uri = URI.parse(media['hiDownload'])
               video_filename = File.basename(uri.path)
               self.organize_s3_video_posts(video_filename);

@@ -228,40 +228,40 @@ class ContentHelper
         #
         # image/uploadedImages folder
         #
-        replacements << ["images/uploadedImages/Corporate Blogger", "content"]
-        replacements << ["images/uploadedImages/Corporate%20Blogger", "content"]
-        replacements << ["images/uploadedImages/Free%20Journey", "content"]
-        replacements << ["images/uploadedImages/Journey Materials/Consumed", "content"]
-        replacements << ["images/uploadedImages/GO%20New%20Orleans", "content"]
-        replacements << ["images/uploadedImages/kidsmusic", "content"]
-        replacements << ["images/uploadedImages/GOMamelodi", "content"]
-        replacements << ["images/uploadedImages/boxes/New Folder", "content"]
-        replacements << ["images/uploadedImages/boxes/New%20Folder", "content"]
-        replacements << ["images/uploadedImages/boxes", "content"]
-        replacements << ["images/uploadedImages/buttons", "content"]
-        replacements << ["images/uploadedImages/banners", "content"]
-        replacements << ["images/uploadedImages/3500 Madison", "content"]
-        replacements << ["images/uploadedImages/3500%20Madison", "content"]
-        replacements << ["images/uploadedImages/Reset", "content"]
-        replacements << ["images/uploadedImages", "content"]
+        replacements << ["images/uploadedImages/Corporate Blogger", "images"]
+        replacements << ["images/uploadedImages/Corporate%20Blogger", "images"]
+        replacements << ["images/uploadedImages/Free%20Journey", "images"]
+        replacements << ["images/uploadedImages/Journey Materials/Consumed", "images"]
+        replacements << ["images/uploadedImages/GO%20New%20Orleans", "images"]
+        replacements << ["images/uploadedImages/kidsmusic", "images"]
+        replacements << ["images/uploadedImages/GOMamelodi", "images"]
+        replacements << ["images/uploadedImages/boxes/New Folder", "images"]
+        replacements << ["images/uploadedImages/boxes/New%20Folder", "images"]
+        replacements << ["images/uploadedImages/boxes", "images"]
+        replacements << ["images/uploadedImages/buttons", "images"]
+        replacements << ["images/uploadedImages/banners", "images"]
+        replacements << ["images/uploadedImages/3500 Madison", "images"]
+        replacements << ["images/uploadedImages/3500%20Madison", "images"]
+        replacements << ["images/uploadedImages/Reset", "images"]
+        replacements << ["images/uploadedImages", "images"]
 
         #
         # img  folder
         #
-        replacements << ["img/icn", "content"]
-        replacements << ["img/tabs", "content"]
+        replacements << ["img/icn", "images"]
+        replacements << ["img/tabs", "images"]
 
         #
         # uploadedfiles  folder
         #
-        replacements << ["uploadedfiles/1/", "content/"]
-        replacements << ["uploadedfiles", "content"]
+        replacements << ["uploadedfiles/1/", "images/"]
+        replacements << ["uploadedfiles", "images"]
 
         #
         # players folder
         #
-        replacements << ["players/media/smallThumbs", "content"]
-        replacements << ["players/media/series", "content"]
+        replacements << ["players/media/smallThumbs", "images"]
+        replacements << ["players/media/series", "images"]
 
         replacements.each { |set| source = source.gsub(set[0], set[1]) }
         source = Immutable.config.s3url+ source
@@ -447,6 +447,25 @@ class ContentHelper
       end
       href
     end
+
+    #
+    # Function to check the content with noSpace class
+    #
+    # * removes the content with the specified condition
+    #
+    # BlogHelper.remove_unwanted_paragraph(data)
+    #
+    def remove_unwanted_paragraph(data_to_remove)
+      doc_to_remove = Nokogiri::HTML(data_to_remove)
+      doc_to_remove.css('p').each do |p|
+        para = p.to_s
+        if para['<p class="noPspace">&nbsp;</p>']
+          p.remove
+        end
+      end
+      return doc_to_remove.to_s
+    end
+
 
   end
 end

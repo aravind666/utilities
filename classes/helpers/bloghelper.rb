@@ -543,23 +543,5 @@ class BlogHelper
       end
     end
 
-    #
-    # Function to check the content with noSpace class
-    #
-    # * removes the content with the specified condition
-    #
-    # BlogHelper.remove_unwanted_paragraph(data)
-    #
-    def remove_unwanted_paragraph(data_to_remove)
-      doc_to_remove = Nokogiri::HTML(data_to_remove)
-      doc_to_remove.css('p').each do |p|
-        para = p.to_s
-        if para['<p class="noPspace">&nbsp;</p>']
-          p.remove
-        end
-      end
-      return doc_to_remove.to_s
-    end
-
   end
 end
