@@ -1,13 +1,12 @@
 # encoding: ASCII-8BIT
 #
-# UploadVideos. class which defines various attributes and behaviours
+# YouTubeHelper. class which defines various attributes and behaviours
 # which are used to upload videos to youtube
 #
 # Author::    Hanumantharaju  (mailto:hanumantharaju.tswamy@costrategix.com)
 # Copyright:: Copyright (c) 2012 Crossroads
 # License::   MIT
 #
-# Initiating this class leads to uploading videos to youtube
 #
 class YouTubeHelper
 
@@ -303,9 +302,9 @@ class YouTubeHelper
     # Function used to get video ids from db which
     # are need to add youtube playlist
     #
-    def get_video_ids
+    def get_message_video_ids(content_type_id)
       begin
-        sql_query = 'SELECT * FROM milacron_youtube_references'
+        sql_query = "SELECT * FROM milacron_youtube_references WHERE content_type_id=#{content_type_id}"
         results = Immutable.dbh.execute(sql_query)
         return results
       end
