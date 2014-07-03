@@ -367,7 +367,7 @@ class BlogHelper
       new_href = false
       clean_hrefs = ContentHelper.clean_hrefs_or_images_url(href);
       web_mail_id = clean_hrefs.split('/').last
-      if !web_mail_id.nil? && web_mail_id == Integer
+      if !web_mail_id.nil? && /^\d+$/ === web_mail_id
         email_id_array = self.get_email_address_by_web_mail_id(web_mail_id);
         if email_id_array.nil?
           new_href = '/'
