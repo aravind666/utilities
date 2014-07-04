@@ -283,5 +283,134 @@ class Mediahelper
       end
     end
 
+    #
+    # This method receives the media content id
+    # and gets single OR multiple content tags associated to it
+    #
+    # * Gets the id
+    # * Gets content information for that id
+    #
+    # mediahelper.get_content_tag_from_media_content_id(12)
+    #
+    def get_content_tag_from_media_content_id(media_content_id)
+      begin
+        content_tag_sql = "SELECT * FROM contenttag WHERE MediaContentID = #{media_content_id}";
+        content_tag_data = Immutable.dbh.execute(content_tag_sql);
+        return content_tag_data;
+        rescue DBI::DatabaseError => e
+        Immutable.log.error "Error code: #{e.err}"
+        Immutable.log.error "Error message: #{e.errstr}"
+        Immutable.log.error "Error SQLSTATE: #{e.state}"
+        abort('An error occurred while getting content tag data from DB, Check migration log for more details');
+      end
+    end
+
+    #
+    # This method the associated media tag id in content tag table
+    #
+    # * Gets the media tag id
+    # * Gets the tag name associated to it
+    #
+    # mediahelper.get_tags_using_media_tag_id(355)
+    #
+    def get_tags_using_media_tag_id(media_tag_id)
+      begin
+        media_tag_sql = "SELECT * FROM mediatag WHERE MediaTagID = #{media_tag_id}";
+        media_tag_data = Immutable.dbh.select_one(media_tag_sql);
+        return media_tag_data;
+        rescue DBI::DatabaseError => e
+        Immutable.log.error "Error code: #{e.err}"
+        Immutable.log.error "Error message: #{e.errstr}"
+        Immutable.log.error "Error SQLSTATE: #{e.state}"
+        abort('An error occurred while getting media tag data from DB, Check migration log for more details');
+      end
+    end
+
+    #
+    # This method used for single media content id related tag list
+    #
+    # * Gets the media content id
+    # * Gets the front matter related to that tag list
+    #
+    # mediahelper.get_tag_data(12)
+    #
+    def get_tag_data(media_content_id)
+      front_matter = ''
+      content_tag_data = self.get_content_tag_from_media_content_id(media_content_id)
+      if content_tag_data.fetchable? then
+        front_matter = "\ntag: "
+        content_tag_data.each do |content_tag|
+          tag = self.get_tags_using_media_tag_id(content_tag[1])
+          if !tag.nil?
+            tag_name = ContentHelper.purify_title_by_removing_special_characters(tag['WordPhrase'].strip)
+            front_matter += "\n - #{tag_name.downcase}"
+          end
+        end
+      end
+      if front_matter == "\ntag: "
+        return false
+      end
+      return front_matter
+    end
+
+    #
+    # This method gets multiple media content id and is based on a message
+    # message contains multiple media and multiple content tags which is organized
+    # and stored as a comma separated array
+    #
+    # * Gets the media content id
+    # * Gets the comma separated info of media content id
+    #
+    # mediahelper.get_message_tag_data(12)
+    #
+    def get_message_tag_data(media_content_id)
+      message_tags = ''
+      content_tag_data = self.get_content_tag_from_media_content_id(media_content_id)
+      if content_tag_data.fetchable? then
+        content_tag_data.each do |content_tag|
+          tag = self.get_tags_using_media_tag_id(content_tag[1])
+          if !tag.nil?
+            tag_name = ContentHelper.purify_title_by_removing_special_characters(tag['WordPhrase'].strip)
+            message_tags += "#{tag_name.downcase},"
+          end
+        end
+      end
+      message_tags.chomp!(',')
+    end
+
+    #
+    # This method combines multiple media content of a message
+    # in comma separated form
+    # and then associates to a front matter
+    #
+    # * Gets the tag array of message media content
+    # * find uniq among all the media content in a message
+    # * get the jeklly front matter
+    #
+    # mediahelper.get_message_tag_front_matter(array)
+    #
+    def get_message_tag_front_matter(message_tag_array)
+      front_matter = "\ntag: "
+      message_tags = ''
+      message_tag_array.each do |tag|
+        if !tag.nil?
+          message_tags += "#{tag},"
+        end
+      end
+      combine_array = message_tags.split(',')
+      if combine_array.any?
+        combine_array.uniq!
+        combine_array.each do |value|
+          if !value.nil?
+            front_matter += "\n - #{value}"
+          end
+        end
+      end
+      if front_matter == "\ntag: "
+        return false
+      end
+      front_matter
+    end
+
   end
 end

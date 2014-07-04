@@ -29,7 +29,7 @@ class BlogHelper
         blog_sql += " JOIN milacron_migrate_post as mmp ON cp.id = mmp.channelpost_id";
         blog_sql += " JOIN channel as c ON c.id = cpx.channelid";
         blog_sql += " JOIN person as p ON p.personId = cpx.createdBy";
-        blog_sql += " WHERE cpx.`channelId` IN (1,2,3,4,5,6,7,8,9)";
+        blog_sql += " WHERE cpx.`channelId` IN (1,2,3,4,5,6,7,8,9,1394)";
         blog_sql += " AND migrate = 'yes'";
         blog_sql += " GROUP BY cp.id";
         blog_sql += " HAVING MAX(cpx.createdDate)";

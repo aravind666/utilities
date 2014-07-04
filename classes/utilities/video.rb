@@ -129,6 +129,10 @@ class Video
     uri = URI.parse(ContentHelper.encode_url_string(media['iPodVideo']))
     video_filename = File.basename(uri.path)
     video_file_path = "#{Immutable.config.s3url}/other-media/video/#{video_filename}"
+    tag_data = Mediahelper.get_tag_data(media['MediaContentID'])
+    if tag_data
+      front_matter += tag_data
+    end
     front_matter += "\nvideo: \"#{video_file_path}\"";
     front_matter += "\nvideo-poster: \"#{video_poster}\"";
     front_matter += "\n---";
