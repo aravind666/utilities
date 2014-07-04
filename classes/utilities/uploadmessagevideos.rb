@@ -1,7 +1,7 @@
 # encoding: ASCII-8BIT
 #
-# UploadVideos. class which defines various attributes and behaviours
-# which are used to upload videos to youtube
+# UploadMessageVideos. class which defines various attributes and behaviours
+# which are used to upload message videos to youtube
 #
 # Author::    Hanumantharaju  (mailto:hanumantharaju.tswamy@costrategix.com)
 # Copyright:: Copyright (c) 2012 Crossroads
@@ -12,7 +12,7 @@
 class UploadMessageVideos
 
   #
-  # Initialize the video uploading videos process
+  # Initialize the message video uploading process
   #
   def initialize
     self.upload_message_video

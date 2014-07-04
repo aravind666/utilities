@@ -12,7 +12,7 @@
 class UploadVideos
 
   #
-  # Initialize the video uploading videos process
+  # Initialize the video uploading process
   #
   def initialize
     self.upload_video
