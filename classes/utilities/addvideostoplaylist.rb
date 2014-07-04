@@ -33,12 +33,13 @@ class AddVideosToPlayList
   end
 
   #
-  # Function used to get video ids
+  # Function used to get message video ids
+  # param content_type_id=4  for message videos
   #
   def get_video_ids_to_add_playlist
     begin
       video_id_array = Array.new
-      video_id_result = YouTubeHelper.get_video_ids
+      video_id_result = YouTubeHelper.get_message_video_ids(content_type_id = 1)
       if video_id_result.fetchable?
         video_id_result.each do |video_data|
           if video_data['id'] > 0

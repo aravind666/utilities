@@ -100,13 +100,17 @@ class Message
   def add_media_content_front_matter(media_content_structure, front_matter, message_id)
     begin
       explicit = ''
+      media_content_id = 0
+      tag_array = []
       media_content_structure.each do |media|
+        media_content_id = media['MediaContentID']
+        tag_array << Mediahelper.get_message_tag_data(media_content_id)
         lq_file_path = media['LowQFilePath'];
         #
         # A message can have multiple media contents we need to look for
         # all possibilities also each media has its own description and title we need them too
         #
-
+        media_content_id = media['MediaContentID']
         if media['isAdult'] == 'N' || media['isAdult']==''
           explicit = false
         else
@@ -162,10 +166,13 @@ class Message
             else
               program_file_path = "#{lq_file_path}#{ContentHelper.encode_url_string(media['HighQFilePath'])}";
             end
-
             front_matter += "\nprogram: \"#{program_file_path}\"";
           else
         end
+      end
+      tag_data = Mediahelper.get_message_tag_front_matter(tag_array)
+      if tag_data
+        front_matter += tag_data
       end
       front_matter += "\nexplicit: #{explicit}";
       return front_matter;

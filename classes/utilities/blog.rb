@@ -169,6 +169,7 @@ class Blog
   #
   def get_jekyll_front_matter_blog_post(data, mediaElements)
     mainTitle = data['title'].gsub /"/, '';
+    data['name'] = data['name'].split('.').first
     tagCategory = ContentHelper.purify_title_by_removing_special_characters(data['name'].downcase.strip);
     front_matter = "---\nlayout: post\ntitle: \"#{mainTitle}\"";
     front_matter += "\nsubtitle: \"#{data['subtitle']}\"";
