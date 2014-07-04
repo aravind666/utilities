@@ -82,6 +82,10 @@ class Audio
       front_matter += "\ndate: #{audio['UploadDate'].strftime('%Y-%m-%d')}"
       front_matter += " \ndescription: \"#{audio_description}\""
       front_matter += "\naudio: \"#{audio_file_path}\"\naudio-duration: \"#{audio['duration']}\""
+      tag_data = Mediahelper.get_tag_data(audio['MediaContentID'])
+      if tag_data
+        front_matter += tag_data
+      end
       front_matter += "\nsrc: \"#{audio_poster}\""
       front_matter += "\n---"
       return front_matter
