@@ -16,6 +16,9 @@ class YouTubeHelper
 
   class << self
 
+    #
+    # Function used to authenticate user
+    #
     def get_authenticated_service
       begin
         credentials = Hash.new
@@ -43,9 +46,27 @@ class YouTubeHelper
       end
     end
 
+    #
+    # Function used to get client object
+    #
+    def get_yt_client_object
+     begin
+       client = YouTubeIt::Client.new(
+           :username => 'hanumanthraju.t',
+           :password =>  'aimangala321',
+           dev_key: 'AIzaSyDwiTWkZwn7mlsIcGcRDiZONBdoFmE3yxY',
+       )
+       client
+     end
+    end
+
+    #
+    # Function used to upload videos to youtube
+    #
     def upload_video_to_youtube(video_data)
       begin
-        client = self.get_authenticated_service
+        #client = self.get_authenticated_service #Used oauth2
+        client = self.get_yt_client_object
         video_file = video_data[:file].gsub('https','http')
         response = client.video_upload(
             "#{video_file}",
@@ -54,7 +75,7 @@ class YouTubeHelper
             :category_id => video_data[:category_id],
             #:keywords => %w["#{video_data['tags']}"],
             :privacy_status => video_data[:privacy_status],
-            :publish_at => video_data[:title],
+            :publish_at => video_data[:publish_at],
             :license => video_data[:license],
             :embeddable => video_data[:embeddable],
             :public_stats_viewable => video_data[:public_stats_viewable],
@@ -67,6 +88,9 @@ class YouTubeHelper
       end
     end
 
+    #
+    # Function used to add videos to playlist
+    #
     def add_video_to_playlist(playlist_id, video_id, position=1)
       begin
         client = self.get_authenticated_service
@@ -230,9 +254,9 @@ class YouTubeHelper
     #
     # Function used to create youtube video reference entry in database
     #
-    def create_entry_in_db(youtube_video_id, video_data)
+    def create_entry_in_db(yt_response_data, video_data)
       begin
-        sql_query = self.prepare_db_query(youtube_video_id, video_data)
+        sql_query = self.prepare_db_query(yt_response_data, video_data)
         Immutable.dbh.execute(sql_query)
         puts "DB insert query : #{sql_query}"
         puts 'Record has been created in DB'
@@ -247,13 +271,13 @@ class YouTubeHelper
     #
     # Function used to prepare db insert query
     #
-    def prepare_db_query(youtube_video_id, video_data)
+    def prepare_db_query(yt_response_data, video_data)
       begin
         insert_data = Hash.new
         sql_query= ''
         date_time = Time.now.strftime('%Y-%m-%d %H:%M:%S')
-        embed_url = 'https://www.youtube.com/embed/'
-        insert_data['video_id'] = youtube_video_id
+        insert_data['video_id'] = yt_response_data['video_id']
+        insert_data['embed_url']= yt_response_data['embed_url']
         insert_data['series_id'] = video_data[:series_id] ? video_data[:series_id] : 0
         insert_data['message_id'] = video_data[:message_id] ? video_data[:message_id] : 0
         insert_data['media_content_id'] = video_data[:media_content_id] ? video_data[:media_content_id] : 0
@@ -261,7 +285,7 @@ class YouTubeHelper
         sql_query =  " INSERT INTO milacron_youtube_references "
         sql_query += " (id, video_id, embed_url, message_id, media_content_id, "
         sql_query += " content_type_id, create_dt_tm, update_dt_tm) "
-        sql_query += " VALUES ('null', '#{insert_data['video_id']}', '#{embed_url}', "
+        sql_query += " VALUES ('null', '#{insert_data['video_id']}', '#{insert_data['embed_url']}', "
         sql_query += " #{insert_data['message_id']}, #{insert_data['media_content_id']}, "
         sql_query += " #{insert_data['content_type_id']}, '#{date_time}', '#{date_time}') "
         return sql_query
@@ -273,9 +297,11 @@ class YouTubeHelper
     #
     def normalize_response_data(response)
       begin
-        video_id = response.unique_id
+        response_data = Hash.new
+        response_data['video_id'] = response.unique_id
+        response_data['embed_url'] = response.embed_url
         puts 'Video has been successfully uploaded'
-        video_id
+        response_data
       end
     end
 

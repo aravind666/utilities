@@ -29,8 +29,8 @@ class UploadMessageVideos
       get_all_video_data.each do |video_data|
         youtube_response = YouTubeHelper.upload_video_to_youtube(video_data)
         puts "Video file '#{video_data[:file]}' uploaded successfully"
-        video_id = YouTubeHelper.normalize_response_data(youtube_response)
-        YouTubeHelper.create_entry_in_db(video_id, video_data)
+        response_data = YouTubeHelper.normalize_response_data(youtube_response)
+        YouTubeHelper.create_entry_in_db(response_data, video_data)
       end
     end
   end
