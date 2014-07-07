@@ -459,8 +459,15 @@ class ContentHelper
       doc_to_remove = Nokogiri::HTML(data_to_remove)
       doc_to_remove.css('p').each do |p|
         para = p.to_s
-        if para['<p class="noPspace">&nbsp;</p>']
-          p.remove
+        if !para.nil?
+          if para['<p class="noPspace">']
+            if !p.text.empty? && p.content.blank?
+              p.remove
+            end
+          end
+          if para['<p class="noPspace">&nbsp;</p>'] || para['<p class="noPspace" dir="ltr">&#160;</p>']
+            p.remove
+          end
         end
       end
       return doc_to_remove.to_s

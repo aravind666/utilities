@@ -27,6 +27,7 @@ class Copy
   def copy_media
 
     begin
+=begin
       self.setup_folders_required;
       self.copy_content_media_references;
       self.copy_dynamic_content_media_references;
@@ -49,6 +50,7 @@ class Copy
       self.copy_message_media_references;
       self.upload_message_media_reference_to_s3;
       self.setup_folders_required;
+=end
       self.organize_existing_s3_files;
     end
   end
@@ -187,7 +189,9 @@ class Copy
         url = video['iPodVideo'];
         url = url.gsub('https://s3.amazonaws.com/crossroadsvideomessages/','');
         video_filename = url.gsub('http://s3.amazonaws.com/crossroadsvideomessages/','');
-        self.organize_s3_video_posts(URI.unescape(video_filename));
+        if(video_filename.length > 0)
+          self.organize_s3_video_posts(URI.unescape(video_filename));
+        end
       end
     end
     audio_list_in_s3 = Mediahelper.get_audio_content();
@@ -211,7 +215,10 @@ class Copy
         url = media['iPodVideo'];
         url = url.gsub('https://s3.amazonaws.com/crossroadsvideomessages/','');
         video_filename = url.gsub('http://s3.amazonaws.com/crossroadsvideomessages/','');
-        self.organize_s3_video_message(URI.unescape(video_filename));
+        if(video_filename.length > 0)
+          self.organize_s3_video_message(URI.unescape(video_filename));
+        end
+
     end
   end
 

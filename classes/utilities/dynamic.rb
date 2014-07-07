@@ -82,7 +82,7 @@ class Dynamic
   def setup_target_file_location(link)
     directory_path = self.get_complete_directory_path_to_migrate(link)
     file_name_to_migrate = get_complete_file_name_to_migrate(link)
-    directory_to_migrate = self.setup_file_path_to_migrate(directory_path)
+    directory_to_migrate = self.setup_file_path_to_migrate(directory_path.downcase)
     target_file = directory_to_migrate.downcase + '/' + file_name_to_migrate.downcase
     if File.file?(target_file)
       Immutable.log.info "File already exists : #{link}"
