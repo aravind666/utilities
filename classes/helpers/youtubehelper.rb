@@ -52,9 +52,9 @@ class YouTubeHelper
     def get_yt_client_object
      begin
        client = YouTubeIt::Client.new(
-           :username => 'hanumanthraju.t',
-           :password =>  'aimangala321',
-           dev_key: 'AIzaSyDwiTWkZwn7mlsIcGcRDiZONBdoFmE3yxY',
+           :username => Immutable.config.youtube_username,
+           :password =>  Immutable.config.youtube_password,
+           :dev_key  => Immutable.config.youtube_dev_key
        )
        client
      end
@@ -73,16 +73,18 @@ class YouTubeHelper
             :title => video_data[:title],
             :description => video_data[:description],
             :category_id => video_data[:category_id],
+            :channel_id => video_data[:channel_id],
             #:keywords => %w["#{video_data['tags']}"],
             :privacy_status => video_data[:privacy_status],
-            :publish_at => video_data[:publish_at],
+            :published_at => video_data[:publish_at],
             :license => video_data[:license],
             :embeddable => video_data[:embeddable],
             :public_stats_viewable => video_data[:public_stats_viewable],
             :location_description => video_data[:location_description],
+            :location => video_data[:location],
             :latitude => video_data[:latitude],
             :longitude => video_data[:longitude],
-            :recorded_at => video_data[:recording_date]
+            :recorded_at => video_data[:recording_date],
         )
         return response
       end
@@ -93,8 +95,10 @@ class YouTubeHelper
     #
     def add_video_to_playlist(playlist_id, video_id, position=1)
       begin
-        client = self.get_authenticated_service
-        playlist = client.add_video_to_playlist(playlist_id, video_id, position)
+        #client = self.get_authenticated_service
+        client = self.get_yt_client_object
+        #playlist = client.add_video_to_playlist(playlist_id, video_id, position)
+        playlist = client.add_video_to_playlist(playlist_id, video_id)
         return playlist
       end
     end
@@ -201,6 +205,9 @@ class YouTubeHelper
           opt :description, 'Video description',
               :default => video_description,
               :type => String
+          opt :channel_id, 'Video description',
+              :default => Immutable.config.youtube_channel_id,
+              :type => String
           opt :tags, 'Video keywords, comma-separated',
               :default => 'none',
               :type => String
@@ -211,8 +218,8 @@ class YouTubeHelper
               :default => 'public',
               :type => String
           opt :publish_at, 'date time',
-              :default => video_data['ActiveDate'],
-              :type => Date
+              :default => video_data['ActiveDate'].strftime('%Y-%m-%dT%H:%M:%S.%S0Z'),
+              :type => String
           opt :license, 'youtube standard license',
               :default => 'youtube',
               :type => String
@@ -232,8 +239,8 @@ class YouTubeHelper
               :default => 84.4229736328,
               :type => :double
           opt :recording_date, 'video record date',
-              :default => video_data['RecordDate'],
-              :type => Date
+              :default => video_data['RecordDate'].strftime('%Y-%m-%dT%H:%M:%S.%S0Z'),
+              :type => String
           opt :series_id, 'message series_id',
               :default => series_id,
               :type => :int
