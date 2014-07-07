@@ -465,7 +465,7 @@ class ContentHelper
               p.remove
             end
           end
-          if para['<p class="noPspace">&nbsp;</p>']
+          if para['<p class="noPspace">&nbsp;</p>'] || para['<p class="noPspace" dir="ltr">&#160;</p>']
             p.remove
           end
         end
