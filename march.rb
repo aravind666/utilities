@@ -40,6 +40,7 @@ require 'uri'
 # Following libraries are required to communicate with gooogle youtube data api
 require 'youtube_it'
 require 'trollop'
+require 'net/http'
 
 # Delete the log file during a fresh run
 # FileUtils.rm('migration.log');

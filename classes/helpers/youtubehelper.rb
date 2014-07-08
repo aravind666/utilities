@@ -67,9 +67,8 @@ class YouTubeHelper
       begin
         #client = self.get_authenticated_service #Used oauth2
         client = self.get_yt_client_object
-        video_file = video_data[:file].gsub('https','http')
         response = client.video_upload(
-            "#{video_file}",
+            "#{video_data[:file]}",
             :title => video_data[:title],
             :description => video_data[:description],
             :category_id => video_data[:category_id],
@@ -121,7 +120,12 @@ class YouTubeHelper
                     message_media_data.each do |media|
                       video_exist_flag = self.check_video_exist_in_youtube(media)
                       if video_exist_flag == 0
-                        video_data_array << self.create_video_data(media, series[0], message[0])
+                        if self.remote_file_exists?(media['iPodVideo'])
+                          video_data_array << self.create_video_data(media, series[0], message[0])
+                        else
+                          log_message = "Mediacontent Id  #{media['MediaContentID']}, file: #{media['iPodVideo']}"
+                          File.open('not_existing_message_video_files.log', 'a+') { |f| f.write(log_message + "\n") }
+                        end
                       end
                     end
                     Immutable.log.info "There are no video content available for media:#{message[0]}"
@@ -141,13 +145,18 @@ class YouTubeHelper
     def get_only_video_data
       begin
         video_data_array = []
-        ipod_video_data = Mediahelper.get_media_content;
+        ipod_video_data = Mediahelper.get_media_content
         if ipod_video_data.fetchable?
           ipod_video_data.each do |video_data|
             if video_data['iPodVideo'].length > 0
               video_exist_flag = self.check_video_exist_in_youtube(video_data)
               if video_exist_flag == 0
-                video_data_array << create_video_data(video_data, 0, 0)
+                if self.remote_file_exists?(video_data['iPodVideo'])
+                  video_data_array << create_video_data(video_data, 0, 0)
+                else
+                  log_message = "Mediacontent Id  #{video_data['MediaContentID']}, file: #{video_data['iPodVideo']}"
+                  File.open('not_existing_video_files.log', 'a+') { |f| f.write(log_message + "\n") }
+                end
               end
             end
           end
@@ -155,30 +164,6 @@ class YouTubeHelper
           Immutable.log.info 'There are no video content available'
         end
         video_data_array
-      end
-    end
-
-    #
-    # Function used to process message media content
-    #
-    def process_message_data(message_data, series_id)
-      begin
-        video_data_hash = Hash.new
-        if message_data.fetchable?
-          message_data.each do |message|
-            #puts message['MessageID']
-            if message['MessageID'] > 0
-              message_media_data = Mediahelper.get_video_media_content_for_message(message[0])
-              if message_media_data.fetchable?
-                message_media_data.each do |media|
-                  self.create_video_data(media, series_id, message[0])
-                end
-                Immutable.log.info "There are no video content available for media:#{message[0]}"
-              end
-            end
-          end
-        end
-        video_data_hash
       end
     end
 
@@ -265,7 +250,6 @@ class YouTubeHelper
       begin
         sql_query = self.prepare_db_query(yt_response_data, video_data)
         Immutable.dbh.execute(sql_query)
-        puts "DB insert query : #{sql_query}"
         puts 'Record has been created in DB'
       rescue DBI::DatabaseError => e
         Immutable.log.error "Error code: #{e.err}"
@@ -292,7 +276,7 @@ class YouTubeHelper
         sql_query =  " INSERT INTO milacron_youtube_references "
         sql_query += " (id, video_id, embed_url, message_id, media_content_id, "
         sql_query += " content_type_id, create_dt_tm, update_dt_tm) "
-        sql_query += " VALUES ('null', '#{insert_data['video_id']}', '#{insert_data['embed_url']}', "
+        sql_query += " VALUES (null, '#{insert_data['video_id']}', '#{insert_data['embed_url']}', "
         sql_query += " #{insert_data['message_id']}, #{insert_data['media_content_id']}, "
         sql_query += " #{insert_data['content_type_id']}, '#{date_time}', '#{date_time}') "
         return sql_query
@@ -320,7 +304,7 @@ class YouTubeHelper
         flag = 0
         sql_query = "SELECT id FROM milacron_youtube_references WHERE  "
         sql_query += "media_content_id=#{video_data['MediaContentID']} AND "
-        sql_query += "content_type_id=#{video_data['ContentTypeID']}"
+        sql_query += "content_type_id=#{video_data['ContentTypeID']} AND delete_flag='0' "
         row = Immutable.dbh.select_one(sql_query)
         if !row.nil?
           if row[:id]
@@ -337,7 +321,7 @@ class YouTubeHelper
     #
     def get_message_video_ids(content_type_id)
       begin
-        sql_query = "SELECT * FROM milacron_youtube_references WHERE content_type_id=#{content_type_id}"
+        sql_query = "SELECT * FROM milacron_youtube_references WHERE content_type_id=#{content_type_id} AND delete_flag='0'"
         results = Immutable.dbh.execute(sql_query)
         return results
       end
@@ -352,7 +336,7 @@ class YouTubeHelper
         response_hash = Hash.new
         sql_query = "SELECT * FROM milacron_youtube_references "
         sql_query += "WHERE message_id=#{message_id} AND media_content_id=#{media_content_id} "
-        sql_query += "AND content_type_id=#{content_type_id} "
+        sql_query += "AND content_type_id=#{content_type_id} AND delete_flag='0' "
         results = Immutable.dbh.execute(sql_query)
         if results.fetchable?
           results.each { |message_data|
@@ -373,7 +357,7 @@ class YouTubeHelper
         response_hash = Hash.new
         sql_query = "SELECT * FROM milacron_youtube_references "
         sql_query += "WHERE media_content_id=#{media_content_id} "
-        sql_query += "AND content_type_id=#{content_type_id} "
+        sql_query += "AND content_type_id=#{content_type_id} AND delete_flag='0' "
         results = Immutable.dbh.execute(sql_query)
         if results.fetchable?
           results.each { |video_data|
@@ -382,6 +366,35 @@ class YouTubeHelper
           }
         end
         return response_hash
+      end
+    end
+
+    #
+    # Function used to check if file exists on a remote server
+    #
+    def remote_file_exists?(file)
+      begin
+        # Support for both good and bad URI's
+        uri = self.get_url_encoded_file(file)
+        response = nil
+        Net::HTTP.start(uri.host, uri.port) {|http|
+          response = http.head(uri.path)
+        }
+        response.code == "200"
+        return response.code
+      rescue
+        false
+      end
+    end
+
+    #
+    # Function used to url encode file and replace https with http
+    #
+    def get_url_encoded_file(file)
+      begin
+        file.gsub!('https','http')
+        uri = URI.parse(URI.escape(URI.unescape(file)))
+        return uri
       end
     end
   end
