@@ -22,7 +22,7 @@ class AddVideosToPlayList
   #
   def add_video_to_playlist(playlist_id)
     begin
-      video_id_array = self.get_video_ids_to_add_playlist
+      video_id_array = self.get_video_ids_to_add_playlist(4)
       if video_id_array.size > 0
         video_id_array.each { |video_id|
           YouTubeHelper.add_video_to_playlist(playlist_id, video_id, position=1)
@@ -36,10 +36,10 @@ class AddVideosToPlayList
   # Function used to get message video ids
   # param content_type_id=4  for message videos
   #
-  def get_video_ids_to_add_playlist
+  def get_video_ids_to_add_playlist(content_type_id=4)
     begin
       video_id_array = Array.new
-      video_id_result = YouTubeHelper.get_message_video_ids(content_type_id = 1)
+      video_id_result = YouTubeHelper.get_message_video_ids(content_type_id)
       if video_id_result.fetchable?
         video_id_result.each do |video_data|
           if video_data['id'] > 0
