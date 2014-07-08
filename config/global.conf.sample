@@ -72,7 +72,9 @@ s3_secret_access_key = '**********put_your_secret_access_key*********'
 # Used to communicate with youtube data api
 youtube_client_oauth_json = 'youtube client and developer key info file'
 youtube_playlist_id = 'youtube messages playlist id'
+youtube_channel_id = 'channel id'
 youtube_dev_key = 'dev key'
 youtube_username = 'username'
 youtube_password = 'password'
+
 
