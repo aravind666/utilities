@@ -381,7 +381,6 @@ class YouTubeHelper
           response = http.head(uri.path)
         }
         response.code == "200"
-        return response.code
       rescue
         false
       end
