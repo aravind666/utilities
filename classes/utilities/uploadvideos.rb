@@ -30,7 +30,7 @@ class UploadVideos
       get_all_video_data.each do |video_data|
         youtube_response = YouTubeHelper.upload_video_to_youtube(video_data)
         puts "media_content_id: #{video_data[:media_content_id]}"
-        puts "Video file '#{video_data[:file]}' uploaded successfully"
+        puts "Video file '#{video_data[:file]}'"
         response_data = YouTubeHelper.normalize_response_data(youtube_response)
         YouTubeHelper.create_entry_in_db(response_data, video_data)
       end
