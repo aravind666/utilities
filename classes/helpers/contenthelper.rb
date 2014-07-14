@@ -329,7 +329,7 @@ class ContentHelper
     # * checks for parent directory clean up
     # * checks for crossroads.net clean up
     #
-    # contenthelper.clean_hrefs_or_images_url(url)
+    # ContentHelper.clean_hrefs_or_images_url(url)
     #
     def clean_hrefs_or_images_url(href)
       href = href.strip;
@@ -453,26 +453,127 @@ class ContentHelper
     #
     # * removes the content with the specified condition
     #
-    # BlogHelper.remove_unwanted_paragraph(data)
+    # ContentHelper.remove_unwanted_paragraph(data)
     #
     def remove_unwanted_paragraph(data_to_remove)
       doc_to_remove = Nokogiri::HTML(data_to_remove)
       doc_to_remove.css('p').each do |p|
         para = p.to_s
         if !para.nil?
-          if para['<p class="noPspace">']
+          blank_status = self.get_various_blank_space_paragraphs(para)
+          if blank_status
             if !p.text.empty? && p.content.blank?
               p.remove
             end
           end
-          if para['<p class="noPspace">&nbsp;</p>'] || para['<p class="noPspace" dir="ltr">&#160;</p>']
+          specific_blank_status = self.get_specific_blank_space_paragraphs(para)
+          if specific_blank_status
             p.remove
+          end
+          replace_to_h1_status = self.replace_header_with_h1(para)
+          if replace_to_h1_status
+            if !p.text.empty? && !p.content.blank?
+              p.content = "<h1>#{p.content}"
+              p.replace(p.content)
+            end
+          end
+          replace_to_h2_status = self.replace_sub_header_with_h2(para)
+          if replace_to_h2_status
+            if !p.text.empty? && !p.content.blank?
+              p.content = '<h2 class="subheading">'"#{p.content}"
+              p.replace(p.content)
+            end
           end
         end
       end
       return doc_to_remove.to_s
     end
 
+    #
+    # Function to list the existing tags that needs replacement for spaces
+    #
+    # * gets the content searches for the pattern and returns true on its existence
+    #
+    # ContentHelper.get_various_blank_space_paragraphs(data)
+    #
+    def get_various_blank_space_paragraphs(para)
+      if para['<p class="noPspace">'] ||
+        para['<p class="subheading noPspace">'] ||
+        para['<p class="normal noPspace">'] ||
+        para['<p class="subheading noPspace normal">'] ||
+        para['<p class="noPspace normal">'] ||
+        para['<p class="noPspace" dir="ltr">'] ||
+        para['<p class="normal noPspace" dir="ltr">'] ||
+        para['<p class="subheading noPspace" style="margin-bottom: 0px;">'] ||
+        para['<p class="sectionHeader noPspace" dir="ltr">'] ||
+        para['<p class="subheading noPspace" dir="ltr">'] ||
+        para['<p class="sectionHeader noPspace">'] ||
+        para['<p class="noPspace" style="line-height: 1.75;" dir="ltr">'] ||
+        para['<p class="subheading noPspace sectionHeader normal">'] ||
+        para['<p class="noPspace sectionHeader" dir="ltr">'] ||
+        para['<p class="sectionHeader noPspace header" dir="ltr">'] ||
+        para['<p class="header noPspace">']
+
+        return true
+      end
+      return false
+    end
+
+    #
+    # Function to list the existing tags that needs replacement for spaces which are specific
+    #
+    # * gets the content searches for the pattern and returns true on its existence
+    #
+    # ContentHelper.get_specific_blank_space_paragraphs(data)
+    #
+    def get_specific_blank_space_paragraphs(para)
+      if para['<p class="noPspace">&nbsp;</p>'] ||
+        para['<p class="noPspace" dir="ltr">&#160;</p>'] ||
+        para['<p class="noPspace" dir="ltr"></p>'] ||
+        para['<p class="noPspace sectionHeader"><strong>&#160;</strong></p>'] ||
+        para['<p class="noPspace"><br><br></p>'] ||
+        para['<p class="noPspace"><br></p>'] ||
+        para['<p class="noPspace"><strong><br></strong></p>'] ||
+        para['<p class="noPspace"><span class="first"><br></span></p>']
+
+        return true
+      end
+      return false
+    end
+
+    #
+    # Function to list the header class that needs to be replaced with h1 tag
+    #
+    # * gets the content searches for the pattern and returns true on its existence
+    #
+    # ContentHelper.replace_header_with_h1(data)
+    #
+    def replace_header_with_h1(para)
+      if para['<p class="header noPspace">'] ||
+        para['<p class="noPspace header">'] ||
+        para['<p class="noPspace"><span class="header">']
+
+        return true
+      end
+      return false
+    end
+
+    #
+    # Function to list the sub header class that needs to be replaced with h2 tag
+    #
+    # * gets the content searches for the pattern and returns true on its existence
+    #
+    # ContentHelper.replace_sub_header_with_h2(data)
+    #
+    def replace_sub_header_with_h2(para)
+      if para['<p class="subheading noPspace">'] ||
+        para['<p class="subheading noPspace" dir="ltr">'] ||
+        para['<p class="noPspace subheading">']
+
+        return true
+      end
+      return false
+    end
 
   end
 end
