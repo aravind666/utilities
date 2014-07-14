@@ -112,7 +112,7 @@ class YouTubeHelper
     end
 
     #
-    # Function used to all message videos
+    # Function used to get all message videos to upload youtube
     #
     def get_message_video_data
       begin
