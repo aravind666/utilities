@@ -425,7 +425,7 @@ class YouTubeHelper
     def remote_file_exists?(file)
       begin
         # Support for both good and bad URI's
-        uri = self.get_url_encoded_file(file)
+        uri = Mediahelper.get_url_encoded_file(file)
         response = nil
         Net::HTTP.start(uri.host, uri.port) {|http|
           response = http.head(uri.path)
