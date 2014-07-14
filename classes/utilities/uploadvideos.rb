@@ -28,11 +28,14 @@ class UploadVideos
       youtube_response['youtube_video_id'] = 0
       get_all_video_data = YouTubeHelper.get_only_video_data
       get_all_video_data.each do |video_data|
-        youtube_response = YouTubeHelper.upload_video_to_youtube(video_data)
+        youtube_response = YouTubeHelper.upload_video_to_youtube(video_data, UploadVideos)
         puts "media_content_id: #{video_data[:media_content_id]}"
         puts "Video file '#{video_data[:file]}'"
         response_data = YouTubeHelper.normalize_response_data(youtube_response)
-        YouTubeHelper.create_entry_in_db(response_data, video_data)
+        if response_data['upload_status'] == 'uploaded'
+          YouTubeHelper.create_entry_in_db(response_data, video_data)
+        end
+        abort
       end
     end
   end

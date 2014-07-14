@@ -8,6 +8,9 @@ gem 'mechanize'
 gem 'nokogiri', '~> 1.6.2.1'
 gem 'aws-sdk'
 gem 'trollop'
-gem 'youtube_it'
-gem 'openssl-extensions'
+gem 'fiber'
+gem 'launchy'
+gem 'thin'
+gem 'google-api-client'
+
 

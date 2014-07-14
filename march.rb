@@ -9,7 +9,6 @@
 #
 #
 
-
 # required to intract with Amazon S3 object and its buckets
 require 'aws-sdk'
 
@@ -28,7 +27,7 @@ require 'fileutils';
 # required for logging
 require 'logger';
 
-# requireed for opening URL in content_migration
+# required for opening URL in content_migration
 require 'mechanize';
 
 # required for HTML parsing
@@ -38,9 +37,17 @@ require 'nokogiri';
 require 'uri'
 
 # Following libraries are required to communicate with gooogle youtube data api
-require 'youtube_it'
 require 'trollop'
 require 'net/http'
+require 'rubygems'
+require 'google/api_client'
+require 'google/api_client/client_secrets'
+require 'google/api_client/auth/file_storage'
+require 'json'
+require 'launchy'
+require 'thin'
+require 'open-uri'
+require 'fiber'
 
 # Delete the log file during a fresh run
 # FileUtils.rm('migration.log');

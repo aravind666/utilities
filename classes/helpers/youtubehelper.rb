@@ -21,28 +21,25 @@ class YouTubeHelper
     #
     def get_authenticated_service
       begin
-        credentials = Hash.new
         client = ''
+        youtube = ''
         credentials_file = Immutable.config.youtube_client_oauth_json
         if File.exist? credentials_file
-          File.open(credentials_file, 'r') do |file|
-            credentials = JSON.load(file)
-            file.close
-          end
-          client = YouTubeIt::OAuth2Client.new(
-              client_access_token: credentials['access_token'],
-              client_refresh_token: credentials['refresh_token'],
-              client_id: credentials['client_id'],
-              client_secret: credentials['client_secret'],
-              dev_key: credentials['dev_key'],
-              expires_at: credentials['expires_in']
+          client = Google::APIClient.new(
+              :application_name => Immutable.config.application_name,
+              :application_version => Immutable.config.application_version
           )
-          client.refresh_access_token!
+          youtube = client.discovered_api(Immutable.config.youtube_service_name,
+                                          Immutable.config.youtube_api_version
+          )
+          auth_util = CommandLineOAuthHelper.new(Immutable.config.youtube_scope)
+          client.authorization = auth_util.authorize(Immutable.config.user_oauth_json)
+          client.authorization
         else
           puts 'client auth info file required'
           abort
         end
-        client
+        return client, youtube
       end
     end
 
@@ -63,29 +60,36 @@ class YouTubeHelper
     #
     # Function used to upload videos to youtube
     #
-    def upload_video_to_youtube(video_data)
+    def upload_video_to_youtube(video_data, class_name)
       begin
-        #client = self.get_authenticated_service #Used oauth2
-        client = self.get_yt_client_object
-        response = client.video_upload(
-            "#{video_data[:file]}",
-            :title => video_data[:title],
-            :description => video_data[:description],
-            :category_id => video_data[:category_id],
-            :channel_id => video_data[:channel_id],
-            #:keywords => %w["#{video_data['tags']}"],
-            :privacy_status => video_data[:privacy_status],
-            :published_at => video_data[:publish_at],
-            :license => video_data[:license],
-            :embeddable => video_data[:embeddable],
-            :public_stats_viewable => video_data[:public_stats_viewable],
-            :location_description => video_data[:location_description],
-            :location => video_data[:location],
-            :latitude => video_data[:latitude],
-            :longitude => video_data[:longitude],
-            :recorded_at => video_data[:recording_date],
+        request_body = self.create_request_body(video_data)
+        uri = Mediahelper.get_url_encoded_file(video_data[:file])
+        video_file_array = uri.path.split('/')
+        video_destination_path = "#{Immutable.config.s3_video_download_local_path}#{video_file_array.last}"
+        unless File.exists?(video_destination_path.to_s)
+          Mediahelper.http_download_uri(uri, video_destination_path)
+        else
+          puts "Skipping download for #{video_file_array.last} It already exists."
+        end
+        client, youtube = self.get_authenticated_service
+        videos_insert_response = client.execute!(
+            :api_method => youtube.videos.insert,
+            :body_object => request_body,
+            :media => Google::APIClient::UploadIO.new(video_destination_path, 'video/*'),
+            :parameters => {
+                :uploadType => 'multipart',
+                :part => request_body.keys.join(',')
+            }
         )
-        return response
+        # delete the file if upload status is success
+        if videos_insert_response.data.status.uploadStatus == 'uploaded'
+          File.delete(video_destination_path) if File.exist?(video_destination_path)
+        end
+        return videos_insert_response
+      rescue Google::APIClient::TransmissionError => e
+        puts e.result.body
+        puts 'Access token has been expired get the new access token and upload video again'
+        class_name.new
       end
     end
 
@@ -94,11 +98,17 @@ class YouTubeHelper
     #
     def add_video_to_playlist(playlist_id, video_id, position=1)
       begin
-        #client = self.get_authenticated_service
-        client = self.get_yt_client_object
-        #playlist = client.add_video_to_playlist(playlist_id, video_id, position)
-        playlist = client.add_video_to_playlist(playlist_id, video_id)
-        return playlist
+        client, youtube = self.get_authenticated_service
+        request_body = self.get_playlist_request_body(playlist_id, video_id, position)
+
+        playlist_response = client.execute!(
+            :api_method => youtube.playlist_items.insert,
+            :body_object => request_body,
+            :parameters => {
+                :part => request_body.keys.join(',')
+            }
+        )
+      return playlist_response
       end
     end
 
@@ -180,6 +190,8 @@ class YouTubeHelper
             :undef => :replace,
             :replace => ''
         )
+        publish_at = video_data['ActiveDate'].utc.iso8601(1)
+        record_date =video_data['RecordDate'].utc.iso8601(3)
         opts = Trollop::options do
           opt :file, 'Video file to upload',
               :default => video_data['iPodVideo'],
@@ -203,7 +215,7 @@ class YouTubeHelper
               :default => 'public',
               :type => String
           opt :publish_at, 'date time',
-              :default => video_data['ActiveDate'].strftime('%Y-%m-%dT%H:%M:%S.%S0Z'),
+              :default => publish_at,
               :type => String
           opt :license, 'youtube standard license',
               :default => 'youtube',
@@ -224,7 +236,7 @@ class YouTubeHelper
               :default => 84.4229736328,
               :type => :double
           opt :recording_date, 'video record date',
-              :default => video_data['RecordDate'].strftime('%Y-%m-%dT%H:%M:%S.%S0Z'),
+              :default => record_date,
               :type => String
           opt :series_id, 'message series_id',
               :default => series_id,
@@ -241,6 +253,38 @@ class YouTubeHelper
         end
         return opts
       end
+    end
+
+    #
+    # Function used to create youtube request body
+    # "publishedAt"=>"2014-07-11T06:10:07.000Z"
+    #
+    def create_request_body(request_data)
+      body = {
+          :snippet => {
+              :title => request_data[:title],
+              :description => request_data[:description],
+              :tags => request_data[:tags].split(','),
+              :categoryId => request_data[:category_id],
+          },
+          :status=> {
+              :privacyStatus=> request_data[:privacy_status],
+              :channelId => request_data[:channel_id],
+              :license=> request_data[:license],
+              :embeddable=> request_data[:embeddable],
+              :publicStatsViewable=> request_data[:public_stats_viewable],
+              #:publishAt=> request_data[:publish_at],
+          },
+          :recordingDetails=> {
+              :locationDescription=> request_data[:location_description],
+              :location=> {
+                  :latitude=> request_data[:latitude],
+                  :longitude=> request_data[:longitude],
+              },
+              :recordingDate=> request_data[:recording_date]
+          }
+      }
+      body
     end
 
     #
@@ -289,9 +333,15 @@ class YouTubeHelper
     def normalize_response_data(response)
       begin
         response_data = Hash.new
-        response_data['video_id'] = response.unique_id
-        response_data['embed_url'] = response.embed_url
-        puts 'Video has been successfully uploaded'
+        response_data['video_id'] = response.data.id
+        response_data['video_title'] = response.data.snippet.title
+        response_data['upload_status'] = response.data.status.uploadStatus
+        if response_data['upload_status'] != 'uploaded'
+          response_data['failure_reason'] = response.data.status.failureReason
+          response_data['rejection_reason'] = response.data.status.rejectionReason
+        end
+        response_data['embed_url'] = 'http://www.youtube.com/v/'
+        puts "Video has been successfully #{response_data['upload_status']}"
         response_data
       end
     end
@@ -380,21 +430,35 @@ class YouTubeHelper
         Net::HTTP.start(uri.host, uri.port) {|http|
           response = http.head(uri.path)
         }
-        response.code == "200"
+        response.code =='200'
       rescue
         false
       end
     end
 
     #
-    # Function used to url encode file and replace https with http
+    # Function used to get utc format datetime
     #
-    def get_url_encoded_file(file)
-      begin
-        file.gsub!('https','http')
-        uri = URI.parse(URI.escape(URI.unescape(file)))
-        return uri
-      end
+    def get_required_time_format(time)
+      Time.utc(time.year,time.month,time.day,time.hour,time.min,time.sec,"#{time.usec}".to_r)
+    end
+
+    #
+    # Function used to prepare playlist item request body
+    #
+    def get_playlist_request_body(playlist_id, video_id, position)
+      body = {
+        :snippet=> {
+          :channelId => Immutable.config.youtube_channel_id,
+          :playlistId => playlist_id,
+          :resourceId => {
+              :kind => 'youtube#video',
+              :videoId => video_id,
+          },
+        }
+      }
+      body
     end
   end
+
 end

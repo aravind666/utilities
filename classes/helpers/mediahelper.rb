@@ -146,7 +146,7 @@ class Mediahelper
         video_sql += " IN (SELECT messagemediacontent.mediaid FROM messagemediacontent WHERE";
         video_sql += " messageid = #{message_id}) AND ( iPodVideo IS NOT NULL)";
         video_sql += " AND (ContentTypeID = 4 OR ContentTypeID = 1) AND (iPodVideo LIKE '%mp4')";
-        video_sql += "AND iPodVideo!=''";
+        video_sql += "AND iPodVideo!='' ORDER BY RecordDate ASC ";
         message_video_content_data = Immutable.dbh.execute(video_sql);
 
         return message_video_content_data;
@@ -170,7 +170,7 @@ class Mediahelper
       begin
         video_sql = "SELECT * FROM mediacontent";
         video_sql += " WHERE  ContentTypeID = 1";
-        video_sql += " AND ( iPodVideo IS NOT NULL AND iPodVideo != '') AND (iPodVideo LIKE '%mp4')";
+        video_sql += " AND ( iPodVideo IS NOT NULL AND iPodVideo != '') AND (iPodVideo LIKE '%mp4') ORDER BY RecordDate ASC";
         message_video_content_data = Immutable.dbh.execute(video_sql);
 
         return message_video_content_data;
@@ -410,6 +410,43 @@ class Mediahelper
         return false
       end
       front_matter
+    end
+
+    #
+    # Function used to download file from url
+    #
+    def http_download_uri(uri, filename)
+      puts "Starting HTTP download for: #{uri.to_s}"
+      http_object = Net::HTTP.new(uri.host, uri.port)
+      http_object.use_ssl = true if uri.scheme == 'https'
+      begin
+        http_object.start do |http|
+          request = Net::HTTP::Get.new uri.request_uri
+          http.read_timeout = 500
+          http.request request do |response|
+            open filename, 'w' do |io|
+              response.read_body do |chunk|
+                io.write chunk
+              end
+            end
+          end
+        end
+      rescue Exception => e
+        puts "=> Exception: '#{e}'. Skipping download."
+        return
+      end
+      puts "Stored download as #{filename}."
+    end
+
+    #
+    # Function used to url encode file and replace https with http
+    #
+    def get_url_encoded_file(file)
+      begin
+        file.gsub!('https','http')
+        uri = URI.parse(URI.escape(URI.unescape(file)))
+        return uri
+      end
     end
 
   end

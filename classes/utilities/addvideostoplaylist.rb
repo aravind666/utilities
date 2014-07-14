@@ -25,8 +25,12 @@ class AddVideosToPlayList
       video_id_array = self.get_video_ids_to_add_playlist(4)
       if video_id_array.size > 0
         video_id_array.each { |video_id|
-          YouTubeHelper.add_video_to_playlist(playlist_id, video_id, position=1)
-          puts "Video:'#{video_id}' add to playlist successfully"
+          playlist_response = YouTubeHelper.add_video_to_playlist(playlist_id, video_id, position=1)
+          if playlist_response.success?
+            puts "Video:'#{video_id}' add to playlist successfully"
+         else
+           puts "Error in addind video to playlist successfully#{playlist_response.body}"
+         end
         }
       end
     end
