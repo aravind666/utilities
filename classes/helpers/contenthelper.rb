@@ -551,7 +551,8 @@ class ContentHelper
     def replace_header_with_h1(para)
       if para['<p class="header noPspace">'] ||
         para['<p class="noPspace header">'] ||
-        para['<p class="noPspace"><span class="header">']
+        para['<p class="noPspace"><span class="header">'] ||
+        para['<p class="header noPspace" dir="ltr">']
 
         return true
       end
