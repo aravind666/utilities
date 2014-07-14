@@ -47,14 +47,14 @@ class YouTubeHelper
     # Function used to get client object
     #
     def get_yt_client_object
-     begin
-       client = YouTubeIt::Client.new(
-           :username => Immutable.config.youtube_username,
-           :password =>  Immutable.config.youtube_password,
-           :dev_key  => Immutable.config.youtube_dev_key
-       )
-       client
-     end
+      begin
+        client = YouTubeIt::Client.new(
+            :username => Immutable.config.youtube_username,
+            :password =>  Immutable.config.youtube_password,
+            :dev_key  => Immutable.config.youtube_dev_key
+        )
+        client
+      end
     end
 
     #
@@ -69,7 +69,7 @@ class YouTubeHelper
         unless File.exists?(video_destination_path.to_s)
           Mediahelper.http_download_uri(uri, video_destination_path)
         else
-          puts "Skipping download for #{video_file_array.last} It already exists."
+          puts "Skipping download for '#{video_file_array.last}' It already exists."
         end
         client, youtube = self.get_authenticated_service
         videos_insert_response = client.execute!(
@@ -100,7 +100,6 @@ class YouTubeHelper
       begin
         client, youtube = self.get_authenticated_service
         request_body = self.get_playlist_request_body(playlist_id, video_id, position)
-
         playlist_response = client.execute!(
             :api_method => youtube.playlist_items.insert,
             :body_object => request_body,
@@ -108,7 +107,7 @@ class YouTubeHelper
                 :part => request_body.keys.join(',')
             }
         )
-      return playlist_response
+        return playlist_response
       end
     end
 
@@ -122,30 +121,53 @@ class YouTubeHelper
         if series_data.fetchable?
           series_data.each do |series|
             series_massage_data = Mediahelper.get_all_messages_for_series(series[0])
-            if series_massage_data.fetchable?
-              series_massage_data.each do |message|
-                if message['MessageID'] > 0
-                  message_media_data = Mediahelper.get_video_media_content_for_message(message[0])
-                  if message_media_data.fetchable?
-                    message_media_data.each do |media|
-                      video_exist_flag = self.check_video_exist_in_youtube(media)
-                      if video_exist_flag == 0
-                        if self.remote_file_exists?(media['iPodVideo'])
-                          video_data_array << self.create_video_data(media, series[0], message[0])
-                        else
-                          log_message = "Mediacontent Id  #{media['MediaContentID']}, file: #{media['iPodVideo']}"
-                          File.open('not_existing_message_video_files.log', 'a+') { |f| f.write(log_message + "\n") }
-                        end
-                      end
-                    end
-                    Immutable.log.info "There are no video content available for media:#{message[0]}"
-                  end
-                end
-              end
-            end
+            video_data_array << self.get_message_video_list(series[0], series_massage_data)
           end
         end
         video_data_array
+      end
+    end
+
+    #
+    # Function used to get message video list to upload
+    #
+    def get_message_video_list(series_id, series_massage_data)
+      begin
+        message_video_data_array = []
+        if series_massage_data.fetchable?
+          series_massage_data.each do |message|
+            if message['MessageID'] > 0
+              message_media_data = Mediahelper.get_video_media_content_for_message(message[0])
+              message_video_data_array << self.get_message_video_content(series_id, message[0], message_media_data)
+            end
+          end
+        end
+        message_video_data_array
+      end
+    end
+
+    #
+    # Function used to get message video to upload
+    # it filters the video which are already present youtube
+    #
+    def get_message_video_content(series_id, message_id, message_media_data)
+      begin
+        message_video_data_array = []
+        if message_media_data.fetchable?
+          message_media_data.each do |media|
+            video_exist_flag = self.check_video_exist_in_youtube(media)
+            if video_exist_flag == 0
+              if self.remote_file_exists?(media['iPodVideo'])
+                message_video_data_array << self.create_video_data(media, series_id, message_id)
+              else
+                log_message = "Mediacontent Id  #{media['MediaContentID']}, file: #{media['iPodVideo']}"
+                File.open('not_existing_message_video_files.log', 'a+') { |f| f.write(log_message + "\n") }
+              end
+            end
+          end
+          Immutable.log.info "There are no video content available for media:#{message_id}"
+        end
+        message_video_data_array
       end
     end
 
@@ -157,23 +179,35 @@ class YouTubeHelper
         video_data_array = []
         ipod_video_data = Mediahelper.get_media_content
         if ipod_video_data.fetchable?
-          ipod_video_data.each do |video_data|
-            if video_data['iPodVideo'].length > 0
-              video_exist_flag = self.check_video_exist_in_youtube(video_data)
-              if video_exist_flag == 0
-                if self.remote_file_exists?(video_data['iPodVideo'])
-                  video_data_array << create_video_data(video_data, 0, 0)
-                else
-                  log_message = "Mediacontent Id  #{video_data['MediaContentID']}, file: #{video_data['iPodVideo']}"
-                  File.open('not_existing_video_files.log', 'a+') { |f| f.write(log_message + "\n") }
-                end
-              end
-            end
-          end
+          video_data_array = self.get_video_list(ipod_video_data)
         else
           Immutable.log.info 'There are no video content available'
         end
         video_data_array
+      end
+    end
+
+    #
+    # Function used to get video list to upload
+    # it filters the video which are already present youtube
+    #
+    def get_video_list(video_data_structure)
+      begin
+        video_data_list = []
+        video_data_structure.each do |video_data|
+          if video_data['iPodVideo'].length > 0
+            video_exist_flag = self.check_video_exist_in_youtube(video_data)
+            if video_exist_flag == 0
+              if self.remote_file_exists?(video_data['iPodVideo'])
+                video_data_list << create_video_data(video_data, 0, 0)
+              else
+                log_message = "Mediacontent Id  #{video_data['MediaContentID']}, file: #{video_data['iPodVideo']}"
+                File.open('not_existing_video_files.log', 'a+') { |f| f.write(log_message + "\n") }
+              end
+            end
+          end
+        end
+        video_data_list
       end
     end
 
@@ -202,11 +236,11 @@ class YouTubeHelper
           opt :description, 'Video description',
               :default => video_description,
               :type => String
-          opt :channel_id, 'Video description',
+          opt :channel_id, 'youtube channel id',
               :default => Immutable.config.youtube_channel_id,
               :type => String
           opt :tags, 'Video keywords, comma-separated',
-              :default => 'none',
+              :default => '',
               :type => String
           opt :category_id, 'category',
               :default => 22,
@@ -229,10 +263,10 @@ class YouTubeHelper
           opt :location_description, 'Crossroads Church',
               :default => 'Crossroads Church',
               :type => String
-          opt :latitude, 'Crossroads Church',
+          opt :latitude, 'latitude value',
               :default => 39.1591796875,
               :type => :double
-          opt :longitude, 'Crossroads Church',
+          opt :longitude, 'longitude value',
               :default => 84.4229736328,
               :type => :double
           opt :recording_date, 'video record date',
@@ -247,7 +281,7 @@ class YouTubeHelper
           opt :media_content_id, 'video media_content_id',
               :default => video_data['MediaContentID'],
               :type => :int
-          opt :media_content_type_id, 'video media_content_id',
+          opt :media_content_type_id, 'video media_content_type_id',
               :default => video_data['ContentTypeID'],
               :type => :int
         end
@@ -258,33 +292,36 @@ class YouTubeHelper
     #
     # Function used to create youtube request body
     # "publishedAt"=>"2014-07-11T06:10:07.000Z"
+    # :publishAt=> request_data[:publish_at],
     #
     def create_request_body(request_data)
-      body = {
-          :snippet => {
-              :title => request_data[:title],
-              :description => request_data[:description],
-              :tags => request_data[:tags].split(','),
-              :categoryId => request_data[:category_id],
-          },
-          :status=> {
-              :privacyStatus=> request_data[:privacy_status],
-              :channelId => request_data[:channel_id],
-              :license=> request_data[:license],
-              :embeddable=> request_data[:embeddable],
-              :publicStatsViewable=> request_data[:public_stats_viewable],
-              #:publishAt=> request_data[:publish_at],
-          },
-          :recordingDetails=> {
-              :locationDescription=> request_data[:location_description],
-              :location=> {
-                  :latitude=> request_data[:latitude],
-                  :longitude=> request_data[:longitude],
-              },
-              :recordingDate=> request_data[:recording_date]
-          }
-      }
-      body
+      begin
+        body = {
+            :snippet => {
+                :title => request_data[:title],
+                :description => request_data[:description],
+                :tags => request_data[:tags].split(','),
+                :categoryId => request_data[:category_id],
+            },
+            :status=> {
+                :privacyStatus=> request_data[:privacy_status],
+                :channelId => request_data[:channel_id],
+                :license=> request_data[:license],
+                :embeddable=> request_data[:embeddable],
+                :publicStatsViewable=> request_data[:public_stats_viewable],
+
+            },
+            :recordingDetails=> {
+                :locationDescription=> request_data[:location_description],
+                :location=> {
+                    :latitude=> request_data[:latitude],
+                    :longitude=> request_data[:longitude],
+                },
+                :recordingDate=> request_data[:recording_date]
+            }
+        }
+        body
+      end
     end
 
     #
@@ -440,24 +477,28 @@ class YouTubeHelper
     # Function used to get utc format datetime
     #
     def get_required_time_format(time)
-      Time.utc(time.year,time.month,time.day,time.hour,time.min,time.sec,"#{time.usec}".to_r)
+      begin
+        Time.utc(time.year,time.month,time.day,time.hour,time.min,time.sec,"#{time.usec}".to_r)
+      end
     end
 
     #
     # Function used to prepare playlist item request body
     #
     def get_playlist_request_body(playlist_id, video_id, position)
-      body = {
-        :snippet=> {
-          :channelId => Immutable.config.youtube_channel_id,
-          :playlistId => playlist_id,
-          :resourceId => {
-              :kind => 'youtube#video',
-              :videoId => video_id,
-          },
+      begin
+        body = {
+            :snippet=> {
+                :channelId => Immutable.config.youtube_channel_id,
+                :playlistId => playlist_id,
+                :resourceId => {
+                    :kind => 'youtube#video',
+                    :videoId => video_id,
+                },
+            }
         }
-      }
-      body
+        body
+      end
     end
   end
 
