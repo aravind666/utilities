@@ -23,7 +23,7 @@ class YouTubeHelper
       begin
         client = ''
         youtube = ''
-        credentials_file = Immutable.config.youtube_client_oauth_json
+        credentials_file = Immutable.config.youtube_client_secrete_json
         if File.exist? credentials_file
           client = Google::APIClient.new(
               :application_name => Immutable.config.application_name,
