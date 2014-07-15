@@ -64,12 +64,9 @@ class MyUploads
       video_status_data.data.items.each do |video_response|
         log_message += "video upload_status : #{video_response['status']['uploadStatus']} \n"
         case video_response['status']['uploadStatus']
-        when 'rejected'
-          rejection_reason = video_response['status']['rejectionReason']
-          log_message += "video rejection_reason : #{rejection_reason}\n"
-        when 'processed'
-          rejection_reason = 'Video matched third party content or blocked in some countries / worldwide.'
-          log_message += "copyright issue : #{rejection_reason}\n"
+          when 'rejected'
+            rejection_reason = video_response['status']['rejectionReason']
+            log_message += "video rejection_reason : #{rejection_reason}\n"
         end
         log_message += "================================================\n"
         File.open('rejected_video.log', 'a+') { |f| f.write(log_message + "\n") }
