@@ -35,7 +35,6 @@ class UploadVideos
         if response_data['upload_status'] == 'uploaded'
           YouTubeHelper.create_entry_in_db(response_data, video_data)
         end
-        abort
       end
     end
   end
