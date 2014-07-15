@@ -133,12 +133,12 @@ class YouTubeHelper
     #
     def get_message_video_list(series_id, series_massage_data)
       begin
-        message_video_data_array = []
+        message_video_data_array = {}
         if series_massage_data.fetchable?
           series_massage_data.each do |message|
             if message['MessageID'] > 0
               message_media_data = Mediahelper.get_video_media_content_for_message(message[0])
-              message_video_data_array << self.get_message_video_content(series_id, message[0], message_media_data)
+              message_video_data_array = self.get_message_video_content(series_id, message[0], message_media_data)
             end
           end
         end
@@ -152,19 +152,20 @@ class YouTubeHelper
     #
     def get_message_video_content(series_id, message_id, message_media_data)
       begin
-        message_video_data_array = []
+        message_video_data_array = {}
         if message_media_data.fetchable?
           message_media_data.each do |media|
             video_exist_flag = self.check_video_exist_in_youtube(media)
             if video_exist_flag == 0
               if self.remote_file_exists?(media['iPodVideo'])
-                message_video_data_array << self.create_video_data(media, series_id, message_id)
+                message_video_data_array = self.create_video_data(media, series_id, message_id)
               else
                 log_message = "Mediacontent Id  #{media['MediaContentID']}, file: #{media['iPodVideo']}"
                 File.open('not_existing_message_video_files.log', 'a+') { |f| f.write(log_message + "\n") }
               end
             end
           end
+        else
           Immutable.log.info "There are no video content available for media:#{message_id}"
         end
         message_video_data_array
@@ -465,7 +466,7 @@ class YouTubeHelper
         sql_query = "SELECT * FROM milacron_youtube_references "
         sql_query += "WHERE delete_flag='0' "
         results = Immutable.dbh.execute(sql_query)
-       return results
+        return results
       end
     end
 
