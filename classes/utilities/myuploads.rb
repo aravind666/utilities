@@ -28,7 +28,7 @@ class MyUploads
         uploaded_video_list.each { |video_data|
           self.get_video_status(video_data)
         }
-        puts 'Logged the rejected video to file'
+        puts "Logged the rejected video to 'rejected_video.log' file"
       end
     end
   end
@@ -58,18 +58,17 @@ class MyUploads
   def log_rejected_video(video_status_data, video_data)
     begin
       log_message = ''
-      rejection_reason = ''
-      log_message = "media_content_id : #{video_data['media_content_id']} \n"
-      log_message += "video_id : #{video_data['video_id']} \n"
       video_status_data.data.items.each do |video_response|
-        log_message += "video upload_status : #{video_response['status']['uploadStatus']} \n"
-        case video_response['status']['uploadStatus']
-          when 'rejected'
-            rejection_reason = video_response['status']['rejectionReason']
-            log_message += "video rejection_reason : #{rejection_reason}\n"
+        if video_response['status']['uploadStatus'] == 'rejected'
+          upload_status = video_response['status']['uploadStatus']
+          rejection_reason = video_response['status']['rejectionReason']
+          log_message = "media_content_id : #{video_data['media_content_id']} \n"
+          log_message += "video_id : #{video_data['video_id']} \n"
+          log_message += "video upload_status : #{upload_status} \n"
+          log_message += "video rejection_reason : #{rejection_reason}\n"
+          log_message += "================================================\n"
+          File.open('rejected_video.log', 'a+') { |f| f.write(log_message + "\n") }
         end
-        log_message += "================================================\n"
-        File.open('rejected_video.log', 'a+') { |f| f.write(log_message + "\n") }
       end
     end
   end
