@@ -457,6 +457,19 @@ class YouTubeHelper
     end
 
     #
+    # Function used to get uploaded video list from milacron_youtube_references table
+    #
+    #
+    def get_uploaded_video_list
+      begin
+        sql_query = "SELECT * FROM milacron_youtube_references "
+        sql_query += "WHERE delete_flag='0' "
+        results = Immutable.dbh.execute(sql_query)
+       return results
+      end
+    end
+
+    #
     # Function used to check if file exists on a remote server
     #
     def remote_file_exists?(file)
