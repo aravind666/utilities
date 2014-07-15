@@ -429,7 +429,7 @@ class YouTubeHelper
         if results.fetchable?
           results.each { |message_data|
             response_hash['video_id'] = message_data['video_id']
-            response_hash['embed_url'] = message_data['embed_url']
+            response_hash['embed_url'] = "#{message_data['embed_url']}#{response_hash['video_id']}"
           }
         end
         return response_hash
@@ -450,7 +450,7 @@ class YouTubeHelper
         if results.fetchable?
           results.each { |video_data|
             response_hash['video_id'] = video_data['video_id']
-            response_hash['embed_url'] = video_data['embed_url']
+            response_hash['embed_url'] = "#{video_data['embed_url']}#{response_hash['video_id']}"
           }
         end
         return response_hash

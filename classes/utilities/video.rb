@@ -133,6 +133,12 @@ class Video
     if tag_data
       front_matter += tag_data
     end
+    # get youtube embed url
+    yt_embed_data = YouTubeHelper.get_video_content_yt_data(media['MediaContentID'], media['ContentTypeID'])
+    embed_url = yt_embed_data['embed_url'].to_s
+    if embed_url.length > 0
+      front_matter += "\nyt-embed-url: \"#{embed_url}\"";
+    end
     front_matter += "\nvideo: \"#{video_file_path}\"";
     front_matter += "\nvideo-poster: \"#{video_poster}\"";
     front_matter += "\n---";

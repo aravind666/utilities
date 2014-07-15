@@ -134,11 +134,17 @@ class Message
                 audio_duration = Mediahelper.get_audio_duration(message_id);
                 media['duration'] = audio_duration['duration'];
               end
+              # get youtube embed url
+              yt_embed_data = YouTubeHelper.get_message_video_yt_data(message_id, media['MediaContentID'], media['ContentTypeID'])
               front_matter += "\ndescription: \"#{video_description}\"";
               uri = URI.parse(ContentHelper.encode_url_string(media['iPodVideo']))
               video_filename =  File.basename(uri.path)
               video_file_path = "#{Immutable.config.s3url}/messages/video/#{ContentHelper.encode_url_string(video_filename)}";
               front_matter += "\nvideo: \"#{video_file_path}\"\nvideo-duration: \"#{media['duration']}\"";
+              embed_url = yt_embed_data['embed_url'].to_s
+              if embed_url.length > 0
+                front_matter += "\nyt-embed-url: \"#{embed_url}\"";
+              end
               front_matter += "\nvideo-image: \"#{Immutable.config.s3url}/images/#{video_poster}\"";
             end
           when 7
