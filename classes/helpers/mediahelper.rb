@@ -449,5 +449,27 @@ class Mediahelper
       end
     end
 
+    #
+    # Function to get the media content information from DB
+    #
+    # * Gets the id
+    # * send the info from DB related to the given id
+    #
+    # Mediahelper.get_content_type_by_content_id(20566)
+    #
+    def get_content_type_by_content_id(content_id)
+      begin
+        media_content_sql = "SELECT * FROM mediacontent";
+        media_content_sql += " where MediaContentID = '#{content_id}'"
+        media_content_data = Immutable.dbh.select_one(media_content_sql)
+        return media_content_data
+        rescue DBI::DatabaseError => e
+        Immutable.log.error "Error code: #{e.err}"
+        Immutable.log.error "Error message: #{e.errstr}"
+        Immutable.log.error "Error SQLSTATE: #{e.state}"
+        abort('An error occurred while getting milacron migrate new pages by legacy path, Check migration log for more details')
+      end
+    end
+
   end
 end
