@@ -126,6 +126,7 @@ class BlogHelper
       clean_hrefs = ContentHelper.clean_hrefs_or_images_url(href);
       media_content_id = clean_hrefs.split('=').last
       if !media_content_id.nil?
+        new_href = self.get_audio_or_video_info_by_content_id(media_content_id)
         message_id_array = self.get_message_media_content_by_id(media_content_id);
         if !message_id_array.nil?
           message_id = message_id_array['MessageId'];
@@ -191,10 +192,10 @@ class BlogHelper
     #
     # BlogHelper.get_message_media_content_by_id(522)
     #
-    def get_message_media_content_by_id(message_id)
+    def get_message_media_content_by_id(media_content_id)
       begin
         media_content_sql = "SELECT MessageId FROM messagemediacontent";
-        media_content_sql += " WHERE MessageMediaContentID = #{message_id}";
+        media_content_sql += " WHERE MediaID = #{media_content_id}";
         media_content_data = Immutable.dbh.select_one(media_content_sql);
         return media_content_data;
         rescue DBI::DatabaseError => e
@@ -587,6 +588,49 @@ class BlogHelper
         Immutable.log.error "Error SQLSTATE: #{e.state}"
         abort('An error occurred while getting milacron migrate new pages by legacy path, Check migration log for more details')
       end
+    end
+
+    #
+    # Function to get the audio and video path's with respect to music and other_media references
+    #
+    # * Gets the content_id
+    # * checks for the content type and replaces accordingly
+    #
+    # BlogHelper.get_audio_or_video_info_by_content_id(2056)
+    #
+    def get_audio_or_video_info_by_content_id(content_id)
+      new_href = false
+      content_type_info = Mediahelper.get_content_type_by_content_id(content_id)
+      if !content_type_info.nil?
+        content_type_id = content_type_info['ContentTypeID']
+        audio_path = content_type_info['HighQFilePath'].to_s
+        video_path = content_type_info['iPodVideo'].to_s
+        # video type
+        if content_type_id == 1 && video_path.gsub('.mp4') && video_path != ''
+          url = self.get_migrated_url(content_type_info)
+          new_href = "/other-media/#{url}"
+        # audio type
+        elsif content_type_id == 2 && audio_path.gsub('.mp3') && audio_path != ''
+          url = self.get_migrated_url(content_type_info)
+          new_href = "/music/#{url}"
+        end
+      end
+      return new_href
+    end
+
+    #
+    # Function to get clean url as it was migrated
+    #
+    # * Gets the array
+    # * replaces the URL as required
+    #
+    # BlogHelper.get_migrated_url(array)
+    #
+    def get_migrated_url(content_type_info)
+      title = ContentHelper.purify_title_by_removing_special_characters(content_type_info['Title'].downcase.strip)
+      url = "#{content_type_info['UploadDate'].strftime('%Y-%m-%d-%H-%M-%S')}-#{title}.html"
+
+      return url
     end
 
   end
