@@ -89,7 +89,7 @@ class YouTubeHelper
       rescue Google::APIClient::TransmissionError => e
         puts e.result.body
         puts 'Access token has been expired get the new access token and upload video again'
-        class_name.new
+        #class_name.new
       end
     end
 
