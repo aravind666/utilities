@@ -80,6 +80,7 @@ user_oauth_json = 'youtube user oauth2'
 youtube_playlist_id = 'youtube playlist id'
 youtube_channel_id = 'channel id'
 youtube_dev_key = 'dev key'
+youtube_embed_url = 'http://www.youtube.com/v/'
 s3_video_download_local_path = 'local video path'
 
 

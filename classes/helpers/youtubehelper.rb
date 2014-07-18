@@ -72,6 +72,7 @@ class YouTubeHelper
           puts "Skipping download for '#{video_file_array.last}' It already exists."
         end
         client, youtube = self.get_authenticated_service
+        puts 'uploading video....'
         videos_insert_response = client.execute!(
             :api_method => youtube.videos.insert,
             :body_object => request_body,
@@ -247,7 +248,7 @@ class YouTubeHelper
               :default => 22,
               :type => :int
           opt :privacy_status, 'Video privacy status: public, private, or unlisted',
-              :default => 'public',
+              :default => 'unlisted',
               :type => String
           opt :publish_at, 'date time',
               :default => publish_at,
@@ -299,6 +300,7 @@ class YouTubeHelper
       begin
         body = {
             :snippet => {
+                :channelId => request_data[:channel_id],
                 :title => request_data[:title],
                 :description => request_data[:description],
                 :tags => request_data[:tags].split(','),
@@ -306,7 +308,6 @@ class YouTubeHelper
             },
             :status=> {
                 :privacyStatus=> request_data[:privacy_status],
-                :channelId => request_data[:channel_id],
                 :license=> request_data[:license],
                 :embeddable=> request_data[:embeddable],
                 :publicStatsViewable=> request_data[:public_stats_viewable],
@@ -350,7 +351,7 @@ class YouTubeHelper
         sql_query= ''
         date_time = Time.now.strftime('%Y-%m-%d %H:%M:%S')
         insert_data['video_id'] = yt_response_data['video_id']
-        insert_data['embed_url']= yt_response_data['embed_url']
+        insert_data['embed_url']= "#{yt_response_data['embed_url']}#{yt_response_data['video_id']}"
         insert_data['series_id'] = video_data[:series_id] ? video_data[:series_id] : 0
         insert_data['message_id'] = video_data[:message_id] ? video_data[:message_id] : 0
         insert_data['media_content_id'] = video_data[:media_content_id] ? video_data[:media_content_id] : 0
@@ -378,7 +379,7 @@ class YouTubeHelper
           response_data['failure_reason'] = response.data.status.failureReason
           response_data['rejection_reason'] = response.data.status.rejectionReason
         end
-        response_data['embed_url'] = 'http://www.youtube.com/v/'
+        response_data['embed_url'] = Immutable.config.youtube_embed_url
         puts "Video has been successfully #{response_data['upload_status']}"
         response_data
       end
@@ -429,7 +430,7 @@ class YouTubeHelper
         if results.fetchable?
           results.each { |message_data|
             response_hash['video_id'] = message_data['video_id']
-            response_hash['embed_url'] = "#{message_data['embed_url']}#{response_hash['video_id']}"
+            response_hash['embed_url'] = message_data['embed_url']
           }
         end
         return response_hash
@@ -450,7 +451,7 @@ class YouTubeHelper
         if results.fetchable?
           results.each { |video_data|
             response_hash['video_id'] = video_data['video_id']
-            response_hash['embed_url'] = "#{video_data['embed_url']}#{response_hash['video_id']}"
+            response_hash['embed_url'] = video_data['embed_url']
           }
         end
         return response_hash
