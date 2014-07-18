@@ -65,7 +65,7 @@ class PlayList
           :snippet => {
               :title => opts[:title],
               :description => opts[:description],
-              :publishedA => opts[:publish_at],
+              :publishedAt => opts[:publish_at],
               :channelId => opts[:channel_id]
           },
           :status => {
