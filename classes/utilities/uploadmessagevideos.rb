@@ -34,7 +34,7 @@ class UploadMessageVideos
           puts "Video file '#{data[0][:file]}'"
           response_data = YouTubeHelper.normalize_response_data(youtube_response)
           if response_data['upload_status'] == 'uploaded'
-            YouTubeHelper.create_entry_in_db(response_data, data)
+            YouTubeHelper.create_entry_in_db(response_data, data[0])
           end
         end
       end
