@@ -26,17 +26,17 @@ class UploadMessageVideos
       File.delete('not_existing_message_video_files.log') if File.exist?('not_existing_message_video_files.log')
       youtube_response = Hash.new
       youtube_response['youtube_video_id'] = 0
-      get_all_video_data = YouTubeHelper.get_message_video_data
-      get_all_video_data.each do |video_data|
-       if video_data.any?
-        youtube_response = YouTubeHelper.upload_video_to_youtube(video_data, UploadMessageVideos)
-        puts "media_content_id: #{video_data[:media_content_id]}"
-        puts "Video file '#{video_data[:file]}'"
-        response_data = YouTubeHelper.normalize_response_data(youtube_response)
-        if response_data['upload_status'] == 'uploaded'
-          YouTubeHelper.create_entry_in_db(response_data, video_data)
+      video_data_array = YouTubeHelper.get_message_video_data
+      video_data_array.each do |video_data|
+        video_data.each do |data|
+          youtube_response = YouTubeHelper.upload_video_to_youtube(data[0], UploadMessageVideos)
+          puts "media_content_id: #{data[0][:media_content_id]}"
+          puts "Video file '#{data[0][:file]}'"
+          response_data = YouTubeHelper.normalize_response_data(youtube_response)
+          if response_data['upload_status'] == 'uploaded'
+            YouTubeHelper.create_entry_in_db(response_data, data)
+          end
         end
-       end
       end
     end
   end
